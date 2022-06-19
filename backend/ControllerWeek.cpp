@@ -22,11 +22,12 @@ HoursAndMinutes calculateExpectedWorkedTime(QTime defaultWorkTimePerDay)
     return HoursAndMinutes{hours, minutes};
 }
 
-HoursAndMinutes
-calculateWorkedTime(const QVector<ControllerDay *> controllerDays)
+HoursAndMinutes calculateWorkedTime(const QVector<QObject *> controllerDays)
 {
     int workedMinutes{0};
-    for (const auto &controllerDay : controllerDays) {
+    for (const auto &controllerDayQObject : controllerDays) {
+        auto controllerDay =
+            qobject_cast<ControllerDay *>(controllerDayQObject);
         workedMinutes += controllerDay->workedMinutes();
     }
 
@@ -36,7 +37,7 @@ calculateWorkedTime(const QVector<ControllerDay *> controllerDays)
 }
 
 HoursAndMinutes
-calculateEarliestEndTime(const QVector<ControllerDay *> &controllerDays,
+calculateEarliestEndTime(const QVector<QObject *> &controllerDays,
                          HoursAndMinutes expectedWorkTime,
                          HoursAndMinutes workTime)
 {
@@ -44,10 +45,12 @@ calculateEarliestEndTime(const QVector<ControllerDay *> &controllerDays,
     for (auto rit = controllerDays.rbegin(); rit != controllerDays.rend();
          ++rit) {
 
-        if ((*rit)->isHoliday() || (*rit)->isVaccation()) {
+        auto controllerDay = qobject_cast<ControllerDay *>(*rit);
+
+        if (controllerDay->isHoliday() || controllerDay->isVaccation()) {
             continue;
         }
-        if ((*rit)->hasValidStartTime()) {
+        if (controllerDay->hasValidStartTime()) {
             lastDayIt = rit;
             break;
         }
@@ -58,22 +61,30 @@ calculateEarliestEndTime(const QVector<ControllerDay *> &controllerDays,
     }
 
     for (auto rit = lastDayIt + 1; rit != controllerDays.rend(); ++rit) {
-        if (!(*rit)->hasValidStartTime()) {
+
+        auto controllerDay = qobject_cast<ControllerDay *>(*rit);
+
+        if (!controllerDay->hasValidStartTime()) {
             return HoursAndMinutes{};
         }
-        if (!(*rit)->hasValidEndTime()) {
+        if (!controllerDay->hasValidEndTime()) {
             return HoursAndMinutes{};
         }
     }
 
     auto remainingWorkTime = expectedWorkTime - workTime;
-    auto startTime = qTimeToHoursAndMinutes((*lastDayIt)->startTimeAsTime());
-    auto pauseTime = qTimeToHoursAndMinutes((*lastDayIt)->pauseTimeAsTime());
+
+    auto lastDayController = qobject_cast<ControllerDay *>(*lastDayIt);
+
+    auto startTime =
+        qTimeToHoursAndMinutes(lastDayController->startTimeAsTime());
+    auto pauseTime =
+        qTimeToHoursAndMinutes(lastDayController->pauseTimeAsTime());
     auto endTime = startTime + remainingWorkTime + pauseTime;
     return endTime;
 }
 
-QVector<ControllerDay *>
+QVector<QObject *>
 makeControllerDays(QDate dateOfMonday, QTime defaultWorkTimePerDay,
                    QTime pauseTimeMonday, QTime pauseTimeTuesday,
                    QTime pauseTimeWednesday, QTime pauseTimeThursday,
@@ -108,29 +119,9 @@ ControllerWeek::ControllerWeek(QDate dateOfMonday, QTime defaultWorkTimePerDay,
     makeControllerDayToControllerWeekConnections();
 }
 
-QObject *ControllerWeek::controllerMonday() const
+QList<QObject *> ControllerWeek::controllerDays() const
 {
-    return m_controllerDays[0];
-}
-
-QObject *ControllerWeek::controllerTuesday() const
-{
-    return m_controllerDays[1];
-}
-
-QObject *ControllerWeek::controllerWednesday() const
-{
-    return m_controllerDays[2];
-}
-
-QObject *ControllerWeek::controllerThursday() const
-{
-    return m_controllerDays[3];
-}
-
-QObject *ControllerWeek::controllerFriday() const
-{
-    return m_controllerDays[4];
+    return m_controllerDays;
 }
 
 QString ControllerWeek::expectedWorkedTime() const
@@ -199,10 +190,12 @@ void ControllerWeek::setEarliestEndTime(const HoursAndMinutes &earliestEndTime)
 
 void ControllerWeek::makeControllerDayToControllerWeekConnections() const
 {
-    for (const auto &controller : m_controllerDays) {
-        connect(controller, &ControllerDay::workTimeChanged, this,
+    for (const auto &controllerDayQObject : m_controllerDays) {
+        auto controllerDay =
+            qobject_cast<ControllerDay *>(controllerDayQObject);
+        connect(controllerDay, &ControllerDay::workTimeChanged, this,
                 &ControllerWeek::onWorkTimeOfDayChanged);
-        connect(controller, &ControllerDay::startTimeChanged, this,
+        connect(controllerDay, &ControllerDay::startTimeChanged, this,
                 &ControllerWeek::onStartTimeOfDayChanged);
     }
 }

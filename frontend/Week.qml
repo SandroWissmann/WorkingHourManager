@@ -13,35 +13,15 @@ Item {
 
         property int elementHeigth: 30
 
-        Day {
-            Layout.preferredHeight: columnLayout.elementHeigth
-            Layout.preferredWidth: parent.width
+        Repeater {
+            model: controller.controllerDays
 
-            controller: root.controller.controllerMonday
-        }
-        Day {
-            Layout.preferredHeight: columnLayout.elementHeigth
-            Layout.preferredWidth: parent.width
+            Day {
+                Layout.preferredHeight: columnLayout.elementHeigth
+                Layout.preferredWidth: parent.width
 
-            controller: root.controller.controllerTuesday
-        }
-        Day {
-            Layout.preferredHeight: columnLayout.elementHeigth
-            Layout.preferredWidth: parent.width
-
-            controller: root.controller.controllerWednesday
-        }
-        Day {
-            Layout.preferredHeight: columnLayout.elementHeigth
-            Layout.preferredWidth: parent.width
-
-            controller: root.controller.controllerThursday
-        }
-        Day {
-            Layout.preferredHeight: columnLayout.elementHeigth
-            Layout.preferredWidth: parent.width
-
-            controller: root.controller.controllerFriday
+                controller: model.modelData
+            }
         }
         Footer {
             Layout.preferredHeight: columnLayout.elementHeigth

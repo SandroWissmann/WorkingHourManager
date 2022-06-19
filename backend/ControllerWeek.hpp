@@ -4,13 +4,11 @@
 #include "HoursAndMinutes.hpp"
 
 #include <QDateTime>
+#include <QList>
 #include <QObject>
 #include <QTime>
-#include <QVector>
 
 namespace whm {
-
-class ControllerDay;
 
 class ControllerWeek : public QObject {
     Q_OBJECT
@@ -20,11 +18,7 @@ class ControllerWeek : public QObject {
     Q_PROPERTY(QString earliestEndTime READ earliestEndTime NOTIFY
                    earliestEndTimeChanged)
 
-    Q_PROPERTY(QObject *controllerMonday READ controllerMonday CONSTANT)
-    Q_PROPERTY(QObject *controllerTuesday READ controllerTuesday CONSTANT)
-    Q_PROPERTY(QObject *controllerWednesday READ controllerWednesday CONSTANT)
-    Q_PROPERTY(QObject *controllerThursday READ controllerThursday CONSTANT)
-    Q_PROPERTY(QObject *controllerFriday READ controllerFriday CONSTANT)
+    Q_PROPERTY(QList<QObject *> controllerDays READ controllerDays CONSTANT)
 public:
     explicit ControllerWeek(QDate dateOfMonday, QTime defaultWorkTimePerDay,
                             QTime pauseTimeMonday, QTime pauseTimeTuesday,
@@ -36,11 +30,7 @@ public:
     ControllerWeek &operator=(const ControllerWeek &) = delete;
     ControllerWeek &operator=(ControllerWeek &&) = delete;
 
-    QObject *controllerMonday() const;
-    QObject *controllerTuesday() const;
-    QObject *controllerWednesday() const;
-    QObject *controllerThursday() const;
-    QObject *controllerFriday() const;
+    QList<QObject *> controllerDays() const;
 
     QString expectedWorkedTime() const;
     QString workedTime() const;
@@ -67,7 +57,7 @@ private:
     HoursAndMinutes m_overTime;
     HoursAndMinutes m_earliestEndTime{};
 
-    QVector<ControllerDay *> m_controllerDays;
+    QVector<QObject *> m_controllerDays;
 };
 
 } // namespace whm
