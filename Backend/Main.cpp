@@ -5,7 +5,7 @@
 #include <QLocale>
 #include <QTranslator>
 
-#include "Backend.hpp"
+#include "Main/Backend.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -17,13 +17,14 @@ int main(int argc, char *argv[])
     QTime pauseTimeMondayToThursday{0, 45};
     QTime pauseTimeFriday{0, 30};
 
-    whm::Backend backend{firstDate,
-                         defaultWorkTimePerDay,
-                         pauseTimeMondayToThursday,
-                         pauseTimeMondayToThursday,
-                         pauseTimeMondayToThursday,
-                         pauseTimeMondayToThursday,
-                         pauseTimeFriday};
+    whm::Backend backend{
+        firstDate,
+        defaultWorkTimePerDay,
+        pauseTimeMondayToThursday,
+        pauseTimeMondayToThursday,
+        pauseTimeMondayToThursday,
+        pauseTimeMondayToThursday,
+        pauseTimeFriday};
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -40,9 +41,11 @@ int main(int argc, char *argv[])
     auto qmlContext = engine.rootContext();
     qmlContext->setContextProperty("backend", &backend);
 
-    const QUrl url(u"qrc:/WorkingHourManager/frontend/main.qml"_qs);
+    const QUrl url(u"qrc:/WorkingHourManager/Frontend/Main.qml"_qs);
     QObject::connect(
-        &engine, &QQmlApplicationEngine::objectCreated, &app,
+        &engine,
+        &QQmlApplicationEngine::objectCreated,
+        &app,
         [url](QObject *obj, const QUrl &objUrl) {
             if (!obj && url == objUrl)
                 QCoreApplication::exit(-1);

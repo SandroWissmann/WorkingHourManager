@@ -1,6 +1,6 @@
 #include "ControllerWeek.hpp"
 
-#include "ControllerDay.hpp"
+#include "ControllerWeek/ControllerDay.hpp"
 
 #include <algorithm>
 
@@ -38,10 +38,10 @@ HoursAndMinutes calculateWorkedTime(const QVector<QObject *> controllerDays)
     return HoursAndMinutes{workedHours, workedMinutes};
 }
 
-HoursAndMinutes
-calculateEarliestEndTime(const QVector<QObject *> &controllerDays,
-                         HoursAndMinutes expectedWorkTime,
-                         HoursAndMinutes workTime)
+HoursAndMinutes calculateEarliestEndTime(
+    const QVector<QObject *> &controllerDays,
+    HoursAndMinutes expectedWorkTime,
+    HoursAndMinutes workTime)
 {
     auto lastDayIt = controllerDays.rend();
     for (auto rit = controllerDays.rbegin(); rit != controllerDays.rend();
@@ -86,38 +86,63 @@ calculateEarliestEndTime(const QVector<QObject *> &controllerDays,
     return endTime;
 }
 
-QVector<QObject *>
-makeControllerDays(const QDate &dateOfMonday, QTime defaultWorkTimePerDay,
-                   QTime pauseTimeMonday, QTime pauseTimeTuesday,
-                   QTime pauseTimeWednesday, QTime pauseTimeThursday,
-                   QTime pauseTimeFriday, QObject *parent)
+QVector<QObject *> makeControllerDays(
+    const QDate &dateOfMonday,
+    QTime defaultWorkTimePerDay,
+    QTime pauseTimeMonday,
+    QTime pauseTimeTuesday,
+    QTime pauseTimeWednesday,
+    QTime pauseTimeThursday,
+    QTime pauseTimeFriday,
+    QObject *parent)
 {
-    return {new ControllerDay{dateOfMonday, defaultWorkTimePerDay,
-                              pauseTimeMonday, parent},
-            new ControllerDay{dateOfMonday.addDays(1), defaultWorkTimePerDay,
-                              pauseTimeTuesday, parent},
-            new ControllerDay{dateOfMonday.addDays(2), defaultWorkTimePerDay,
-                              pauseTimeWednesday, parent},
-            new ControllerDay{dateOfMonday.addDays(3), defaultWorkTimePerDay,
-                              pauseTimeThursday, parent},
-            new ControllerDay{dateOfMonday.addDays(4), defaultWorkTimePerDay,
-                              pauseTimeFriday, parent}};
+    return {
+        new ControllerDay{
+            dateOfMonday, defaultWorkTimePerDay, pauseTimeMonday, parent},
+        new ControllerDay{
+            dateOfMonday.addDays(1),
+            defaultWorkTimePerDay,
+            pauseTimeTuesday,
+            parent},
+        new ControllerDay{
+            dateOfMonday.addDays(2),
+            defaultWorkTimePerDay,
+            pauseTimeWednesday,
+            parent},
+        new ControllerDay{
+            dateOfMonday.addDays(3),
+            defaultWorkTimePerDay,
+            pauseTimeThursday,
+            parent},
+        new ControllerDay{
+            dateOfMonday.addDays(4),
+            defaultWorkTimePerDay,
+            pauseTimeFriday,
+            parent}};
 }
 
 } // namespace
 
-ControllerWeek::ControllerWeek(const QDate &dateOfMonday,
-                               QTime defaultWorkTimePerDay,
-                               QTime pauseTimeMonday, QTime pauseTimeTuesday,
-                               QTime pauseTimeWednesday,
-                               QTime pauseTimeThursday, QTime pauseTimeFriday,
-                               QObject *parent)
+ControllerWeek::ControllerWeek(
+    const QDate &dateOfMonday,
+    QTime defaultWorkTimePerDay,
+    QTime pauseTimeMonday,
+    QTime pauseTimeTuesday,
+    QTime pauseTimeWednesday,
+    QTime pauseTimeThursday,
+    QTime pauseTimeFriday,
+    QObject *parent)
     : m_expectedWorkTime{calculateExpectedWorkedTime(defaultWorkTimePerDay)},
       m_overTime{m_workedTime - m_expectedWorkTime},
-      m_controllerDays{makeControllerDays(dateOfMonday, defaultWorkTimePerDay,
-                                          pauseTimeMonday, pauseTimeTuesday,
-                                          pauseTimeWednesday, pauseTimeThursday,
-                                          pauseTimeFriday, parent)}
+      m_controllerDays{makeControllerDays(
+          dateOfMonday,
+          defaultWorkTimePerDay,
+          pauseTimeMonday,
+          pauseTimeTuesday,
+          pauseTimeWednesday,
+          pauseTimeThursday,
+          pauseTimeFriday,
+          parent)}
 {
     makeControllerDayToControllerWeekConnections();
 }
@@ -245,10 +270,16 @@ void ControllerWeek::makeControllerDayToControllerWeekConnections() const
     for (const auto &controllerDayQObject : m_controllerDays) {
         auto controllerDay =
             qobject_cast<ControllerDay *>(controllerDayQObject);
-        connect(controllerDay, &ControllerDay::workTimeChanged, this,
-                &ControllerWeek::onWorkTimeOfDayChanged);
-        connect(controllerDay, &ControllerDay::startTimeChanged, this,
-                &ControllerWeek::onStartTimeOfDayChanged);
+        connect(
+            controllerDay,
+            &ControllerDay::workTimeChanged,
+            this,
+            &ControllerWeek::onWorkTimeOfDayChanged);
+        connect(
+            controllerDay,
+            &ControllerDay::startTimeChanged,
+            this,
+            &ControllerWeek::onStartTimeOfDayChanged);
     }
 }
 

@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 
+import "Week"
+
 Item {
     id: root
 

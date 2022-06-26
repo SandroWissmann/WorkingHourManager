@@ -1,7 +1,7 @@
 #ifndef WORKING_HOUR_MANAGER_CONTROLLER_WEEK_HPP
 #define WORKING_HOUR_MANAGER_CONTROLLER_WEEK_HPP
 
-#include "HoursAndMinutes.hpp"
+#include "ControllerWeek/HoursAndMinutes.hpp"
 
 #include <QDateTime>
 #include <QList>
@@ -20,11 +20,15 @@ class ControllerWeek : public QObject {
 
     Q_PROPERTY(QVector<QObject *> controllerDays READ controllerDays CONSTANT)
 public:
-    explicit ControllerWeek(const QDate &dateOfMonday,
-                            QTime defaultWorkTimePerDay, QTime pauseTimeMonday,
-                            QTime pauseTimeTuesday, QTime pauseTimeWednesday,
-                            QTime pauseTimeThursday, QTime pauseTimeFriday,
-                            QObject *parent = nullptr);
+    explicit ControllerWeek(
+        const QDate &dateOfMonday,
+        QTime defaultWorkTimePerDay,
+        QTime pauseTimeMonday,
+        QTime pauseTimeTuesday,
+        QTime pauseTimeWednesday,
+        QTime pauseTimeThursday,
+        QTime pauseTimeFriday,
+        QObject *parent = nullptr);
 
     ControllerWeek(const ControllerWeek &) = delete;
     ControllerWeek(ControllerWeek &&) = delete;

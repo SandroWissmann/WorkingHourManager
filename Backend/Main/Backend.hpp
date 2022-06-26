@@ -2,9 +2,8 @@
 #define WORKING_HOUR_MANAGER_BACKEND_HPP
 
 #include <QObject>
+#include <QTime>
 #include <QVector>
-#include <QTime>
-#include <QTime>
 
 namespace whm {
 
@@ -16,14 +15,14 @@ class Backend : public QObject {
 public:
     // Expect weeks contain the right years
     Backend(
-            const QDate &firstDate,
-            QTime defaultWorkTimePerDay,
-            QTime pauseTimeMonday,
-            QTime pauseTimeTuesday,
-            QTime pauseTimeWednesday,
-            QTime pauseTimeThursday,
-            QTime pauseTimeFriday,
-            QObject *parent = nullptr);
+        const QDate &firstDate,
+        QTime defaultWorkTimePerDay,
+        QTime pauseTimeMonday,
+        QTime pauseTimeTuesday,
+        QTime pauseTimeWednesday,
+        QTime pauseTimeThursday,
+        QTime pauseTimeFriday,
+        QObject *parent = nullptr);
 
     QVector<QObject *> controllerMonths() const;
 

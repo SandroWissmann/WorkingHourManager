@@ -8,31 +8,32 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt6 6.2 COMPONENTS Core Quick REQUIRED)
 
 qt_add_executable(appWorkingHourManager
-    backend/main.cpp
-    backend/ControllerDay.hpp
-    backend/ControllerDay.cpp
-    backend/ControllerWeek.hpp
-    backend/ControllerWeek.cpp
-    backend/ControllerMonth.hpp
-    backend/ControllerMonth.cpp
-    backend/ControllerYear.hpp
-    backend/ControllerYear.cpp
-    backend/Backend.hpp
-    backend/Backend.cpp
-    backend/HoursAndMinutes.hpp
-    backend/HoursAndMinutes.cpp
+    Backend/Main.cpp
+    Backend/Main/Backend.hpp
+    Backend/Main/Backend.cpp
+    Backend/Main/Backend/
+    Backend/Main/Backend/ControllerYear.hpp
+    Backend/Main/Backend/ControllerYear.cpp
+    Backend/Main/Backend/ControllerYear/ControllerMonth.hpp
+    Backend/Main/Backend/ControllerYear/ControllerMonth.cpp
+    Backend/Main/Common/ControllerWeek.hpp
+    Backend/Main/Common/ControllerWeek.cpp
+    Backend/Main/Common/ControllerWeek/ControllerDay.hpp
+    Backend/Main/Common/ControllerWeek/ControllerDay.cpp
+    Backend/Main/Common/ControllerWeek/HoursAndMinutes.hpp
+    Backend/Main/Common/ControllerWeek/HoursAndMinutes.cpp
 )
 
 qt_add_qml_module(appWorkingHourManager
     URI WorkingHourManager
     VERSION 1.0
     QML_FILES
-    frontend/main.qml
-    frontend/Header.qml
-    frontend/Day.qml
-    frontend/HourMinInput.qml
-    frontend/Footer.qml
-    frontend/Week.qml
+    Frontend/Main.qml
+    Frontend/Main/Header.qml
+    Frontend/Main/Week.qml
+    Frontend/Main/Week/Day.qml
+    Frontend/Main/Week/Footer.qml
+    Frontend/Main/Week/Day/HourMinInput.qml
 )
 
 target_compile_definitions(appWorkingHourManager

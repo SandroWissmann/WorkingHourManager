@@ -1,7 +1,7 @@
 #include "ControllerYear.hpp"
 
-#include "ControllerMonth.hpp"
-#include "ControllerWeek.hpp"
+#include "../Common/ControllerWeek.hpp"
+#include "ControllerYear/ControllerMonth.hpp"
 
 #include <algorithm>
 
