@@ -18,24 +18,33 @@ class ControllerWeek : public QObject {
     Q_PROPERTY(QString earliestEndTime READ earliestEndTime NOTIFY
                    earliestEndTimeChanged)
 
-    Q_PROPERTY(QList<QObject *> controllerDays READ controllerDays CONSTANT)
+    Q_PROPERTY(QVector<QObject *> controllerDays READ controllerDays CONSTANT)
 public:
-    explicit ControllerWeek(QDate dateOfMonday, QTime defaultWorkTimePerDay,
-                            QTime pauseTimeMonday, QTime pauseTimeTuesday,
-                            QTime pauseTimeWednesday, QTime pauseTimeThursday,
-                            QTime pauseTimeFriday, QObject *parent = nullptr);
+    explicit ControllerWeek(const QDate &dateOfMonday,
+                            QTime defaultWorkTimePerDay, QTime pauseTimeMonday,
+                            QTime pauseTimeTuesday, QTime pauseTimeWednesday,
+                            QTime pauseTimeThursday, QTime pauseTimeFriday,
+                            QObject *parent = nullptr);
 
     ControllerWeek(const ControllerWeek &) = delete;
     ControllerWeek(ControllerWeek &&) = delete;
     ControllerWeek &operator=(const ControllerWeek &) = delete;
     ControllerWeek &operator=(ControllerWeek &&) = delete;
 
-    QList<QObject *> controllerDays() const;
+    ~ControllerWeek() = default;
+
+    QVector<QObject *> controllerDays() const;
 
     QString expectedWorkedTime() const;
     QString workedTime() const;
     QString overTime() const;
     QString earliestEndTime() const;
+
+    // Indicate in which month the week is present
+    QVector<int> months() const;
+
+    // Indicate in which year the week is present
+    QVector<int> years() const;
 
 signals:
     void workedTimeChanged();

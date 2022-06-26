@@ -13,6 +13,12 @@ qt_add_executable(appWorkingHourManager
     backend/ControllerDay.cpp
     backend/ControllerWeek.hpp
     backend/ControllerWeek.cpp
+    backend/ControllerMonth.hpp
+    backend/ControllerMonth.cpp
+    backend/ControllerYear.hpp
+    backend/ControllerYear.cpp
+    backend/Backend.hpp
+    backend/Backend.cpp
     backend/HoursAndMinutes.hpp
     backend/HoursAndMinutes.cpp
 )

@@ -14,7 +14,7 @@ Item {
         property int elementHeigth: 30
 
         Repeater {
-            model: controller.controllerDays
+            model: root.controller.controllerDays
 
             Day {
                 Layout.preferredHeight: columnLayout.elementHeigth

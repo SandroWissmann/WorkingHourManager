@@ -2,6 +2,8 @@
 
 #include "ControllerDay.hpp"
 
+#include <algorithm>
+
 namespace whm {
 
 namespace {
@@ -85,7 +87,7 @@ calculateEarliestEndTime(const QVector<QObject *> &controllerDays,
 }
 
 QVector<QObject *>
-makeControllerDays(QDate dateOfMonday, QTime defaultWorkTimePerDay,
+makeControllerDays(const QDate &dateOfMonday, QTime defaultWorkTimePerDay,
                    QTime pauseTimeMonday, QTime pauseTimeTuesday,
                    QTime pauseTimeWednesday, QTime pauseTimeThursday,
                    QTime pauseTimeFriday, QObject *parent)
@@ -104,7 +106,8 @@ makeControllerDays(QDate dateOfMonday, QTime defaultWorkTimePerDay,
 
 } // namespace
 
-ControllerWeek::ControllerWeek(QDate dateOfMonday, QTime defaultWorkTimePerDay,
+ControllerWeek::ControllerWeek(const QDate &dateOfMonday,
+                               QTime defaultWorkTimePerDay,
                                QTime pauseTimeMonday, QTime pauseTimeTuesday,
                                QTime pauseTimeWednesday,
                                QTime pauseTimeThursday, QTime pauseTimeFriday,
@@ -119,7 +122,7 @@ ControllerWeek::ControllerWeek(QDate dateOfMonday, QTime defaultWorkTimePerDay,
     makeControllerDayToControllerWeekConnections();
 }
 
-QList<QObject *> ControllerWeek::controllerDays() const
+QVector<QObject *> ControllerWeek::controllerDays() const
 {
     return m_controllerDays;
 }
@@ -142,6 +145,55 @@ QString ControllerWeek::overTime() const
 QString ControllerWeek::earliestEndTime() const
 {
     return m_earliestEndTime.toString();
+}
+
+QVector<int> ControllerWeek::months() const
+{
+    QVector<int> months;
+    for (const auto &controllerDayAsQObject : m_controllerDays) {
+        auto controllerDay =
+            qobject_cast<ControllerDay *>(controllerDayAsQObject);
+
+        auto month = controllerDay->month();
+
+        if (months.isEmpty()) {
+            months.emplaceBack(month);
+            continue;
+        }
+
+        auto it = std::find(months.begin(), months.end(), month);
+
+        if (it != months.end()) {
+            continue;
+        }
+        months.emplaceBack(month);
+    }
+    return months;
+}
+
+// code duplication to months, maybe generalize
+QVector<int> ControllerWeek::years() const
+{
+    QVector<int> years;
+    for (const auto &controllerDayAsQObject : m_controllerDays) {
+        auto controllerDay =
+            qobject_cast<ControllerDay *>(controllerDayAsQObject);
+
+        auto year = controllerDay->year();
+
+        if (years.isEmpty()) {
+            years.emplaceBack(year);
+            continue;
+        }
+
+        auto it = std::find(years.begin(), years.end(), year);
+
+        if (it != years.end()) {
+            continue;
+        }
+        years.emplaceBack(year);
+    }
+    return years;
 }
 
 void ControllerWeek::onWorkTimeOfDayChanged()

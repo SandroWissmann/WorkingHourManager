@@ -42,6 +42,10 @@ public:
     // Monday / Tuesday etc.
     QString day() const;
 
+    int month() const;
+
+    int year() const;
+
     QString startTime() const;
     QTime startTimeAsTime() const;
     void setStartTime(const QString &startTime);

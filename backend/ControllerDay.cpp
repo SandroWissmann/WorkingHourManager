@@ -97,6 +97,16 @@ QString ControllerDay::day() const
     return m_date.toString("dddd");
 }
 
+int ControllerDay::month() const
+{
+    return m_date.month();
+}
+
+int ControllerDay::year() const
+{
+    return m_date.year();
+}
+
 QString ControllerDay::startTime() const
 {
     return timeToString(m_startTime);

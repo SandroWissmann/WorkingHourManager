@@ -5,25 +5,25 @@
 #include <QLocale>
 #include <QTranslator>
 
-#include "ControllerWeek.hpp"
+#include "Backend.hpp"
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    QDate dateOfMonday{2022, 06, 06};
+    QDate firstDate{2021, 01, 01};
 
-    QTime defaultWorkTime{7, 45};
+    QTime defaultWorkTimePerDay{7, 45};
     QTime pauseTimeMondayToThursday{0, 45};
     QTime pauseTimeFriday{0, 30};
 
-    whm::ControllerWeek controllerWeek{dateOfMonday,
-                                       defaultWorkTime,
-                                       pauseTimeMondayToThursday,
-                                       pauseTimeMondayToThursday,
-                                       pauseTimeMondayToThursday,
-                                       pauseTimeMondayToThursday,
-                                       pauseTimeFriday};
+    whm::Backend backend{firstDate,
+                         defaultWorkTimePerDay,
+                         pauseTimeMondayToThursday,
+                         pauseTimeMondayToThursday,
+                         pauseTimeMondayToThursday,
+                         pauseTimeMondayToThursday,
+                         pauseTimeFriday};
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     auto qmlContext = engine.rootContext();
-    qmlContext->setContextProperty("controllerWeek", &controllerWeek);
+    qmlContext->setContextProperty("backend", &backend);
 
     const QUrl url(u"qrc:/WorkingHourManager/frontend/main.qml"_qs);
     QObject::connect(
