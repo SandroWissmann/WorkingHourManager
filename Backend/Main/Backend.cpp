@@ -57,6 +57,11 @@ QVector<QObject *> Backend::controllerYears() const
     return m_controllerYears;
 }
 
+void Backend::saveToFile()
+{
+    qDebug() << Q_FUNC_INFO << "NOT IMPLEMENTED";
+}
+
 namespace {
 QVector<QObject *> makeControllerWeeksUntilCurrentWeek(
     const QDate &firstDate,

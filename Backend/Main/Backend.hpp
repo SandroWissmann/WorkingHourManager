@@ -37,6 +37,9 @@ public:
 
     QVector<QObject *> controllerYears() const;
 
+    Q_INVOKABLE
+    void saveToFile();
+
 private:
     QVector<QObject *> m_controllerWeeks;
     QVector<QObject *> m_controllerYears;

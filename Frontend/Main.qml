@@ -4,7 +4,7 @@ import QtQuick.Controls
 
 import "Main"
 
-Window {
+ApplicationWindow {
     id: root
     width: 1024
     height: 800
@@ -12,6 +12,16 @@ Window {
     title: qsTr("Working Hour Manager")
 
     property QtObject controller: backend
+
+    menuBar: MenuBar {
+        Menu {
+            title: qsTr("&File")
+            Action {
+                text: qsTr("&Save")
+                onTriggered: root.controller.saveToFile()
+            }
+        }
+    }
 
     ColumnLayout {
         id: columnLayout
