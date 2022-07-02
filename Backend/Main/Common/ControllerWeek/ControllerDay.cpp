@@ -1,5 +1,7 @@
 #include "ControllerDay.hpp"
 
+#include "../TimeConvert.hpp"
+
 #include <QDebug>
 
 namespace whm {
@@ -9,16 +11,6 @@ namespace {
 QTime makeInitTime()
 {
     return QTime::fromString("00:00", "hh:mm");
-}
-
-QTime stringToTime(const QString hhmmStr)
-{
-    return QTime::fromString(hhmmStr, "hh:mm");
-}
-
-QString timeToString(const QTime &time)
-{
-    return time.toString("hh:mm");
 }
 
 int timeToMinutes(const QTime &time)
@@ -75,8 +67,11 @@ bool hasValidTime(const QTime &time, bool isHoliday, bool isVaccation)
 
 } // namespace
 
-ControllerDay::ControllerDay(QDate date, QTime defaultWorkTime, QTime pauseTime,
-                             QObject *parent)
+ControllerDay::ControllerDay(
+    QDate date,
+    QTime defaultWorkTime,
+    QTime pauseTime,
+    QObject *parent)
     : QObject{parent}, m_date{date},
       m_startTime{makeInitTime()}, m_endTime{makeInitTime()},
       m_defaultWorkTime{defaultWorkTime}, m_pauseTime{pauseTime}

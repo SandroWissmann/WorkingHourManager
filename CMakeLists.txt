@@ -22,6 +22,8 @@ qt_add_executable(appWorkingHourManager
     Backend/Main/Common/ControllerWeek/ControllerDay.cpp
     Backend/Main/Common/ControllerWeek/HoursAndMinutes.hpp
     Backend/Main/Common/ControllerWeek/HoursAndMinutes.cpp
+    Backend/Main/Common/TimeConvert.hpp
+    Backend/Main/Common/TimeConvert.cpp
 )
 
 qt_add_qml_module(appWorkingHourManager

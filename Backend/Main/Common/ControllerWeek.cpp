@@ -89,36 +89,20 @@ HoursAndMinutes calculateEarliestEndTime(
 QVector<QObject *> makeControllerDays(
     const QDate &dateOfMonday,
     QTime defaultWorkTimePerDay,
-    QTime pauseTimeMonday,
-    QTime pauseTimeTuesday,
-    QTime pauseTimeWednesday,
-    QTime pauseTimeThursday,
-    QTime pauseTimeFriday,
+    const std::array<QTime, 5> &pauseTimesPerDay,
     QObject *parent)
 {
-    return {
-        new ControllerDay{
-            dateOfMonday, defaultWorkTimePerDay, pauseTimeMonday, parent},
-        new ControllerDay{
-            dateOfMonday.addDays(1),
+    QVector<QObject *> controllerDays;
+    controllerDays.reserve(pauseTimesPerDay.size());
+
+    for (auto i = 0; i < pauseTimesPerDay.size(); ++i) {
+        controllerDays.emplaceBack(new ControllerDay{
+            dateOfMonday.addDays(i),
             defaultWorkTimePerDay,
-            pauseTimeTuesday,
-            parent},
-        new ControllerDay{
-            dateOfMonday.addDays(2),
-            defaultWorkTimePerDay,
-            pauseTimeWednesday,
-            parent},
-        new ControllerDay{
-            dateOfMonday.addDays(3),
-            defaultWorkTimePerDay,
-            pauseTimeThursday,
-            parent},
-        new ControllerDay{
-            dateOfMonday.addDays(4),
-            defaultWorkTimePerDay,
-            pauseTimeFriday,
-            parent}};
+            pauseTimesPerDay[i],
+            parent});
+    }
+    return controllerDays;
 }
 
 } // namespace
@@ -126,22 +110,14 @@ QVector<QObject *> makeControllerDays(
 ControllerWeek::ControllerWeek(
     const QDate &dateOfMonday,
     QTime defaultWorkTimePerDay,
-    QTime pauseTimeMonday,
-    QTime pauseTimeTuesday,
-    QTime pauseTimeWednesday,
-    QTime pauseTimeThursday,
-    QTime pauseTimeFriday,
+    const std::array<QTime, 5> &pauseTimesPerDay,
     QObject *parent)
     : m_expectedWorkTime{calculateExpectedWorkedTime(defaultWorkTimePerDay)},
       m_overTime{m_workedTime - m_expectedWorkTime},
       m_controllerDays{makeControllerDays(
           dateOfMonday,
           defaultWorkTimePerDay,
-          pauseTimeMonday,
-          pauseTimeTuesday,
-          pauseTimeWednesday,
-          pauseTimeThursday,
-          pauseTimeFriday,
+          pauseTimesPerDay,
           parent)}
 {
     makeControllerDayToControllerWeekConnections();

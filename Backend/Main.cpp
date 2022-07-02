@@ -20,11 +20,11 @@ int main(int argc, char *argv[])
     whm::Backend backend{
         firstDate,
         defaultWorkTimePerDay,
-        pauseTimeMondayToThursday,
-        pauseTimeMondayToThursday,
-        pauseTimeMondayToThursday,
-        pauseTimeMondayToThursday,
-        pauseTimeFriday};
+        {pauseTimeMondayToThursday,
+         pauseTimeMondayToThursday,
+         pauseTimeMondayToThursday,
+         pauseTimeMondayToThursday,
+         pauseTimeFriday}};
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();

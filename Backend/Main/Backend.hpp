@@ -5,6 +5,8 @@
 #include <QTime>
 #include <QVector>
 
+#include <array>
+
 namespace whm {
 
 class Backend : public QObject {
@@ -16,12 +18,8 @@ public:
     // Expect weeks contain the right years
     Backend(
         const QDate &firstDate,
-        QTime defaultWorkTimePerDay,
-        QTime pauseTimeMonday,
-        QTime pauseTimeTuesday,
-        QTime pauseTimeWednesday,
-        QTime pauseTimeThursday,
-        QTime pauseTimeFriday,
+        const QTime &defaultWorkTimePerDay,
+        const std::array<QTime, 5> &pauseTimesPerDay,
         QObject *parent = nullptr);
 
     QVector<QObject *> controllerMonths() const;
@@ -41,6 +39,9 @@ public:
     void saveToFile();
 
 private:
+    QTime m_defaultWorkTimePerDay;
+    std::array<QTime, 5> m_pauseTimesPerDay;
+
     QVector<QObject *> m_controllerWeeks;
     QVector<QObject *> m_controllerYears;
 };

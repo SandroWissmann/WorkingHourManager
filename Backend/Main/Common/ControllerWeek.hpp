@@ -8,6 +8,8 @@
 #include <QObject>
 #include <QTime>
 
+#include <array>
+
 namespace whm {
 
 class ControllerWeek : public QObject {
@@ -23,11 +25,7 @@ public:
     explicit ControllerWeek(
         const QDate &dateOfMonday,
         QTime defaultWorkTimePerDay,
-        QTime pauseTimeMonday,
-        QTime pauseTimeTuesday,
-        QTime pauseTimeWednesday,
-        QTime pauseTimeThursday,
-        QTime pauseTimeFriday,
+        const std::array<QTime, 5> &pauseTimesPerDay,
         QObject *parent = nullptr);
 
     ControllerWeek(const ControllerWeek &) = delete;
