@@ -11,11 +11,12 @@ qt_add_executable(appWorkingHourManager
     Backend/Main.cpp
     Backend/Main/Backend.hpp
     Backend/Main/Backend.cpp
-    Backend/Main/Backend/
     Backend/Main/Backend/ControllerYear.hpp
     Backend/Main/Backend/ControllerYear.cpp
     Backend/Main/Backend/ControllerYear/ControllerMonth.hpp
     Backend/Main/Backend/ControllerYear/ControllerMonth.cpp
+    Backend/Main/Backend/FileWriter.hpp
+    Backend/Main/Backend/FileWriter.cpp
     Backend/Main/Common/ControllerWeek.hpp
     Backend/Main/Common/ControllerWeek.cpp
     Backend/Main/Common/ControllerWeek/ControllerDay.hpp
