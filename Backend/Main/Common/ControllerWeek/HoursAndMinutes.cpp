@@ -16,6 +16,11 @@ HoursAndMinutes::HoursAndMinutes(int hours, int minutes)
 {
 }
 
+HoursAndMinutes::HoursAndMinutes(int minutes)
+    : m_hours{minutes / 60}, m_minutes{minutes - m_hours * 60}
+{
+}
+
 QString HoursAndMinutes::toString() const
 {
     auto hourString = toStringWith2Digits(m_hours);

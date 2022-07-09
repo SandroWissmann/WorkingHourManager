@@ -8,13 +8,12 @@ namespace whm {
 
 namespace {
 
-HoursAndMinutes qTimeToHoursAndMinutes(const QTime &time)
+Time toTime(const HoursAndMinutes hoursAndMinutes)
 {
-    // note: slicing happens here we only keep hours and minutes
-    return HoursAndMinutes{time.hour(), time.minute()};
+    return Time{hoursAndMinutes.hours(), hoursAndMinutes.minutes()};
 }
 
-HoursAndMinutes calculateExpectedWorkedTime(QTime defaultWorkTimePerDay)
+HoursAndMinutes calculateExpectedWorkedTime(Time defaultWorkTimePerDay)
 {
     auto minutes =
         defaultWorkTimePerDay.hour() * 60 + defaultWorkTimePerDay.minute();
@@ -26,19 +25,18 @@ HoursAndMinutes calculateExpectedWorkedTime(QTime defaultWorkTimePerDay)
 
 HoursAndMinutes calculateWorkedTime(const QVector<QObject *> controllerDays)
 {
-    int workedMinutes{0};
+    int workedMinutes = 0;
     for (const auto &controllerDayQObject : controllerDays) {
         auto controllerDay =
             qobject_cast<ControllerDay *>(controllerDayQObject);
-        workedMinutes += controllerDay->workedMinutes();
-    }
 
-    auto workedHours = workedMinutes / 60;
-    workedMinutes = workedMinutes - workedHours * 60;
-    return HoursAndMinutes{workedHours, workedMinutes};
+        auto workedTime = controllerDay->workedTime();
+        workedMinutes += workedTime.totalMinutes();
+    }
+    return HoursAndMinutes{workedMinutes};
 }
 
-HoursAndMinutes calculateEarliestEndTime(
+Time calculateEarliestEndTime(
     const QVector<QObject *> &controllerDays,
     HoursAndMinutes expectedWorkTime,
     HoursAndMinutes workTime)
@@ -49,7 +47,7 @@ HoursAndMinutes calculateEarliestEndTime(
 
         auto controllerDay = qobject_cast<ControllerDay *>(*rit);
 
-        if (controllerDay->isHoliday() || controllerDay->isVaccation()) {
+        if (controllerDay->isHoliday() || controllerDay->isVacation()) {
             continue;
         }
         if (controllerDay->hasValidStartTime()) {
@@ -58,19 +56,18 @@ HoursAndMinutes calculateEarliestEndTime(
         }
         // last element has not filled out startTime so we cant calc end time
         else {
-            return HoursAndMinutes{};
+            return Time{};
         }
     }
 
     for (auto rit = lastDayIt + 1; rit != controllerDays.rend(); ++rit) {
-
         auto controllerDay = qobject_cast<ControllerDay *>(*rit);
 
         if (!controllerDay->hasValidStartTime()) {
-            return HoursAndMinutes{};
+            return Time{};
         }
         if (!controllerDay->hasValidEndTime()) {
-            return HoursAndMinutes{};
+            return Time{};
         }
     }
 
@@ -78,18 +75,17 @@ HoursAndMinutes calculateEarliestEndTime(
 
     auto lastDayController = qobject_cast<ControllerDay *>(*lastDayIt);
 
-    auto startTime =
-        qTimeToHoursAndMinutes(lastDayController->startTimeAsTime());
-    auto pauseTime =
-        qTimeToHoursAndMinutes(lastDayController->pauseTimeAsTime());
-    auto endTime = startTime + remainingWorkTime + pauseTime;
+    auto startTime = lastDayController->startTime();
+    auto pauseTime = lastDayController->pauseTime();
+
+    auto endTime = startTime + toTime(remainingWorkTime) + pauseTime;
     return endTime;
 }
 
 QVector<QObject *> makeControllerDays(
-    const QDate &dateOfMonday,
-    QTime defaultWorkTimePerDay,
-    const std::array<QTime, 5> &pauseTimesPerDay,
+    const Date &dateOfMonday,
+    Time defaultWorkTimePerDay,
+    const std::array<Time, 5> &pauseTimesPerDay,
     QObject *parent)
 {
     QVector<QObject *> controllerDays;
@@ -97,7 +93,7 @@ QVector<QObject *> makeControllerDays(
 
     for (auto i = 0; i < pauseTimesPerDay.size(); ++i) {
         controllerDays.emplaceBack(new ControllerDay{
-            dateOfMonday.addDays(i),
+            Day{dateOfMonday.addDays(i)},
             defaultWorkTimePerDay,
             pauseTimesPerDay[i],
             parent});
@@ -108,9 +104,9 @@ QVector<QObject *> makeControllerDays(
 } // namespace
 
 ControllerWeek::ControllerWeek(
-    const QDate &dateOfMonday,
-    QTime defaultWorkTimePerDay,
-    const std::array<QTime, 5> &pauseTimesPerDay,
+    const Date &dateOfMonday,
+    Time defaultWorkTimePerDay,
+    const std::array<Time, 5> &pauseTimesPerDay,
     QObject *parent)
     : m_expectedWorkTime{calculateExpectedWorkedTime(defaultWorkTimePerDay)},
       m_overTime{m_workedTime - m_expectedWorkTime},
@@ -145,7 +141,7 @@ QString ControllerWeek::overTime() const
 
 QString ControllerWeek::earliestEndTime() const
 {
-    return m_earliestEndTime.toString();
+    return m_earliestEndTime.asString();
 }
 
 QVector<int> ControllerWeek::months() const
@@ -155,7 +151,9 @@ QVector<int> ControllerWeek::months() const
         auto controllerDay =
             qobject_cast<ControllerDay *>(controllerDayAsQObject);
 
-        auto month = controllerDay->month();
+        auto day = controllerDay->day();
+        auto date = day.date();
+        auto month = date.month();
 
         if (months.isEmpty()) {
             months.emplaceBack(month);
@@ -180,7 +178,9 @@ QVector<int> ControllerWeek::years() const
         auto controllerDay =
             qobject_cast<ControllerDay *>(controllerDayAsQObject);
 
-        auto year = controllerDay->year();
+        auto day = controllerDay->day();
+        auto date = day.date();
+        auto year = date.year();
 
         if (years.isEmpty()) {
             years.emplaceBack(year);
@@ -232,7 +232,7 @@ void ControllerWeek::setOverTime(const HoursAndMinutes &overTime)
     emit overTimeChanged();
 }
 
-void ControllerWeek::setEarliestEndTime(const HoursAndMinutes &earliestEndTime)
+void ControllerWeek::setEarliestEndTime(const Time &earliestEndTime)
 {
     if (m_earliestEndTime == earliestEndTime) {
         return;

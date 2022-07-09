@@ -1,6 +1,9 @@
 #ifndef WORKING_HOUR_MANAGER_BACKEND_HPP
 #define WORKING_HOUR_MANAGER_BACKEND_HPP
 
+#include "Support/Date.hpp"
+#include "Support/Time.hpp"
+
 #include <QObject>
 #include <QTime>
 #include <QVector>
@@ -17,9 +20,9 @@ class Backend : public QObject {
 public:
     // Expect weeks contain the right years
     Backend(
-        const QDate &firstDate,
-        const QTime &defaultWorkTimePerDay,
-        const std::array<QTime, 5> &pauseTimesPerDay,
+        const Date &firstDate,
+        const Time &defaultWorkTimePerDay,
+        const std::array<Time, 5> &pauseTimesPerDay,
         QObject *parent = nullptr);
 
     QVector<QObject *> controllerMonths() const;
@@ -39,8 +42,8 @@ public:
     void saveToFile();
 
 private:
-    QTime m_defaultWorkTimePerDay;
-    std::array<QTime, 5> m_pauseTimesPerDay;
+    Time m_defaultWorkTimePerDay;
+    std::array<Time, 5> m_pauseTimesPerDay;
 
     QVector<QObject *> m_controllerWeeks;
     QVector<QObject *> m_controllerYears;

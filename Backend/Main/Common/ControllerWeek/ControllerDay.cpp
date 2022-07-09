@@ -1,235 +1,167 @@
 #include "ControllerDay.hpp"
 
-#include "../TimeConvert.hpp"
-
-#include <QDebug>
-
 namespace whm {
 
-namespace {
-
-QTime makeInitTime()
-{
-    return QTime::fromString("00:00", "hh:mm");
-}
-
-int timeToMinutes(const QTime &time)
-{
-    auto hour = time.hour();
-    auto minutes = time.minute();
-    return hour * 60 + minutes;
-}
-
-QTime minutesToTime(int minutes)
-{
-    auto hours = minutes / 60;
-    minutes = minutes - hours * 60;
-
-    return QTime{hours, minutes};
-}
-
-QTime workTimeFromTimes(QTime startTime, QTime endTime, QTime pauseTime)
-{
-    auto startMinutes = timeToMinutes(startTime);
-    auto endMinutes = timeToMinutes(endTime);
-    auto pauseMinutes = timeToMinutes(pauseTime);
-
-    auto workedMinutes = endMinutes - startMinutes - pauseMinutes;
-    auto workTime = minutesToTime(workedMinutes);
-    return workTime;
-}
-
-bool setTime(QTime &time, const QTime &newTime)
-{
-    if (time == newTime) {
-        return false;
-    }
-    time = newTime;
-    if (!time.isValid()) {
-        time = makeInitTime();
-    }
-    return true;
-}
-
-bool hasValidTime(const QTime &time, bool isHoliday, bool isVaccation)
-{
-    if (isHoliday) {
-        return true;
-    }
-    if (isVaccation) {
-        return true;
-    }
-    if (timeToString(time) == "00:00") {
-        return false;
-    }
-    return true;
-}
-
-} // namespace
-
 ControllerDay::ControllerDay(
-    QDate date,
-    QTime defaultWorkTime,
-    QTime pauseTime,
+    const Day &day,
+    const Time &defaultWorkTime,
+    const Time &pauseTime,
     QObject *parent)
-    : QObject{parent}, m_date{date},
-      m_startTime{makeInitTime()}, m_endTime{makeInitTime()},
-      m_defaultWorkTime{defaultWorkTime}, m_pauseTime{pauseTime}
+    : QObject{parent}, m_day{day}, m_defaultWorkTime{defaultWorkTime},
+      m_pauseTime{pauseTime}
 {
-    if (!m_pauseTime.isValid()) {
-        qDebug() << Q_FUNC_INFO << "Invalid pause time passed";
-        m_pauseTime = makeInitTime();
-    }
 }
 
-QString ControllerDay::date() const
+Day ControllerDay::day() const
 {
-    return m_date.toString("dd.MM.yyyy");
+    return m_day;
 }
 
-QString ControllerDay::day() const
+QString ControllerDay::dateAsString() const
 {
-    return m_date.toString("dddd");
+    return m_day.date().asString();
 }
 
-int ControllerDay::month() const
+QString ControllerDay::weekday() const
 {
-    return m_date.month();
+    return m_day.date().weekday();
 }
 
-int ControllerDay::year() const
+Time ControllerDay::startTime() const
 {
-    return m_date.year();
+    return m_day.startTime();
 }
 
-QString ControllerDay::startTime() const
+QString ControllerDay::startTimeAsString() const
 {
-    return timeToString(m_startTime);
-}
-
-QTime ControllerDay::startTimeAsTime() const
-{
-    return m_startTime;
+    return m_day.startTime().asString();
 }
 
 void ControllerDay::setStartTime(const QString &startTime)
 {
-    auto newTime = stringToTime(startTime);
-    setStartTime(newTime);
+    if (m_day.setStartTime(startTime)) {
+        emit startTimeChanged();
+        calcWorkTime();
+    }
 }
 
-QString ControllerDay::endTime() const
+QString ControllerDay::endTimeAsString() const
 {
-    return timeToString(m_endTime);
+    return m_day.endTime().asString();
 }
 
 void ControllerDay::setEndTime(const QString &endTime)
 {
-    auto newTime = stringToTime(endTime);
-    setEndTime(newTime);
+    if (m_day.setEndTime(endTime)) {
+        emit endTimeChanged();
+        calcWorkTime();
+    }
 }
 
-QString ControllerDay::pauseTime() const
-{
-    return timeToString(m_pauseTime);
-}
-
-QTime ControllerDay::pauseTimeAsTime() const
+Time ControllerDay::pauseTime() const
 {
     return m_pauseTime;
 }
 
-QString ControllerDay::workTime() const
+QString ControllerDay::pauseTimeAsString() const
 {
-    return timeToString(m_workTime);
+    return m_pauseTime.asString();
 }
 
-int ControllerDay::workedMinutes() const
+Time ControllerDay::workedTime() const
 {
-    if (!m_workTime.isValid()) {
-        return 0;
-    }
-    return m_workTime.hour() * 60 + m_workTime.minute();
+    return m_workTime;
+}
+
+QString ControllerDay::workTimeAsString() const
+{
+    return m_workTime.asString();
 }
 
 bool ControllerDay::isHoliday() const
 {
-    return m_isHoliday;
+    return m_day.isHoliday();
 }
 
 void ControllerDay::setIsHoliday(bool isHoliday)
 {
-    if (m_isHoliday == isHoliday) {
+    if (!m_day.setIsHoliday(isHoliday)) {
         return;
     }
-    m_isHoliday = isHoliday;
     emit isHolidayChanged();
-    setStartTime(makeInitTime());
-    setEndTime(makeInitTime());
+
+    if (m_day.setStartTime(Time{})) {
+        emit startTimeChanged();
+    }
+
+    if (m_day.setEndTime(Time{})) {
+        emit endTimeChanged();
+    }
+
     calcWorkTime();
 }
 
-bool ControllerDay::isVaccation() const
+bool ControllerDay::isVacation() const
 {
-    return m_isVaccation;
+    return m_day.isVacation();
 }
 
 bool ControllerDay::hasValidStartTime() const
 {
-    if (hasValidTime(m_startTime, isHoliday(), isVaccation())) {
-        return true;
-    }
-    return false;
+    return m_day.hasValidStartTime();
 }
 
 bool ControllerDay::hasValidEndTime() const
 {
-    if (hasValidTime(m_endTime, isHoliday(), isVaccation())) {
-        return true;
-    }
-    return false;
+    return m_day.hasValidEndTime();
 }
 
-void ControllerDay::setIsVaccation(bool isVaccation)
+void ControllerDay::setisVacation(bool isVacation)
 {
-    if (m_isVaccation == isVaccation) {
+    if (!m_day.setisVacation(isVacation)) {
         return;
     }
-    m_isVaccation = isVaccation;
-    emit isVaccationChanged();
-    calcWorkTime();
-}
+    emit isVacationChanged();
 
-void ControllerDay::setStartTime(const QTime &startTime)
-{
-    if (!setTime(m_startTime, startTime)) {
-        return;
+    if (m_day.setStartTime(Time{})) {
+        emit startTimeChanged();
     }
-    emit startTimeChanged();
-    calcWorkTime();
-}
 
-void ControllerDay::setEndTime(const QTime &endTime)
-{
-    if (!setTime(m_endTime, endTime)) {
-        return;
+    if (m_day.setEndTime(Time{})) {
+        emit endTimeChanged();
     }
-    emit endTimeChanged();
+
     calcWorkTime();
 }
 
 void ControllerDay::calcWorkTime()
 {
-    if (m_isHoliday || m_isVaccation) {
+    Q_ASSERT(m_pauseTime.isValid());
+
+    auto isHoliday = m_day.isHoliday();
+    auto isVacation = m_day.isVacation();
+    auto startTime = m_day.startTime();
+    auto endTime = m_day.endTime();
+
+    if (isHoliday) {
         setWorkTime(m_defaultWorkTime);
     }
+    else if (isVacation) {
+        setWorkTime(m_defaultWorkTime);
+    }
+    else if (!startTime.isValid()) {
+        setWorkTime(Time{});
+    }
+    else if (!endTime.isValid()) {
+        setWorkTime(Time{});
+    }
     else {
-        auto workTime = workTimeFromTimes(m_startTime, m_endTime, m_pauseTime);
+        auto workTime = m_day.endTime() - m_day.startTime() - m_pauseTime;
         setWorkTime(workTime);
     }
 }
 
-void ControllerDay::setWorkTime(const QTime &workTime)
+void ControllerDay::setWorkTime(const Time &workTime)
 {
     if (m_workTime == workTime) {
         return;

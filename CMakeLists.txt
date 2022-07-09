@@ -20,10 +20,14 @@ qt_add_executable(appWorkingHourManager
     Backend/Main/Common/ControllerWeek.cpp
     Backend/Main/Common/ControllerWeek/ControllerDay.hpp
     Backend/Main/Common/ControllerWeek/ControllerDay.cpp
+    Backend/Main/Common/ControllerWeek/ControllerDay/Day.hpp
+    Backend/Main/Common/ControllerWeek/ControllerDay/Day.cpp
     Backend/Main/Common/ControllerWeek/HoursAndMinutes.hpp
     Backend/Main/Common/ControllerWeek/HoursAndMinutes.cpp
-    Backend/Main/Common/TimeConvert.hpp
-    Backend/Main/Common/TimeConvert.cpp
+    Backend/Main/Support/Date.hpp
+    Backend/Main/Support/Date.cpp
+    Backend/Main/Support/Time.hpp
+    Backend/Main/Support/Time.cpp
 )
 
 qt_add_qml_module(appWorkingHourManager

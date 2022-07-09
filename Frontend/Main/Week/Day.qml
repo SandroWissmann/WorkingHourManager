@@ -24,17 +24,17 @@ Item {
             text: root.controller.date
         }
         Text {
-            id: day_text
+            id: weekday_text
             Layout.preferredWidth: rowLayout.elementWidth
             font.bold: true
             color: "red"
-            text: root.controller.day
+            text: root.controller.weekday
         }
         HourMinInput {
             id: startTime_hourMinInput
             Layout.preferredWidth: rowLayout.elementWidth
             text: root.controller.startTime
-            readOnly: vaccation_checkBox.checked || holiday_checkBox.checked
+            readOnly: vacation_checkBox.checked || holiday_checkBox.checked
 
             onEditingFinished: {
                 root.controller.startTime = text
@@ -44,7 +44,7 @@ Item {
             id: endTime_textField
             Layout.preferredWidth: rowLayout.elementWidth
             text: root.controller.endTime
-            readOnly: vaccation_checkBox.checked || holiday_checkBox.checked
+            readOnly: vacation_checkBox.checked || holiday_checkBox.checked
 
             onEditingFinished: {
                 root.controller.endTime = text
@@ -69,21 +69,21 @@ Item {
 
             onCheckedChanged: {
                 if (checked) {
-                    vaccation_checkBox.checked = false
+                    vacation_checkBox.checked = false
                 }
                 root.controller.isHoliday = checked
             }
         }
         CheckBox {
-            id: vaccation_checkBox
+            id: vacation_checkBox
             Layout.preferredWidth: rowLayout.elementWidth
-            checked: root.controller.isVaccation
+            checked: root.controller.isVacation
 
             onCheckedChanged: {
                 if (checked) {
                     holiday_checkBox.checked = false
                 }
-                root.controller.isVaccation = checked
+                root.controller.isVacation = checked
             }
         }
     }

@@ -4,7 +4,7 @@
 #include "Common/ControllerWeek.hpp"
 #include "Common/ControllerWeek/ControllerDay.hpp"
 
-#include "Common/TimeConvert.hpp"
+#include "Support/Date.hpp"
 
 #include <QDebug>
 #include <QFile>
@@ -17,28 +17,20 @@ namespace whm {
 
 namespace {
 QVector<QObject *> makeControllerWeeksUntilCurrentWeek(
-    const QDate &firstDate,
-    QTime defaultWorkTimePerDay,
-    const std::array<QTime, 5> &pauseTimesPerDay,
+    const Date &firstDate,
+    Time defaultWorkTimePerDay,
+    const std::array<Time, 5> &pauseTimesPerDay,
     QObject *parent);
 
-QDate goBackToPreviousMonday(const QDate &firstDate);
-
-// similar to build in functions QDate::addDays but negative and only for
-// one day
-void removeDay(QDate &date);
-
-QDate makeCurrentDate();
-
 QJsonObject makeApplicationDataJsonObject(
-    const QTime &defaultWorkTimePerDay,
-    const std::array<QTime, 5> &pauseTimesPerDay,
+    const Time &defaultWorkTimePerDay,
+    const std::array<Time, 5> &pauseTimesPerDay,
     const QVector<QObject *> &controllerWeeks);
 
 QJsonArray makeHolidaysPerYearJsonArray();
 
 QJsonArray
-makePauseTimesPerDayJsonArray(const std::array<QTime, 5> &pauseTimesPerDay);
+makePauseTimesPerDayJsonArray(const std::array<Time, 5> &pauseTimesPerDay);
 
 QJsonArray makeWeeksJsonArray(const QVector<QObject *> &controllerWeeks);
 
@@ -51,9 +43,9 @@ QJsonObject makeDayJsonObject(const ControllerDay &controllerDay);
 } // namespace
 
 Backend::Backend(
-    const QDate &firstDate,
-    const QTime &defaultWorkTimePerDay,
-    const std::array<QTime, 5> &pauseTimesPerDay,
+    const Date &firstDate,
+    const Time &defaultWorkTimePerDay,
+    const std::array<Time, 5> &pauseTimesPerDay,
     QObject *parent)
     : QObject{parent}, m_defaultWorkTimePerDay{defaultWorkTimePerDay},
       m_pauseTimesPerDay{pauseTimesPerDay},
@@ -92,15 +84,16 @@ void Backend::saveToFile()
 
 namespace {
 QVector<QObject *> makeControllerWeeksUntilCurrentWeek(
-    const QDate &firstDate,
-    QTime defaultWorkTimePerDay,
-    const std::array<QTime, 5> &pauseTimesPerDay,
+    const Date &firstDate,
+    Time defaultWorkTimePerDay,
+    const std::array<Time, 5> &pauseTimesPerDay,
     QObject *parent)
 {
-    auto startDate = goBackToPreviousMonday(firstDate);
+    constexpr int mondayIdx = 1;
+    auto startDate = firstDate.getPreviouseDateWithDayOfWeek(mondayIdx);
 
     // auto startDate = firstDate;
-    auto endDate = makeCurrentDate();
+    auto endDate = Date::currentDate();
 
     QVector<QObject *> controllerWeeks;
     while (startDate <= endDate) {
@@ -112,57 +105,13 @@ QVector<QObject *> makeControllerWeeksUntilCurrentWeek(
     return controllerWeeks;
 }
 
-QDate goBackToPreviousMonday(const QDate &firstDate)
-{
-    QDate date = firstDate;
-    constexpr int dayOfWeekMonday = 1;
-
-    while (date.dayOfWeek() != dayOfWeekMonday) {
-        removeDay(date);
-    }
-
-    return date;
-}
-
-void removeDay(QDate &date)
-{
-    auto year = date.year();
-    auto month = date.month();
-    auto day = date.day();
-
-    date.setDate(year, month, day - 1);
-
-    // we were at start of the month so go back one month
-    if (!date.isValid()) {
-
-        date.setDate(year, month - 1, 1);
-        auto daysInMonth = date.daysInMonth();
-        date.setDate(year, month - 1, daysInMonth);
-
-        // we were at start of the year so go back one year
-        if (!date.isValid()) {
-            date.setDate(year - 1, 12, 31);
-        }
-    }
-
-    if (!date.isValid()) {
-        qDebug() << Q_FUNC_INFO << "Date is invalid";
-    }
-}
-
-QDate makeCurrentDate()
-{
-    auto currentDateTime = QDateTime::currentDateTime();
-    return currentDateTime.date();
-}
-
 QJsonObject makeApplicationDataJsonObject(
-    const QTime &defaultWorkTimePerDay,
-    const std::array<QTime, 5> &pauseTimesPerDay,
+    const Time &defaultWorkTimePerDay,
+    const std::array<Time, 5> &pauseTimesPerDay,
     const QVector<QObject *> &controllerWeeks)
 {
     QJsonObject jsonObject;
-    jsonObject["defaultWorkTimePerDay"] = timeToString(defaultWorkTimePerDay);
+    jsonObject["defaultWorkTimePerDay"] = defaultWorkTimePerDay.asString();
     jsonObject["holidaysPerYear"] = makeHolidaysPerYearJsonArray();
     jsonObject["pauseTimesPerDay"] =
         makePauseTimesPerDayJsonArray(pauseTimesPerDay);
@@ -182,11 +131,11 @@ QJsonArray makeHolidaysPerYearJsonArray()
 }
 
 QJsonArray
-makePauseTimesPerDayJsonArray(const std::array<QTime, 5> &pauseTimesPerDay)
+makePauseTimesPerDayJsonArray(const std::array<Time, 5> &pauseTimesPerDay)
 {
     QJsonArray jsonArray;
     for (auto i = 0; i < pauseTimesPerDay.size(); ++i) {
-        QJsonValue jsonValue = timeToString(pauseTimesPerDay[i]);
+        QJsonValue jsonValue = pauseTimesPerDay[i].asString();
         jsonArray.insert(i, jsonValue);
     }
     return jsonArray;
@@ -229,11 +178,11 @@ QJsonArray makeDaysJsonArray(const QVector<QObject *> &controllerDays)
 QJsonObject makeDayJsonObject(const ControllerDay &controllerDay)
 {
     QJsonObject jsonObject;
-    jsonObject["date"] = controllerDay.date();
-    jsonObject["startTime"] = controllerDay.startTime();
-    jsonObject["endTime"] = controllerDay.endTime();
+    jsonObject["date"] = controllerDay.day().date().asString();
+    jsonObject["startTime"] = controllerDay.startTimeAsString();
+    jsonObject["endTime"] = controllerDay.endTimeAsString();
     jsonObject["isHoliday"] = controllerDay.isHoliday();
-    jsonObject["isVaccation"] = controllerDay.isVaccation();
+    jsonObject["isVacation"] = controllerDay.isVacation();
     // TODO implement ignore function so weeks are not used for calc the times
     // holidays etc.
     jsonObject["isIgnore"] = false;

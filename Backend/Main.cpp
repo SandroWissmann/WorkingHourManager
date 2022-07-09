@@ -11,11 +11,10 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    QDate firstDate{2021, 01, 01};
-
-    QTime defaultWorkTimePerDay{7, 45};
-    QTime pauseTimeMondayToThursday{0, 45};
-    QTime pauseTimeFriday{0, 30};
+    whm::Date firstDate{2021, 01, 01};
+    whm::Time defaultWorkTimePerDay{7, 45};
+    whm::Time pauseTimeMondayToThursday{0, 45};
+    whm::Time pauseTimeFriday{0, 30};
 
     whm::Backend backend{
         firstDate,

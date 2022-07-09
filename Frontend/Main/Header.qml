@@ -47,7 +47,7 @@ Item {
         }
         Text {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("Vaccation")
+            text: qsTr("Vacation")
             font.bold: true
         }
     }

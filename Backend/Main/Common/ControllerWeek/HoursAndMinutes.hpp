@@ -8,6 +8,7 @@ namespace whm {
 class HoursAndMinutes {
 public:
     HoursAndMinutes() = default;
+    explicit HoursAndMinutes(int minutes);
     HoursAndMinutes(int hours, int minutes);
 
     HoursAndMinutes(const HoursAndMinutes &) = default;
@@ -31,15 +32,15 @@ private:
     int m_hours{};
     int m_minutes{};
 
-    friend bool operator==(const HoursAndMinutes &lhs,
-                           const HoursAndMinutes &rhs);
-    friend bool operator!=(const HoursAndMinutes &lhs,
-                           const HoursAndMinutes &rhs);
+    friend bool
+    operator==(const HoursAndMinutes &lhs, const HoursAndMinutes &rhs);
+    friend bool
+    operator!=(const HoursAndMinutes &lhs, const HoursAndMinutes &rhs);
 
-    friend HoursAndMinutes operator+(HoursAndMinutes lhs,
-                                     const HoursAndMinutes &rhs);
-    friend HoursAndMinutes operator-(HoursAndMinutes lhs,
-                                     const HoursAndMinutes &rhs);
+    friend HoursAndMinutes
+    operator+(HoursAndMinutes lhs, const HoursAndMinutes &rhs);
+    friend HoursAndMinutes
+    operator-(HoursAndMinutes lhs, const HoursAndMinutes &rhs);
 };
 
 bool operator==(const HoursAndMinutes &lhs, const HoursAndMinutes &rhs);

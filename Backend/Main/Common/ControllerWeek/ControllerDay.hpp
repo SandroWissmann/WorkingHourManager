@@ -1,34 +1,39 @@
 #ifndef WORKING_HOUR_MANAGER_CONTROLLER_DAY_HPP
 #define WORKING_HOUR_MANAGER_CONTROLLER_DAY_HPP
 
-#include <QDate>
+#include "../../Support/Date.hpp"
+#include "../../Support/Time.hpp"
+#include "ControllerDay/Day.hpp"
+
 #include <QObject>
-#include <QTime>
 
 namespace whm {
 
 class ControllerDay : public QObject {
     Q_OBJECT
-    Q_PROPERTY(QString date READ date CONSTANT)
-    Q_PROPERTY(QString day READ day CONSTANT)
+    Q_PROPERTY(QString date READ dateAsString CONSTANT)
+    Q_PROPERTY(QString weekday READ weekday CONSTANT)
 
-    Q_PROPERTY(QString startTime READ startTime WRITE setStartTime NOTIFY
-                   startTimeChanged)
-    Q_PROPERTY(
-        QString endTime READ endTime WRITE setEndTime NOTIFY endTimeChanged)
+    Q_PROPERTY(QString startTime READ startTimeAsString WRITE setStartTime
+                   NOTIFY startTimeChanged)
+    Q_PROPERTY(QString endTime READ endTimeAsString WRITE setEndTime NOTIFY
+                   endTimeChanged)
 
-    Q_PROPERTY(QString pauseTime READ pauseTime CONSTANT)
+    Q_PROPERTY(QString pauseTime READ pauseTimeAsString CONSTANT)
 
-    Q_PROPERTY(QString workTime READ workTime NOTIFY workTimeChanged)
+    Q_PROPERTY(QString workTime READ workTimeAsString NOTIFY workTimeChanged)
 
     Q_PROPERTY(bool isHoliday READ isHoliday WRITE setIsHoliday NOTIFY
                    isHolidayChanged)
 
-    Q_PROPERTY(bool isVaccation READ isVaccation WRITE setIsVaccation NOTIFY
-                   isVaccationChanged)
+    Q_PROPERTY(bool isVacation READ isVacation WRITE setisVacation NOTIFY
+                   isVacationChanged)
 public:
-    explicit ControllerDay(QDate date, QTime defaultWorkTime, QTime pauseTime,
-                           QObject *parent = nullptr);
+    ControllerDay(
+        const Day &day,
+        const Time &defaultWorkTime,
+        const Time &pauseTime,
+        QObject *parent = nullptr);
 
     ControllerDay(const ControllerDay &) = delete;
     ControllerDay(ControllerDay &&) = delete;
@@ -37,33 +42,30 @@ public:
 
     ~ControllerDay() = default;
 
-    // format dd.MM.yyyy
-    QString date() const;
-    // Monday / Tuesday etc.
-    QString day() const;
+    Day day() const;
 
-    int month() const;
+    QString dateAsString() const;
 
-    int year() const;
+    QString weekday() const;
 
-    QString startTime() const;
-    QTime startTimeAsTime() const;
+    Time startTime() const;
+    QString startTimeAsString() const;
     void setStartTime(const QString &startTime);
 
-    QString endTime() const;
+    QString endTimeAsString() const;
     void setEndTime(const QString &endTime);
 
-    QString pauseTime() const;
-    QTime pauseTimeAsTime() const;
+    Time pauseTime() const;
+    QString pauseTimeAsString() const;
 
-    QString workTime() const;
-    int workedMinutes() const;
+    Time workedTime() const;
+    QString workTimeAsString() const;
 
     bool isHoliday() const;
     void setIsHoliday(bool isHoliday);
 
-    bool isVaccation() const;
-    void setIsVaccation(bool isVaccation);
+    bool isVacation() const;
+    void setisVacation(bool isVacation);
 
     bool hasValidStartTime() const;
     bool hasValidEndTime() const;
@@ -73,25 +75,17 @@ signals:
     void endTimeChanged();
     void workTimeChanged();
     void isHolidayChanged();
-    void isVaccationChanged();
+    void isVacationChanged();
 
 private:
-    void setStartTime(const QTime &startTime);
-    void setEndTime(const QTime &endTime);
-
     void calcWorkTime();
-    void setWorkTime(const QTime &workTime);
+    void setWorkTime(const Time &workTime);
 
-    QDate m_date;
+    Day m_day;
 
-    QTime m_startTime;
-    QTime m_endTime;
-    QTime m_defaultWorkTime;
-    QTime m_pauseTime;
-    QTime m_workTime{};
-
-    bool m_isHoliday{false};
-    bool m_isVaccation{false};
+    Time m_defaultWorkTime;
+    Time m_pauseTime;
+    Time m_workTime{};
 };
 
 } // namespace whm

@@ -1,12 +1,12 @@
 #ifndef WORKING_HOUR_MANAGER_CONTROLLER_WEEK_HPP
 #define WORKING_HOUR_MANAGER_CONTROLLER_WEEK_HPP
 
+#include "../Support/Date.hpp"
+#include "../Support/Time.hpp"
 #include "ControllerWeek/HoursAndMinutes.hpp"
 
-#include <QDateTime>
 #include <QList>
 #include <QObject>
-#include <QTime>
 
 #include <array>
 
@@ -23,9 +23,9 @@ class ControllerWeek : public QObject {
     Q_PROPERTY(QVector<QObject *> controllerDays READ controllerDays CONSTANT)
 public:
     explicit ControllerWeek(
-        const QDate &dateOfMonday,
-        QTime defaultWorkTimePerDay,
-        const std::array<QTime, 5> &pauseTimesPerDay,
+        const Date &dateOfMonday,
+        Time defaultWorkTimePerDay,
+        const std::array<Time, 5> &pauseTimesPerDay,
         QObject *parent = nullptr);
 
     ControllerWeek(const ControllerWeek &) = delete;
@@ -60,13 +60,13 @@ private slots:
 private:
     void setWorkedTime(const HoursAndMinutes &workedTime);
     void setOverTime(const HoursAndMinutes &overTime);
-    void setEarliestEndTime(const HoursAndMinutes &earliestEndTime);
+    void setEarliestEndTime(const Time &earliestEndTime);
     void makeControllerDayToControllerWeekConnections() const;
 
     HoursAndMinutes m_expectedWorkTime;
     HoursAndMinutes m_workedTime{};
     HoursAndMinutes m_overTime;
-    HoursAndMinutes m_earliestEndTime{};
+    Time m_earliestEndTime{};
 
     QVector<QObject *> m_controllerDays;
 };
