@@ -39,6 +39,10 @@ Date::Date(int year, int month, int day) : m_date{year, month, day}
 {
 }
 
+Date::Date(const QString date) : m_date{QDate::fromString(date, "dd.MM.yyyy")}
+{
+}
+
 QString Date::asString() const
 {
     return m_date.toString("dd.MM.yyyy");

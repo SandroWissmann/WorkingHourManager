@@ -30,6 +30,11 @@ Day::Day(
 {
 }
 
+Day::Day(const Date &date, const Time &startTime, const Time &endTime)
+    : Day(date, startTime, endTime, false, false)
+{
+}
+
 Day::Day(const Date &date) : Day(date, Time{}, Time{}, false, false)
 {
 }

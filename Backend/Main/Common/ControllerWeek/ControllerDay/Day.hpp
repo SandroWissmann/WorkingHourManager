@@ -11,13 +11,15 @@ namespace whm {
 
 class Day {
 public:
-    explicit Day(const Date &date);
-
     Day(const Date &date,
         const Time &startTime,
         const Time &endTime,
         bool isHoliday,
         bool isVacation);
+
+    Day(const Date &date, const Time &startTime, const Time &endTime);
+
+    explicit Day(const Date &date);
 
     Day(const Day &) = default;
     Day(Day &&) = default;

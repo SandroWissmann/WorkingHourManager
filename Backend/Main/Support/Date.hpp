@@ -11,6 +11,9 @@ public:
 
     Date(int year, int month, int day);
 
+    // dd.MM.yyyy
+    Date(const QString date);
+
     Date(const Date &) = default;
     Date(Date &&) = default;
     Date &operator=(const Date &) = default;
