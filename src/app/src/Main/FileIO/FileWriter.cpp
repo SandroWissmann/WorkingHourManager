@@ -1,7 +1,7 @@
 #include "FileWriter.hpp"
 
-#include "../Common/ControllerWeek.hpp"
-#include "../Common/ControllerWeek/ControllerDay.hpp"
+#include "../Controller/ControllerWeek.hpp"
+#include "../Controller/ControllerDay.hpp"
 
 #include <QDebug>
 #include <QFile>

@@ -1,19 +1,19 @@
 add_executable(appWorkingHourManager
     src/Main.cpp
     src/Main/Backend.hpp
-    src/Main/Backend.cpp
-    src/Main/Backend/ControllerYear.hpp
-    src/Main/Backend/ControllerYear.cpp
-    src/Main/Backend/ControllerYear/ControllerMonth.hpp
-    src/Main/Backend/ControllerYear/ControllerMonth.cpp
-    src/Main/Backend/FileReader.hpp
-    src/Main/Backend/FileReader.cpp
-    src/Main/Backend/FileWriter.hpp
-    src/Main/Backend/FileWriter.cpp
-    src/Main/Common/ControllerWeek.hpp
-    src/Main/Common/ControllerWeek.cpp
-    src/Main/Common/ControllerWeek/ControllerDay.hpp
-    src/Main/Common/ControllerWeek/ControllerDay.cpp
+    src/Main/Backend.cpp    
+    src/Main/Controller/ControllerDay.hpp
+    src/Main/Controller/ControllerDay.cpp
+    src/Main/Controller/ControllerMonth.hpp
+    src/Main/Controller/ControllerMonth.cpp
+    src/Main/Controller/ControllerWeek.hpp
+    src/Main/Controller/ControllerWeek.cpp
+    src/Main/Controller/ControllerYear.hpp
+    src/Main/Controller/ControllerYear.cpp
+    src/Main/FileIO/FileReader.hpp
+    src/Main/FileIO/FileReader.cpp
+    src/Main/FileIO/FileWriter.hpp
+    src/Main/FileIO/FileWriter.cpp
 )
 
 qt_add_qml_module(appWorkingHourManager

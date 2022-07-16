@@ -1,6 +1,6 @@
 #include "ControllerWeek.hpp"
 
-#include "ControllerWeek/ControllerDay.hpp"
+#include "ControllerDay.hpp"
 
 #include <algorithm>
 

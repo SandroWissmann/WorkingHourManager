@@ -2,11 +2,11 @@
 
 #include <whm/types/Date.hpp>
 
-#include "Backend/ControllerYear.hpp"
-#include "Backend/FileReader.hpp"
-#include "Backend/FileWriter.hpp"
-#include "Common/ControllerWeek.hpp"
-#include "Common/ControllerWeek/ControllerDay.hpp"
+#include "Controller/ControllerDay.hpp"
+#include "Controller/ControllerWeek.hpp"
+#include "Controller/ControllerYear.hpp"
+#include "FileIO/FileReader.hpp"
+#include "FileIO/FileWriter.hpp"
 
 #include <QDebug>
 
