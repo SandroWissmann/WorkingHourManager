@@ -77,8 +77,26 @@ QVector<QObject *> Backend::controllerYears() const
 void Backend::saveToFile()
 {
     FileWriter fileWriter{"save.json"};
+
+    QVector<Day> days;
+    days.reserve(m_controllerWeeks.size() * 5);
+
+    for (const auto &controllerWeekAsQObject : m_controllerWeeks) {
+        auto controllerWeek =
+            qobject_cast<ControllerWeek *>(controllerWeekAsQObject);
+        auto controllerDays = controllerWeek->controllerDays();
+
+        for (const auto &controllerDayAsQObject : controllerDays) {
+            auto controllerDay =
+                qobject_cast<ControllerDay *>(controllerDayAsQObject);
+
+            auto day = controllerDay->day();
+            days.emplace_back(day);
+        }
+    }
+
     auto writeOk = fileWriter.writeToFile(
-        m_defaultWorkTimePerDay, m_pauseTimesPerDay, m_controllerWeeks);
+        m_defaultWorkTimePerDay, m_pauseTimesPerDay, days);
 
     if (!writeOk) {
         qWarning() << Q_FUNC_INFO << "Save to file failed.";

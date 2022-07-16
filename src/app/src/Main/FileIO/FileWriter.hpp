@@ -9,6 +9,7 @@
 namespace whm {
 
 class Time;
+class Day;
 
 class FileWriter {
 public:
@@ -24,7 +25,7 @@ public:
     bool writeToFile(
         const Time &defaultWorkTimePerDay,
         const std::array<Time, 5> &pauseTimesPerDay,
-        const QVector<QObject *> &controllerWeeks);
+        const QVector<Day> &days);
 
 private:
     QString m_filename;

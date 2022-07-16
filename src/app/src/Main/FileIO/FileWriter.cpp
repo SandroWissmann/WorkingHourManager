@@ -1,7 +1,6 @@
 #include "FileWriter.hpp"
 
-#include "../Controller/ControllerWeek.hpp"
-#include "../Controller/ControllerDay.hpp"
+#include <whm/types/Day.hpp>
 
 #include <QDebug>
 #include <QFile>
@@ -17,20 +16,16 @@ namespace {
 QJsonObject makeApplicationDataJsonObject(
     const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
-    const QVector<QObject *> &controllerWeeks);
+    const QVector<Day> &days);
 
 QJsonArray makeHolidaysPerYearJsonArray();
 
 QJsonArray
 makePauseTimesPerDayJsonArray(const std::array<Time, 5> &pauseTimesPerDay);
 
-QJsonArray makeWeeksJsonArray(const QVector<QObject *> &controllerWeeks);
+QJsonArray makeDaysJsonArray(const QVector<Day> &days);
 
-QJsonObject makeWeekJsonObject(const ControllerWeek &controllerWeek);
-
-QJsonArray makeDaysJsonArray(const QVector<QObject *> &controllerDays);
-
-QJsonObject makeDayJsonObject(const ControllerDay &controllerDay);
+QJsonObject makeDayJsonObject(const Day &day);
 
 } // namespace
 
@@ -41,7 +36,7 @@ FileWriter::FileWriter(const QString &filename) : m_filename{filename}
 bool FileWriter::writeToFile(
     const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
-    const QVector<QObject *> &controllerWeeks)
+    const QVector<Day> &days)
 {
     QFile saveFile{m_filename};
 
@@ -51,7 +46,7 @@ bool FileWriter::writeToFile(
     }
 
     auto jsonObject = makeApplicationDataJsonObject(
-        defaultWorkTimePerDay, pauseTimesPerDay, controllerWeeks);
+        defaultWorkTimePerDay, pauseTimesPerDay, days);
 
     saveFile.write(QJsonDocument(jsonObject).toJson());
     return true;
@@ -62,14 +57,14 @@ namespace {
 QJsonObject makeApplicationDataJsonObject(
     const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
-    const QVector<QObject *> &controllerWeeks)
+    const QVector<Day> &days)
 {
     QJsonObject jsonObject;
     jsonObject["defaultWorkTimePerDay"] = defaultWorkTimePerDay.asString();
     jsonObject["holidaysPerYear"] = makeHolidaysPerYearJsonArray();
     jsonObject["pauseTimesPerDay"] =
         makePauseTimesPerDayJsonArray(pauseTimesPerDay);
-    jsonObject["weeks"] = makeWeeksJsonArray(controllerWeeks);
+    jsonObject["days"] = makeDaysJsonArray(days);
     return jsonObject;
 }
 
@@ -95,51 +90,38 @@ makePauseTimesPerDayJsonArray(const std::array<Time, 5> &pauseTimesPerDay)
     return jsonArray;
 }
 
-QJsonArray makeWeeksJsonArray(const QVector<QObject *> &controllerWeeks)
+QJsonArray makeDaysJsonArray(const QVector<Day> &days)
 {
     QJsonArray jsonArray;
-    for (const auto &controllerWeekAsQObject : controllerWeeks) {
-        auto controllerWeek =
-            qobject_cast<ControllerWeek *>(controllerWeekAsQObject);
-
-        QJsonObject jsonObject = makeWeekJsonObject(*controllerWeek);
+    for (const auto &day : days) {
+        QJsonObject jsonObject = makeDayJsonObject(day);
         jsonArray.append(jsonObject);
     }
     return jsonArray;
 }
 
-QJsonObject makeWeekJsonObject(const ControllerWeek &controllerWeek)
+QJsonObject makeDayJsonObject(const Day &day)
 {
-    auto controllerDays = controllerWeek.controllerDays();
     QJsonObject jsonObject;
-    QJsonArray jsonArray = makeDaysJsonArray(controllerDays);
-    jsonObject["days"] = jsonArray;
-    return jsonObject;
-}
+    jsonObject["date"] = day.date().asString();
 
-QJsonArray makeDaysJsonArray(const QVector<QObject *> &controllerDays)
-{
-    QJsonArray jsonArray;
-    for (const auto &controllerDayAsQObject : controllerDays) {
-        auto controllerDay =
-            qobject_cast<ControllerDay *>(controllerDayAsQObject);
-        QJsonObject jsonObject = makeDayJsonObject(*controllerDay);
-        jsonArray.append(jsonObject);
+    // To save space we only save if values are different from the default
+    // values
+    if (day.startTime() != Time{}) {
+        jsonObject["startTime"] = day.startTime().asString();
     }
-    return jsonArray;
-}
-
-QJsonObject makeDayJsonObject(const ControllerDay &controllerDay)
-{
-    QJsonObject jsonObject;
-    jsonObject["date"] = controllerDay.day().date().asString();
-    jsonObject["startTime"] = controllerDay.startTimeAsString();
-    jsonObject["endTime"] = controllerDay.endTimeAsString();
-    jsonObject["isHoliday"] = controllerDay.isHoliday();
-    jsonObject["isVacation"] = controllerDay.isVacation();
+    if (day.startTime() != Time{}) {
+        jsonObject["endTime"] = day.endTime().asString();
+    }
+    if (auto isHoliday = day.isHoliday()) {
+        jsonObject["isHoliday"] = isHoliday;
+    }
+    if (auto isVacation = day.isVacation()) {
+        jsonObject["isVacation"] = isVacation;
+    }
     // TODO implement ignore function so weeks are not used for calc the
     // times holidays etc.
-    jsonObject["isIgnore"] = false;
+    // jsonObject["isIgnore"] = false;
     return jsonObject;
 }
 
