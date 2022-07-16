@@ -91,6 +91,16 @@ Date Date::getPreviouseDateWithDayOfWeek(int dayOfWeek) const
     return {returnDate.year(), returnDate.month(), returnDate.day()};
 }
 
+bool operator==(const Date &lhs, const Date &rhs)
+{
+    return lhs.asString() == rhs.asString();
+}
+
+bool operator!=(const Date &lhs, const Date &rhs)
+{
+    return !(lhs == rhs);
+}
+
 bool operator<(const Date &lhs, const Date &rhs)
 {
     return lhs.m_date < rhs.m_date;

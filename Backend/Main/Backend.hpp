@@ -25,6 +25,14 @@ public:
         const std::array<Time, 5> &pauseTimesPerDay,
         QObject *parent = nullptr);
 
+    Backend(
+        const QVector<QObject *> &controllerWeeks,
+        const Time &defaultWorkTimePerDay,
+        const std::array<Time, 5> &pauseTimesPerDay,
+        QObject *parent = nullptr);
+
+    static Backend fromFile();
+
     QVector<QObject *> controllerMonths() const;
 
     Backend(const Backend &) = delete;

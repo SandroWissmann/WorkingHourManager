@@ -12,6 +12,8 @@
 
 namespace whm {
 
+class Day;
+
 class ControllerWeek : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString expectedWorkedTime READ expectedWorkedTime CONSTANT)
@@ -22,11 +24,16 @@ class ControllerWeek : public QObject {
 
     Q_PROPERTY(QVector<QObject *> controllerDays READ controllerDays CONSTANT)
 public:
-    explicit ControllerWeek(
+    ControllerWeek(
         const Date &dateOfMonday,
-        Time defaultWorkTimePerDay,
+        const Time &defaultWorkTimePerDay,
         const std::array<Time, 5> &pauseTimesPerDay,
         QObject *parent = nullptr);
+
+    ControllerWeek(
+        const Time &defaultWorkTimePerDay,
+        const std::array<Time, 5> &pauseTimesPerDay,
+        const std::array<Day, 5> &days);
 
     ControllerWeek(const ControllerWeek &) = delete;
     ControllerWeek(ControllerWeek &&) = delete;

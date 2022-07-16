@@ -11,19 +11,21 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    whm::Date firstDate{2021, 01, 01};
-    whm::Time defaultWorkTimePerDay{7, 45};
-    whm::Time pauseTimeMondayToThursday{0, 45};
-    whm::Time pauseTimeFriday{0, 30};
+    //    whm::Date firstDate{2021, 01, 01};
+    //    whm::Time defaultWorkTimePerDay{7, 45};
+    //    whm::Time pauseTimeMondayToThursday{0, 45};
+    //    whm::Time pauseTimeFriday{0, 30};
 
-    whm::Backend backend{
-        firstDate,
-        defaultWorkTimePerDay,
-        {pauseTimeMondayToThursday,
-         pauseTimeMondayToThursday,
-         pauseTimeMondayToThursday,
-         pauseTimeMondayToThursday,
-         pauseTimeFriday}};
+    //    whm::Backend backend{
+    //        firstDate,
+    //        defaultWorkTimePerDay,
+    //        {pauseTimeMondayToThursday,
+    //         pauseTimeMondayToThursday,
+    //         pauseTimeMondayToThursday,
+    //         pauseTimeMondayToThursday,
+    //         pauseTimeFriday}};
+
+    auto backend = whm::Backend::fromFile();
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
