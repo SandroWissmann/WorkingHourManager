@@ -134,52 +134,33 @@ QVector<Day> FileReader::days() const
     }
 
     auto jsonObject = m_jsonDocument.object();
-
-    QString key{"weeks"};
-    if (!jsonObject.contains(key)) {
+    QString dayKey{"days"};
+    if (!jsonObject.contains(dayKey)) {
         return QVector<Day>{};
     }
-    if (!jsonObject[key].isArray()) {
+    if (!jsonObject[dayKey].isArray()) {
         return QVector<Day>{};
     }
 
-    auto weeksArray = jsonObject[key].toArray();
+    auto daysArray = jsonObject[dayKey].toArray();
 
     QVector<Day> days;
-    for (int i = 0; i < weeksArray.size(); ++i) {
+    days.reserve(daysArray.size());
+    for (int j = 0; j < daysArray.size(); ++j) {
+        auto dayObject = daysArray[j].toObject();
+        auto optDate = extractDateFromDay(dayObject);
 
-        if (!weeksArray[i].isObject()) {
+        if (!optDate) {
             return QVector<Day>{};
         }
 
-        auto weekObject = weeksArray[i].toObject();
+        auto startTime = extractStartTimeFromDay(dayObject);
+        auto endTime = extractEndTimeFromDay(dayObject);
+        auto isHoliday = extractIsHolidayFromDay(dayObject);
+        auto isVaccation = extractIsVacationFromDay(dayObject);
 
-        QString dayKey{"days"};
-        if (!weekObject.contains(dayKey)) {
-            return QVector<Day>{};
-        }
-        if (!weekObject[dayKey].isArray()) {
-            return QVector<Day>{};
-        }
-
-        auto daysArray = weekObject[dayKey].toArray();
-
-        for (int j = 0; j < daysArray.size(); ++j) {
-            auto dayObject = daysArray[j].toObject();
-            auto optDate = extractDateFromDay(dayObject);
-
-            if (!optDate) {
-                return QVector<Day>{};
-            }
-
-            auto startTime = extractStartTimeFromDay(dayObject);
-            auto endTime = extractEndTimeFromDay(dayObject);
-            auto isHoliday = extractIsHolidayFromDay(dayObject);
-            auto isVaccation = extractIsVacationFromDay(dayObject);
-
-            Day day{*optDate, startTime, endTime, isHoliday, isVaccation};
-            days.emplace_back(day);
-        }
+        Day day{*optDate, startTime, endTime, isHoliday, isVaccation};
+        days.emplace_back(day);
     }
     return days;
 }
