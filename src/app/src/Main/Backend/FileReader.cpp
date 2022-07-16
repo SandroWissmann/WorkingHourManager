@@ -1,7 +1,7 @@
 #include "FileReader.hpp"
 
-#include "../Types/Day.hpp"
-#include "../Types/Time.hpp"
+#include <whm/types/Day.hpp>
+#include <whm/types/Time.hpp>
 
 #include <QDebug>
 #include <QFile>

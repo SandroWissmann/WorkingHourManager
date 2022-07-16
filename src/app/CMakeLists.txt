@@ -1,4 +1,4 @@
-qt_add_executable(appWorkingHourManager
+add_executable(appWorkingHourManager
     src/Main.cpp
     src/Main/Backend.hpp
     src/Main/Backend.cpp
@@ -14,14 +14,6 @@ qt_add_executable(appWorkingHourManager
     src/Main/Common/ControllerWeek.cpp
     src/Main/Common/ControllerWeek/ControllerDay.hpp
     src/Main/Common/ControllerWeek/ControllerDay.cpp
-    src/Main/Types/Day.hpp
-    src/Main/Types/Day.cpp
-    src/Main/Types/Date.hpp
-    src/Main/Types/Date.cpp
-    src/Main/Types/HoursAndMinutes.hpp
-    src/Main/Types/HoursAndMinutes.cpp
-    src/Main/Types/Time.hpp
-    src/Main/Types/Time.cpp
 )
 
 qt_add_qml_module(appWorkingHourManager
@@ -40,4 +32,5 @@ target_compile_definitions(appWorkingHourManager
     PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 
 target_link_libraries(appWorkingHourManager
-    PRIVATE Qt6::Quick)
+    PRIVATE Qt6::Quick
+    whm-types)

@@ -1,9 +1,9 @@
 #ifndef WORKING_HOUR_MANAGER_CONTROLLER_WEEK_HPP
 #define WORKING_HOUR_MANAGER_CONTROLLER_WEEK_HPP
 
-#include "../Types/Date.hpp"
-#include "../Types/HoursAndMinutes.hpp"
-#include "../Types/Time.hpp"
+#include <whm/types/Date.hpp>
+#include <whm/types/HoursAndMinutes.hpp>
+#include <whm/types/Time.hpp>
 
 #include <QList>
 #include <QObject>

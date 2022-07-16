@@ -1,5 +1,4 @@
-
-#include "Day.hpp"
+#include "../include/whm/types/Day.hpp"
 
 namespace whm {
 

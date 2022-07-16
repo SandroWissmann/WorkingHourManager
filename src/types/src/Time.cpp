@@ -1,5 +1,4 @@
-
-#include "Time.hpp"
+#include "../include/whm/types/Time.hpp"
 
 namespace whm {
 

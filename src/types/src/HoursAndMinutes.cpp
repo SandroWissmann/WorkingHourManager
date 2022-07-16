@@ -1,4 +1,4 @@
-#include "HoursAndMinutes.hpp"
+#include "../include/whm/types/HoursAndMinutes.hpp"
 
 namespace whm {
 
