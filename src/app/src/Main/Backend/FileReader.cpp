@@ -1,7 +1,7 @@
 #include "FileReader.hpp"
 
-#include "../Common/ControllerWeek/ControllerDay/Day.hpp"
-#include "../Support/Time.hpp"
+#include "../Types/Day.hpp"
+#include "../Types/Time.hpp"
 
 #include <QDebug>
 #include <QFile>

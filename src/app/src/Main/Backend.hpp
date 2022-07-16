@@ -1,8 +1,8 @@
 #ifndef WORKING_HOUR_MANAGER_BACKEND_HPP
 #define WORKING_HOUR_MANAGER_BACKEND_HPP
 
-#include "Support/Date.hpp"
-#include "Support/Time.hpp"
+#include "Types/Date.hpp"
+#include "Types/Time.hpp"
 
 #include <QObject>
 #include <QTime>

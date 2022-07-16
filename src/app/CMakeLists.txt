@@ -14,14 +14,14 @@ qt_add_executable(appWorkingHourManager
     src/Main/Common/ControllerWeek.cpp
     src/Main/Common/ControllerWeek/ControllerDay.hpp
     src/Main/Common/ControllerWeek/ControllerDay.cpp
-    src/Main/Common/ControllerWeek/ControllerDay/Day.hpp
-    src/Main/Common/ControllerWeek/ControllerDay/Day.cpp
-    src/Main/Common/ControllerWeek/HoursAndMinutes.hpp
-    src/Main/Common/ControllerWeek/HoursAndMinutes.cpp
-    src/Main/Support/Date.hpp
-    src/Main/Support/Date.cpp
-    src/Main/Support/Time.hpp
-    src/Main/Support/Time.cpp
+    src/Main/Types/Day.hpp
+    src/Main/Types/Day.cpp
+    src/Main/Types/Date.hpp
+    src/Main/Types/Date.cpp
+    src/Main/Types/HoursAndMinutes.hpp
+    src/Main/Types/HoursAndMinutes.cpp
+    src/Main/Types/Time.hpp
+    src/Main/Types/Time.cpp
 )
 
 qt_add_qml_module(appWorkingHourManager

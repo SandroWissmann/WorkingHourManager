@@ -1,9 +1,9 @@
 #ifndef WORKING_HOUR_MANAGER_CONTROLLER_DAY_HPP
 #define WORKING_HOUR_MANAGER_CONTROLLER_DAY_HPP
 
-#include "../../Support/Date.hpp"
-#include "../../Support/Time.hpp"
-#include "ControllerDay/Day.hpp"
+#include "../../Types/Date.hpp"
+#include "../../Types/Day.hpp"
+#include "../../Types/Time.hpp"
 
 #include <QObject>
 

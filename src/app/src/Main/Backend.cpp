@@ -6,7 +6,7 @@
 #include "Common/ControllerWeek.hpp"
 #include "Common/ControllerWeek/ControllerDay.hpp"
 
-#include "Support/Date.hpp"
+#include "Types/Date.hpp"
 
 #include <QDebug>
 

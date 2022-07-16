@@ -1,8 +1,8 @@
 #ifndef WORKING_HOUR_MANAGER_DAY_HPP
 #define WORKING_HOUR_MANAGER_DAY_HPP
 
-#include "../../../Support/Date.hpp"
-#include "../../../Support/Time.hpp"
+#include "Date.hpp"
+#include "Time.hpp"
 
 #include <QDate>
 #include <QTime>
