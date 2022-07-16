@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     auto qmlContext = engine.rootContext();
     qmlContext->setContextProperty("backend", &backend);
 
-    const QUrl url(u"qrc:/WorkingHourManager/Frontend/Main.qml"_qs);
+    const QUrl url(u"qrc:/WorkingHourManager/ressources/qml/Main.qml"_qs);
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreated,
