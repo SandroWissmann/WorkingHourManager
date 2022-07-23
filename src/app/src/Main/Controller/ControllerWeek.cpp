@@ -2,6 +2,8 @@
 
 #include "ControllerDay.hpp"
 
+#include <whm/types/Day.hpp>
+
 #include <algorithm>
 
 namespace whm {
@@ -22,17 +24,17 @@ Time calculateEarliestEndTime(
 QVector<QObject *> makeControllerDays(
     const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
-    const std::array<Day, 5> &days,
+    const std::array<std::shared_ptr<Day>, 5> &days,
     QObject *parent);
 
-bool isValidWorkWeek(const std::array<Day, 5> &days);
+bool isValidWorkWeek(const std::array<std::shared_ptr<Day>, 5> &days);
 
 } // namespace
 
 ControllerWeek::ControllerWeek(
     const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
-    const std::array<Day, 5> &days,
+    const std::array<std::shared_ptr<Day>, 5> &days,
     QObject *parent)
     : QObject{parent}, m_controllerDays{makeControllerDays(
                            defaultWorkTimePerDay,
@@ -79,7 +81,7 @@ QVector<int> ControllerWeek::months() const
             qobject_cast<ControllerDay *>(controllerDayAsQObject);
 
         auto day = controllerDay->day();
-        auto date = day.date();
+        auto date = day->date();
         auto month = date.month();
 
         if (months.isEmpty()) {
@@ -106,7 +108,7 @@ QVector<int> ControllerWeek::years() const
             qobject_cast<ControllerDay *>(controllerDayAsQObject);
 
         auto day = controllerDay->day();
-        auto date = day.date();
+        auto date = day->date();
         auto year = date.year();
 
         if (years.isEmpty()) {
@@ -264,7 +266,7 @@ Time calculateEarliestEndTime(
 QVector<QObject *> makeControllerDays(
     const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
-    const std::array<Day, 5> &days,
+    const std::array<std::shared_ptr<Day>, 5> &days,
     QObject *parent)
 {
     if (!isValidWorkWeek(days)) {
@@ -283,15 +285,15 @@ QVector<QObject *> makeControllerDays(
     return controllerDays;
 }
 
-bool isValidWorkWeek(const std::array<Day, 5> &days)
+bool isValidWorkWeek(const std::array<std::shared_ptr<Day>, 5> &days)
 {
-    auto mondayDate = days[0].date();
+    auto mondayDate = days[0]->date();
     if (mondayDate.weekday() != "Monday") {
         return false;
     }
 
     for (int i = 0; i < days.size(); ++i) {
-        auto date = days[i].date();
+        auto date = days[i]->date();
         auto expectedDate = mondayDate.addDays(i);
         if (date != expectedDate) {
             return false;

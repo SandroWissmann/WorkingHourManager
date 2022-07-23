@@ -5,6 +5,7 @@
 #include <QString>
 
 #include <array>
+#include <memory>
 
 namespace whm {
 
@@ -25,7 +26,7 @@ public:
     bool writeToFile(
         const Time &defaultWorkTimePerDay,
         const std::array<Time, 5> &pauseTimesPerDay,
-        const QVector<Day> &days);
+        const QVector<std::shared_ptr<Day>> &days);
 
 private:
     QString m_filename;

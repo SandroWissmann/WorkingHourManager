@@ -1,6 +1,7 @@
 #include "Backend.hpp"
 
 #include <whm/types/Date.hpp>
+#include <whm/types/Day.hpp>
 
 #include "Controller/ControllerDay.hpp"
 #include "Controller/ControllerWeek.hpp"
@@ -79,7 +80,7 @@ void Backend::saveToFile()
 {
     FileWriter fileWriter{"save.json"};
 
-    QVector<Day> days;
+    QVector<std::shared_ptr<Day>> days;
     days.reserve(m_controllerWeeks.size() * 5);
 
     for (const auto &controllerWeekAsQObject : m_controllerWeeks) {
@@ -117,15 +118,16 @@ QVector<QObject *> makeControllerWeeksUntilCurrentWeek(
     // auto startDate = firstDate;
     auto endDate = Date::currentDate();
 
-    QVector<Day> weekdays;
+    QVector<std::shared_ptr<Day>> weekdays;
     QVector<QObject *> controllerWeeks;
     while (date <= endDate) {
         auto weekday = date.weekday();
         if (weekday != "Saturday" && weekday != "Sunday") {
-            weekdays.emplace_back(Day{date});
+            auto day = std::make_shared<Day>(date);
+            weekdays.emplace_back(day);
         }
         if (weekday == "Friday") {
-            std::array<Day, 5> days{
+            std::array<std::shared_ptr<Day>, 5> days{
                 weekdays[0],
                 weekdays[1],
                 weekdays[2],
@@ -176,7 +178,7 @@ Backend makeBackendFromFile(const FileReader &fileReader)
 
     QVector<QObject *> controllerWeeks;
     for (auto it = days.begin(); it < days.end(); it += 5) {
-        std::array<Day, 5> weekdays{
+        std::array<std::shared_ptr<Day>, 5> weekdays{
             *it, *(it + 1), *(it + 2), *(it + 3), *(it + 4)};
 
         auto controllerWeek = new ControllerWeek{

@@ -16,16 +16,16 @@ namespace {
 QJsonObject makeApplicationDataJsonObject(
     const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
-    const QVector<Day> &days);
+    const QVector<std::shared_ptr<Day>> &days);
 
 QJsonArray makeHolidaysPerYearJsonArray();
 
 QJsonArray
 makePauseTimesPerDayJsonArray(const std::array<Time, 5> &pauseTimesPerDay);
 
-QJsonArray makeDaysJsonArray(const QVector<Day> &days);
+QJsonArray makeDaysJsonArray(const QVector<std::shared_ptr<Day>> &days);
 
-QJsonObject makeDayJsonObject(const Day &day);
+QJsonObject makeDayJsonObject(std::shared_ptr<Day> day);
 
 } // namespace
 
@@ -36,7 +36,7 @@ FileWriter::FileWriter(const QString &filename) : m_filename{filename}
 bool FileWriter::writeToFile(
     const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
-    const QVector<Day> &days)
+    const QVector<std::shared_ptr<Day>> &days)
 {
     QFile saveFile{m_filename};
 
@@ -57,7 +57,7 @@ namespace {
 QJsonObject makeApplicationDataJsonObject(
     const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
-    const QVector<Day> &days)
+    const QVector<std::shared_ptr<Day>> &days)
 {
     QJsonObject jsonObject;
     jsonObject["defaultWorkTimePerDay"] = defaultWorkTimePerDay.asString();
@@ -90,7 +90,7 @@ makePauseTimesPerDayJsonArray(const std::array<Time, 5> &pauseTimesPerDay)
     return jsonArray;
 }
 
-QJsonArray makeDaysJsonArray(const QVector<Day> &days)
+QJsonArray makeDaysJsonArray(const QVector<std::shared_ptr<Day>> &days)
 {
     QJsonArray jsonArray;
     for (const auto &day : days) {
@@ -100,23 +100,23 @@ QJsonArray makeDaysJsonArray(const QVector<Day> &days)
     return jsonArray;
 }
 
-QJsonObject makeDayJsonObject(const Day &day)
+QJsonObject makeDayJsonObject(std::shared_ptr<Day> day)
 {
     QJsonObject jsonObject;
-    jsonObject["date"] = day.date().asString();
+    jsonObject["date"] = day->date().asString();
 
     // To save space we only save if values are different from the default
     // values
-    if (day.startTime() != Time{}) {
-        jsonObject["startTime"] = day.startTime().asString();
+    if (day->startTime() != Time{}) {
+        jsonObject["startTime"] = day->startTime().asString();
     }
-    if (day.startTime() != Time{}) {
-        jsonObject["endTime"] = day.endTime().asString();
+    if (day->startTime() != Time{}) {
+        jsonObject["endTime"] = day->endTime().asString();
     }
-    if (auto isHoliday = day.isHoliday()) {
+    if (auto isHoliday = day->isHoliday()) {
         jsonObject["isHoliday"] = isHoliday;
     }
-    if (auto isVacation = day.isVacation()) {
+    if (auto isVacation = day->isVacation()) {
         jsonObject["isVacation"] = isVacation;
     }
     // TODO implement ignore function so weeks are not used for calc the

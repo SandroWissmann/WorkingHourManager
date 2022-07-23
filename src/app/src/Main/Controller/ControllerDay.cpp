@@ -1,9 +1,11 @@
 #include "ControllerDay.hpp"
 
+#include <whm/types/Day.hpp>
+
 namespace whm {
 
 ControllerDay::ControllerDay(
-    const Day &day,
+    std::shared_ptr<Day> day,
     const Time &defaultWorkTime,
     const Time &pauseTime,
     QObject *parent)
@@ -13,34 +15,36 @@ ControllerDay::ControllerDay(
     calcWorkTime();
 }
 
-Day ControllerDay::day() const
+ControllerDay::~ControllerDay() = default;
+
+std::shared_ptr<Day> ControllerDay::day() const
 {
     return m_day;
 }
 
 QString ControllerDay::dateAsString() const
 {
-    return m_day.date().asString();
+    return m_day->date().asString();
 }
 
 QString ControllerDay::weekday() const
 {
-    return m_day.date().weekday();
+    return m_day->date().weekday();
 }
 
 Time ControllerDay::startTime() const
 {
-    return m_day.startTime();
+    return m_day->startTime();
 }
 
 QString ControllerDay::startTimeAsString() const
 {
-    return m_day.startTime().asString();
+    return m_day->startTime().asString();
 }
 
 void ControllerDay::setStartTime(const QString &startTime)
 {
-    if (m_day.setStartTime(startTime)) {
+    if (m_day->setStartTime(startTime)) {
         emit startTimeChanged();
         calcWorkTime();
     }
@@ -48,12 +52,12 @@ void ControllerDay::setStartTime(const QString &startTime)
 
 QString ControllerDay::endTimeAsString() const
 {
-    return m_day.endTime().asString();
+    return m_day->endTime().asString();
 }
 
 void ControllerDay::setEndTime(const QString &endTime)
 {
-    if (m_day.setEndTime(endTime)) {
+    if (m_day->setEndTime(endTime)) {
         emit endTimeChanged();
         calcWorkTime();
     }
@@ -81,21 +85,21 @@ QString ControllerDay::workTimeAsString() const
 
 bool ControllerDay::isHoliday() const
 {
-    return m_day.isHoliday();
+    return m_day->isHoliday();
 }
 
 void ControllerDay::setIsHoliday(bool isHoliday)
 {
-    if (!m_day.setIsHoliday(isHoliday)) {
+    if (!m_day->setIsHoliday(isHoliday)) {
         return;
     }
     emit isHolidayChanged();
 
-    if (m_day.setStartTime(Time{})) {
+    if (m_day->setStartTime(Time{})) {
         emit startTimeChanged();
     }
 
-    if (m_day.setEndTime(Time{})) {
+    if (m_day->setEndTime(Time{})) {
         emit endTimeChanged();
     }
 
@@ -104,31 +108,31 @@ void ControllerDay::setIsHoliday(bool isHoliday)
 
 bool ControllerDay::isVacation() const
 {
-    return m_day.isVacation();
+    return m_day->isVacation();
 }
 
 bool ControllerDay::hasValidStartTime() const
 {
-    return m_day.hasValidStartTime();
+    return m_day->hasValidStartTime();
 }
 
 bool ControllerDay::hasValidEndTime() const
 {
-    return m_day.hasValidEndTime();
+    return m_day->hasValidEndTime();
 }
 
 void ControllerDay::setisVacation(bool isVacation)
 {
-    if (!m_day.setisVacation(isVacation)) {
+    if (!m_day->setisVacation(isVacation)) {
         return;
     }
     emit isVacationChanged();
 
-    if (m_day.setStartTime(Time{})) {
+    if (m_day->setStartTime(Time{})) {
         emit startTimeChanged();
     }
 
-    if (m_day.setEndTime(Time{})) {
+    if (m_day->setEndTime(Time{})) {
         emit endTimeChanged();
     }
 
@@ -139,10 +143,10 @@ void ControllerDay::calcWorkTime()
 {
     Q_ASSERT(m_pauseTime.isValid());
 
-    auto isHoliday = m_day.isHoliday();
-    auto isVacation = m_day.isVacation();
-    auto startTime = m_day.startTime();
-    auto endTime = m_day.endTime();
+    auto isHoliday = m_day->isHoliday();
+    auto isVacation = m_day->isVacation();
+    auto startTime = m_day->startTime();
+    auto endTime = m_day->endTime();
 
     if (isHoliday) {
         setWorkTime(m_defaultWorkTime);
@@ -157,7 +161,7 @@ void ControllerDay::calcWorkTime()
         setWorkTime(Time{});
     }
     else {
-        auto workTime = m_day.endTime() - m_day.startTime() - m_pauseTime;
+        auto workTime = m_day->endTime() - m_day->startTime() - m_pauseTime;
         setWorkTime(workTime);
     }
 }

@@ -2,12 +2,15 @@
 #define WORKING_HOUR_MANAGER_CONTROLLER_DAY_HPP
 
 #include <whm/types/Date.hpp>
-#include <whm/types/Day.hpp>
 #include <whm/types/Time.hpp>
 
 #include <QObject>
 
+#include <memory>
+
 namespace whm {
+
+class Day;
 
 class ControllerDay : public QObject {
     Q_OBJECT
@@ -30,7 +33,7 @@ class ControllerDay : public QObject {
                    isVacationChanged)
 public:
     ControllerDay(
-        const Day &day,
+        std::shared_ptr<Day> day,
         const Time &defaultWorkTime,
         const Time &pauseTime,
         QObject *parent = nullptr);
@@ -40,9 +43,9 @@ public:
     ControllerDay &operator=(const ControllerDay &) = delete;
     ControllerDay &operator=(ControllerDay &&) = delete;
 
-    ~ControllerDay() = default;
+    ~ControllerDay() override;
 
-    Day day() const;
+    std::shared_ptr<Day> day() const;
 
     QString dateAsString() const;
 
@@ -81,7 +84,7 @@ private:
     void calcWorkTime();
     void setWorkTime(const Time &workTime);
 
-    Day m_day;
+    std::shared_ptr<Day> m_day;
 
     Time m_defaultWorkTime;
     Time m_pauseTime;

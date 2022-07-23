@@ -9,6 +9,7 @@
 #include <QObject>
 
 #include <array>
+#include <memory>
 
 namespace whm {
 
@@ -27,7 +28,7 @@ public:
     ControllerWeek(
         const Time &defaultWorkTimePerDay,
         const std::array<Time, 5> &pauseTimesPerDay,
-        const std::array<Day, 5> &days,
+        const std::array<std::shared_ptr<Day>, 5> &days,
         QObject *parent = nullptr);
 
     ControllerWeek(const ControllerWeek &) = delete;

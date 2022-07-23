@@ -1,10 +1,10 @@
 #ifndef WORKING_HOUR_MANAGER_FILE_READER_HPP
 #define WORKING_HOUR_MANAGER_FILE_READER_HPP
 
+#include <QJsonDocument>
 #include <QObject>
 #include <QString>
 #include <QVector>
-#include <QJsonDocument>
 
 #include <array>
 
@@ -32,12 +32,12 @@ public:
 
     std::array<Time, 5> pauseTimesPerDay() const;
 
-    QVector<Day> days() const;
+    QVector<std::shared_ptr<Day>> days() const;
 
 private:
     QJsonDocument m_jsonDocument;
 };
 
-}
+} // namespace whm
 
 #endif

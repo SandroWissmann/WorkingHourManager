@@ -127,31 +127,31 @@ std::array<Time, 5> FileReader::pauseTimesPerDay() const
         Time{jsonArray[4].toString()}};
 }
 
-QVector<Day> FileReader::days() const
+QVector<std::shared_ptr<Day>> FileReader::days() const
 {
     if (!isValidFile()) {
-        return QVector<Day>{};
+        return {};
     }
 
     auto jsonObject = m_jsonDocument.object();
     QString dayKey{"days"};
     if (!jsonObject.contains(dayKey)) {
-        return QVector<Day>{};
+        return {};
     }
     if (!jsonObject[dayKey].isArray()) {
-        return QVector<Day>{};
+        return {};
     }
 
     auto daysArray = jsonObject[dayKey].toArray();
 
-    QVector<Day> days;
+    QVector<std::shared_ptr<Day>> days;
     days.reserve(daysArray.size());
     for (int j = 0; j < daysArray.size(); ++j) {
         auto dayObject = daysArray[j].toObject();
         auto optDate = extractDateFromDay(dayObject);
 
         if (!optDate) {
-            return QVector<Day>{};
+            return {};
         }
 
         auto startTime = extractStartTimeFromDay(dayObject);
@@ -159,7 +159,9 @@ QVector<Day> FileReader::days() const
         auto isHoliday = extractIsHolidayFromDay(dayObject);
         auto isVaccation = extractIsVacationFromDay(dayObject);
 
-        Day day{*optDate, startTime, endTime, isHoliday, isVaccation};
+        auto day = std::make_shared<Day>(
+            *optDate, startTime, endTime, isHoliday, isVaccation);
+
         days.emplace_back(day);
     }
     return days;
