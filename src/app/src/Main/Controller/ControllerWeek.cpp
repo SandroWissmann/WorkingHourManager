@@ -20,12 +20,6 @@ Time calculateEarliestEndTime(
     HoursAndMinutes workTime);
 
 QVector<QObject *> makeControllerDays(
-    const Date &dateOfMonday,
-    const Time &defaultWorkTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
-    QObject *parent);
-
-QVector<QObject *> makeControllerDays(
     const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
     const std::array<Day, 5> &days,
@@ -36,33 +30,20 @@ bool isValidWorkWeek(const std::array<Day, 5> &days);
 } // namespace
 
 ControllerWeek::ControllerWeek(
-    const Date &dateOfMonday,
     const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
+    const std::array<Day, 5> &days,
     QObject *parent)
-    : m_expectedWorkTime{calculateExpectedWorkedTime(defaultWorkTimePerDay)},
-      m_overTime{m_workedTime - m_expectedWorkTime},
-      m_controllerDays{makeControllerDays(
-          dateOfMonday,
-          defaultWorkTimePerDay,
-          pauseTimesPerDay,
-          parent)}
+    : QObject{parent}, m_controllerDays{makeControllerDays(
+                           defaultWorkTimePerDay,
+                           pauseTimesPerDay,
+                           days,
+                           this)},
+      m_expectedWorkTime{calculateExpectedWorkedTime(defaultWorkTimePerDay)},
+      m_workedTime{calculateWorkedTime(m_controllerDays)},
+      m_overTime{m_workedTime - m_expectedWorkTime}
 {
     makeControllerDayToControllerWeekConnections();
-}
-
-ControllerWeek::ControllerWeek(
-    const Time &defaultWorkTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
-    const std::array<Day, 5> &days)
-    : m_expectedWorkTime{calculateExpectedWorkedTime(defaultWorkTimePerDay)},
-      m_overTime{m_workedTime - m_expectedWorkTime},
-      m_controllerDays{makeControllerDays(
-          defaultWorkTimePerDay,
-          pauseTimesPerDay,
-          days,
-          this)}
-{
 }
 
 QVector<QObject *> ControllerWeek::controllerDays() const
@@ -278,25 +259,6 @@ Time calculateEarliestEndTime(
 
     auto endTime = startTime + toTime(remainingWorkTime) + pauseTime;
     return endTime;
-}
-
-QVector<QObject *> makeControllerDays(
-    const Date &dateOfMonday,
-    const Time &defaultWorkTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
-    QObject *parent)
-{
-    QVector<QObject *> controllerDays;
-    controllerDays.reserve(pauseTimesPerDay.size());
-
-    for (auto i = 0; i < pauseTimesPerDay.size(); ++i) {
-        controllerDays.emplaceBack(new ControllerDay{
-            Day{dateOfMonday.addDays(i)},
-            defaultWorkTimePerDay,
-            pauseTimesPerDay[i],
-            parent});
-    }
-    return controllerDays;
 }
 
 QVector<QObject *> makeControllerDays(

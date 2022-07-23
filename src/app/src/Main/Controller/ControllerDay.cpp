@@ -10,6 +10,7 @@ ControllerDay::ControllerDay(
     : QObject{parent}, m_day{day}, m_defaultWorkTime{defaultWorkTime},
       m_pauseTime{pauseTime}
 {
+    calcWorkTime();
 }
 
 Day ControllerDay::day() const

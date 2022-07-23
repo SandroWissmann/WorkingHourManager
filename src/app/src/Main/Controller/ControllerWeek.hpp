@@ -25,15 +25,10 @@ class ControllerWeek : public QObject {
     Q_PROPERTY(QVector<QObject *> controllerDays READ controllerDays CONSTANT)
 public:
     ControllerWeek(
-        const Date &dateOfMonday,
         const Time &defaultWorkTimePerDay,
         const std::array<Time, 5> &pauseTimesPerDay,
+        const std::array<Day, 5> &days,
         QObject *parent = nullptr);
-
-    ControllerWeek(
-        const Time &defaultWorkTimePerDay,
-        const std::array<Time, 5> &pauseTimesPerDay,
-        const std::array<Day, 5> &days);
 
     ControllerWeek(const ControllerWeek &) = delete;
     ControllerWeek(ControllerWeek &&) = delete;
@@ -70,12 +65,12 @@ private:
     void setEarliestEndTime(const Time &earliestEndTime);
     void makeControllerDayToControllerWeekConnections() const;
 
+    QVector<QObject *> m_controllerDays;
+
     HoursAndMinutes m_expectedWorkTime;
     HoursAndMinutes m_workedTime{};
     HoursAndMinutes m_overTime;
     Time m_earliestEndTime{};
-
-    QVector<QObject *> m_controllerDays;
 };
 
 } // namespace whm

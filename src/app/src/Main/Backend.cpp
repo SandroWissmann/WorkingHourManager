@@ -13,9 +13,10 @@
 namespace whm {
 
 namespace {
+
 QVector<QObject *> makeControllerWeeksUntilCurrentWeek(
     const Date &firstDate,
-    Time defaultWorkTimePerDay,
+    const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
     QObject *parent);
 
@@ -106,21 +107,35 @@ void Backend::saveToFile()
 namespace {
 QVector<QObject *> makeControllerWeeksUntilCurrentWeek(
     const Date &firstDate,
-    Time defaultWorkTimePerDay,
+    const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
     QObject *parent)
 {
     constexpr int mondayIdx = 1;
-    auto startDate = firstDate.getPreviouseDateWithDayOfWeek(mondayIdx);
+    auto date = firstDate.getPreviouseDateWithDayOfWeek(mondayIdx);
 
     // auto startDate = firstDate;
     auto endDate = Date::currentDate();
 
+    QVector<Day> weekdays;
     QVector<QObject *> controllerWeeks;
-    while (startDate <= endDate) {
-        controllerWeeks.emplace_back(new ControllerWeek{
-            startDate, defaultWorkTimePerDay, pauseTimesPerDay, parent});
-        startDate = startDate.addDays(7);
+    while (date <= endDate) {
+        auto weekday = date.weekday();
+        if (weekday != "Saturday" && weekday != "Sunday") {
+            weekdays.emplace_back(Day{date});
+        }
+        if (weekday == "Friday") {
+            std::array<Day, 5> days{
+                weekdays[0],
+                weekdays[1],
+                weekdays[2],
+                weekdays[3],
+                weekdays[4]};
+            weekdays.clear();
+            controllerWeeks.emplace_back(new ControllerWeek{
+                defaultWorkTimePerDay, pauseTimesPerDay, days});
+        }
+        date.addDays(1);
     }
 
     return controllerWeeks;
