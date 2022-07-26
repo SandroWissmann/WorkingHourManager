@@ -10,9 +10,7 @@ namespace whm {
 
 namespace {
 
-Time extractExpectedWorkTime(QVector<QObject *> controllerDays);
-
-HoursAndMinutes calculateExpectedWorkedTime(Time defaultWorkTimePerDay);
+HoursAndMinutes calculateExpectedWorkedTime(QVector<QObject *> controllerDays);
 
 HoursAndMinutes calculateWorkedTime(const QVector<QObject *> controllerDays);
 
@@ -25,7 +23,7 @@ Time calculateEarliestEndTime(
 
 ControllerWeek::ControllerWeek(const QVector<QObject *> &controllerDays)
     : m_controllerDays{controllerDays},
-      m_expectedWorkTime{extractExpectedWorkTime(controllerDays)},
+      m_expectedWorkTime{calculateExpectedWorkedTime(controllerDays)},
       m_workedTime{calculateWorkedTime(m_controllerDays)},
       m_overTime{m_workedTime - m_expectedWorkTime}
 {
@@ -35,6 +33,9 @@ ControllerWeek::ControllerWeek(const QVector<QObject *> &controllerDays)
         controllerDay->setParent(this);
     }
     makeControllerDayToControllerWeekConnections();
+
+    onWorkTimeOfDayChanged();
+    onStartTimeOfDayChanged();
 }
 
 QVector<QObject *> ControllerWeek::controllerDays() const
@@ -199,14 +200,19 @@ Time extractExpectedWorkTime(QVector<QObject *> controllerDays)
     return controllerDay->defaultWorkTime();
 }
 
-HoursAndMinutes calculateExpectedWorkedTime(Time defaultWorkTimePerDay)
+HoursAndMinutes calculateExpectedWorkedTime(QVector<QObject *> controllerDays)
 {
-    auto minutes =
-        defaultWorkTimePerDay.hour() * 60 + defaultWorkTimePerDay.minute();
-    minutes *= 5;
-    auto hours = minutes / 60;
-    minutes = minutes - hours * 60;
-    return HoursAndMinutes{hours, minutes};
+    HoursAndMinutes expectedWorkedTime;
+
+    for (const auto &controllerDayAsQObject : controllerDays) {
+        auto controllerDay =
+            qobject_cast<ControllerDay *>(controllerDayAsQObject);
+        HoursAndMinutes expectedWorkedTimeOfDay{
+            controllerDay->defaultWorkTime()};
+
+        expectedWorkedTime += expectedWorkedTimeOfDay;
+    }
+    return expectedWorkedTime;
 }
 
 HoursAndMinutes calculateWorkedTime(const QVector<QObject *> controllerDays)
