@@ -35,8 +35,7 @@ public:
     ControllerDay(
         std::shared_ptr<Day> day,
         const Time &defaultWorkTime,
-        const Time &pauseTime,
-        QObject *parent = nullptr);
+        const Time &pauseTime);
 
     ControllerDay(const ControllerDay &) = delete;
     ControllerDay(ControllerDay &&) = delete;
@@ -50,6 +49,8 @@ public:
     QString dateAsString() const;
 
     QString weekday() const;
+
+    Time defaultWorkTime() const;
 
     Time startTime() const;
     QString startTimeAsString() const;

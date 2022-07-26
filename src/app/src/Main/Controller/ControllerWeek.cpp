@@ -10,7 +10,7 @@ namespace whm {
 
 namespace {
 
-Time toTime(const HoursAndMinutes hoursAndMinutes);
+Time extractExpectedWorkTime(QVector<QObject *> controllerDays);
 
 HoursAndMinutes calculateExpectedWorkedTime(Time defaultWorkTimePerDay);
 
@@ -21,30 +21,19 @@ Time calculateEarliestEndTime(
     HoursAndMinutes expectedWorkTime,
     HoursAndMinutes workTime);
 
-QVector<QObject *> makeControllerDays(
-    const Time &defaultWorkTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
-    const std::array<std::shared_ptr<Day>, 5> &days,
-    QObject *parent);
-
-bool isValidWorkWeek(const std::array<std::shared_ptr<Day>, 5> &days);
-
 } // namespace
 
-ControllerWeek::ControllerWeek(
-    const Time &defaultWorkTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
-    const std::array<std::shared_ptr<Day>, 5> &days,
-    QObject *parent)
-    : QObject{parent}, m_controllerDays{makeControllerDays(
-                           defaultWorkTimePerDay,
-                           pauseTimesPerDay,
-                           days,
-                           this)},
-      m_expectedWorkTime{calculateExpectedWorkedTime(defaultWorkTimePerDay)},
+ControllerWeek::ControllerWeek(const QVector<QObject *> &controllerDays)
+    : m_controllerDays{controllerDays},
+      m_expectedWorkTime{extractExpectedWorkTime(controllerDays)},
       m_workedTime{calculateWorkedTime(m_controllerDays)},
       m_overTime{m_workedTime - m_expectedWorkTime}
 {
+    Q_ASSERT(m_controllerDays.size() == 5);
+
+    for (auto &controllerDay : m_controllerDays) {
+        controllerDay->setParent(this);
+    }
     makeControllerDayToControllerWeekConnections();
 }
 
@@ -126,6 +115,19 @@ QVector<int> ControllerWeek::years() const
     return years;
 }
 
+QVector<std::shared_ptr<Day>> ControllerWeek::days() const
+{
+    QVector<std::shared_ptr<Day>> days;
+    days.reserve(m_controllerDays.size());
+    for (const auto &controllerDayAsQObject : m_controllerDays) {
+        auto controllerDay =
+            qobject_cast<ControllerDay *>(controllerDayAsQObject);
+        auto day = controllerDay->day();
+        days.emplace_back(day);
+    }
+    return days;
+}
+
 void ControllerWeek::onWorkTimeOfDayChanged()
 {
     auto m_workedTime = calculateWorkedTime(m_controllerDays);
@@ -189,9 +191,12 @@ void ControllerWeek::makeControllerDayToControllerWeekConnections() const
 }
 
 namespace {
-Time toTime(const HoursAndMinutes hoursAndMinutes)
+Time extractExpectedWorkTime(QVector<QObject *> controllerDays)
 {
-    return Time{hoursAndMinutes.hours(), hoursAndMinutes.minutes()};
+    Q_ASSERT(!controllerDays.isEmpty());
+
+    auto controllerDay = qobject_cast<ControllerDay *>(controllerDays[0]);
+    return controllerDay->defaultWorkTime();
 }
 
 HoursAndMinutes calculateExpectedWorkedTime(Time defaultWorkTimePerDay)
@@ -259,47 +264,8 @@ Time calculateEarliestEndTime(
     auto startTime = lastDayController->startTime();
     auto pauseTime = lastDayController->pauseTime();
 
-    auto endTime = startTime + toTime(remainingWorkTime) + pauseTime;
+    auto endTime = startTime + remainingWorkTime.toTime() + pauseTime;
     return endTime;
-}
-
-QVector<QObject *> makeControllerDays(
-    const Time &defaultWorkTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
-    const std::array<std::shared_ptr<Day>, 5> &days,
-    QObject *parent)
-{
-    if (!isValidWorkWeek(days)) {
-        qDebug() << Q_FUNC_INFO << "Invalid days";
-        return QVector<QObject *>{};
-    }
-
-    QVector<QObject *> controllerDays;
-    controllerDays.reserve(days.size());
-
-    for (int i = 0; i < days.size(); ++i) {
-        auto controllerDay = new ControllerDay{
-            days[i], defaultWorkTimePerDay, pauseTimesPerDay[i]};
-        controllerDays.emplace_back(controllerDay);
-    }
-    return controllerDays;
-}
-
-bool isValidWorkWeek(const std::array<std::shared_ptr<Day>, 5> &days)
-{
-    auto mondayDate = days[0]->date();
-    if (mondayDate.weekday() != "Monday") {
-        return false;
-    }
-
-    for (int i = 0; i < days.size(); ++i) {
-        auto date = days[i]->date();
-        auto expectedDate = mondayDate.addDays(i);
-        if (date != expectedDate) {
-            return false;
-        }
-    }
-    return true;
 }
 
 } // namespace

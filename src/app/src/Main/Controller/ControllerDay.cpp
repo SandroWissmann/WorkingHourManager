@@ -7,10 +7,8 @@ namespace whm {
 ControllerDay::ControllerDay(
     std::shared_ptr<Day> day,
     const Time &defaultWorkTime,
-    const Time &pauseTime,
-    QObject *parent)
-    : QObject{parent}, m_day{day}, m_defaultWorkTime{defaultWorkTime},
-      m_pauseTime{pauseTime}
+    const Time &pauseTime)
+    : m_day{day}, m_defaultWorkTime{defaultWorkTime}, m_pauseTime{pauseTime}
 {
     calcWorkTime();
 }
@@ -30,6 +28,11 @@ QString ControllerDay::dateAsString() const
 QString ControllerDay::weekday() const
 {
     return m_day->date().weekday();
+}
+
+Time ControllerDay::defaultWorkTime() const
+{
+    return m_defaultWorkTime;
 }
 
 Time ControllerDay::startTime() const

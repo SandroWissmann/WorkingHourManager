@@ -2,14 +2,31 @@
 
 #include "ControllerWeek.hpp"
 
+#include <whm/types/Day.hpp>
+
+#include <algorithm>
+#include <map>
+
 namespace whm {
 
 namespace {
-int calculateMonth(ControllerWeek *controllerWeeks);
-}
 
-ControllerMonth::ControllerMonth(QObject *parent) : QObject{parent}
+QVector<std::shared_ptr<Day>>
+allDaysInWeeks(const QVector<QObject *> &m_controllerWeeks);
+
+int getCurrentMonth(const QVector<std::shared_ptr<Day>> &days);
+
+int getCurrentYear(const QVector<std::shared_ptr<Day>> &days);
+} // namespace
+
+ControllerMonth::ControllerMonth(const QVector<QObject *> &controllerWeeks)
+    : m_controllerWeeks{controllerWeeks}
 {
+    Q_ASSERT(controllerWeeks.size() >= 1 && controllerWeeks.size());
+
+    for (auto &controllerWeek : m_controllerWeeks) {
+        controllerWeek->setParent(this);
+    }
 }
 
 QVector<QObject *> ControllerMonth::controllerWeeks() const
@@ -17,38 +34,87 @@ QVector<QObject *> ControllerMonth::controllerWeeks() const
     return m_controllerWeeks;
 }
 
-void ControllerMonth::insertControllerWeek(ControllerWeek *controllerWeek)
+QVector<std::shared_ptr<Day>> ControllerMonth::days() const
 {
-    // precondition weeks are ordered consecutively
+    auto days = allDaysInWeeks(m_controllerWeeks);
+    auto month = getCurrentMonth(days);
 
-    m_controllerWeeks.emplace_back(controllerWeek);
-
-    // check only first week to determine month
-    if (m_controllerWeeks.size() == 1) {
-        m_month = calculateMonth(controllerWeek);
-    }
+    // erase all days which are int the previous or next month
+    days.erase(
+        std::remove_if(
+            days.begin(),
+            days.end(),
+            [month](const auto &day) { return month != day->date().month(); }),
+        days.end());
+    return days;
 }
 
 int ControllerMonth::month() const
 {
-    return m_month;
+    auto days = allDaysInWeeks(m_controllerWeeks);
+    return getCurrentMonth(days);
+}
+
+// same code as month except the function call, maybe genralize
+int ControllerMonth::year() const
+{
+    auto days = allDaysInWeeks(m_controllerWeeks);
+    return getCurrentYear(days);
 }
 
 namespace {
-int calculateMonth(ControllerWeek *controllerWeek)
-{
-    auto months = controllerWeek->months();
 
-    if (months.size() == 2) {
-        // take second because first value is previous month
-        return months.at(1);
+QVector<std::shared_ptr<Day>>
+allDaysInWeeks(const QVector<QObject *> &m_controllerWeeks)
+{
+    QVector<std::shared_ptr<Day>> days;
+    // get all days from weeks even the ones from previous and next month
+    for (const auto &controllerWeekAsQObject : m_controllerWeeks) {
+        auto controllerWeek =
+            qobject_cast<ControllerWeek *>(controllerWeekAsQObject);
+
+        auto weekDays = controllerWeek->days();
+
+        days.append(weekDays);
     }
-    if (months.size() == 1) {
-        return months.at(0);
-    }
-    // invalid size for month. weeks can be only in one or two months.
-    return -1;
+    return days;
 }
+
+int getCurrentMonth(const QVector<std::shared_ptr<Day>> &days)
+{
+    int count = 0;
+    int currentMonth = -1;
+    std::map<int, int> monthToCount;
+    for (const auto &day : days) {
+        auto month = day->date().month();
+
+        monthToCount[month]++;
+        if (monthToCount[month] > count) {
+            count = monthToCount[month];
+            currentMonth = month;
+        }
+    }
+    return currentMonth;
+}
+
+// almost same code as month maybe generalize?
+int getCurrentYear(const QVector<std::shared_ptr<Day>> &days)
+{
+    int count = 0;
+    int currentYear = -1;
+    std::map<int, int> yearToCount;
+    for (const auto &day : days) {
+        auto year = day->date().year();
+
+        yearToCount[year]++;
+        if (yearToCount[year] > count) {
+            count = yearToCount[year];
+            currentYear = year;
+        }
+    }
+    return currentYear;
+}
+
 } // namespace
 
 } // namespace whm

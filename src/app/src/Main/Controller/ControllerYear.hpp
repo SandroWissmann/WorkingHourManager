@@ -6,27 +6,28 @@
 
 namespace whm {
 
-class ControllerMonth;
-class ControllerWeek;
+class Day;
 
 class ControllerYear : public QObject {
     Q_OBJECT
     Q_PROPERTY(
         QVector<QObject *> controllerMonths READ controllerMonths CONSTANT)
+    Q_PROPERTY(int year READ year CONSTANT)
 public:
-    // Expect weeks contain the right years
-    ControllerYear(
-        const QVector<QObject *> &controllerWeeks,
-        QObject *parent = nullptr);
+    ControllerYear(const QVector<QObject *> &controllerMonths);
 
-    ControllerYear(const ControllerMonth &) = delete;
-    ControllerYear(ControllerMonth &&) = delete;
-    ControllerYear &operator=(const ControllerMonth &) = delete;
-    ControllerYear &operator=(ControllerMonth &&) = delete;
+    ControllerYear(const ControllerYear &) = delete;
+    ControllerYear(ControllerYear &&) = delete;
+    ControllerYear &operator=(const ControllerYear &) = delete;
+    ControllerYear &operator=(ControllerYear &&) = delete;
 
     ~ControllerYear() = default;
 
     QVector<QObject *> controllerMonths() const;
+
+    int year() const;
+
+    QVector<std::shared_ptr<Day>> days() const;
 
 private:
     QVector<QObject *> m_controllerMonths;

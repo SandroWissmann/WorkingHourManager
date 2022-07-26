@@ -23,41 +23,27 @@ ApplicationWindow {
         }
     }
 
-    ColumnLayout {
-        id: columnLayout
+    header: TabBar {
+        id: tabBarYear
+    }
+
+    Year {
         anchors.fill: parent
-        spacing: 0
+        controller: root.controller.controllerYears[tabBarYear.currentIndex]
+    }
 
-        property int elementHeigth: 30
+    Component {
+        id: componentTabButton
+        TabButton {}
+    }
 
-        Header {
-            Layout.preferredHeight: columnLayout.elementHeigth
-            Layout.preferredWidth: parent.width
-        }
-
-        ScrollView {
-            id: scrollView
-            Layout.fillHeight: true
-            Layout.preferredWidth: parent.width
-
-            ColumnLayout {
-                //width: Math.max(scrollView.viewport.width, implicitWidth)
-                height: children.height
-
-                Repeater {
-                    model: root.controller.controllerWeeks
-
-                    delegate: Week {
-                        width: root.width
-                        height: columnLayout.elementHeigth * 6
-
-                        controller: model.modelData
-                    }
-                }
-            }
-        }
-        Item {
-            Layout.fillHeight: true
+    Component.onCompleted: {
+        for (var i = 0; i < root.controller.controllerYears.length; i++) {
+            var year = root.controller.controllerYears[i].year
+            var tabYear = componentTabButton.createObject(tabBarYear, {
+                                                              "text": year
+                                                          })
+            tabBarYear.addItem(tabYear)
         }
     }
 }

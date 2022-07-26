@@ -22,10 +22,12 @@ qt_add_qml_module(appWorkingHourManager
     QML_FILES
     ressources/qml/Main.qml
     ressources/qml/Main/Header.qml
+    ressources/qml/Main/Month.qml
     ressources/qml/Main/Week.qml
     ressources/qml/Main/Week/Day.qml
     ressources/qml/Main/Week/Footer.qml
     ressources/qml/Main/Week/Day/HourMinInput.qml
+    ressources/qml/Main/Year.qml
 )
 
 target_compile_definitions(appWorkingHourManager

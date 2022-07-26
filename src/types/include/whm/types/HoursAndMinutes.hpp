@@ -5,10 +5,13 @@
 
 namespace whm {
 
+class Time;
+
 class HoursAndMinutes {
 public:
     HoursAndMinutes() = default;
     explicit HoursAndMinutes(int minutes);
+    explicit HoursAndMinutes(const Time &time);
     HoursAndMinutes(int hours, int minutes);
 
     HoursAndMinutes(const HoursAndMinutes &) = default;
@@ -18,6 +21,9 @@ public:
 
     // format mm:hh
     QString toString() const;
+
+    // If HoursAndMinutes will be > 23:59 time will be invalid
+    Time toTime() const;
 
     int hours() const;
     int minutes() const;

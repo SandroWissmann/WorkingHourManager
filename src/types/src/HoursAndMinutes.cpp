@@ -1,5 +1,7 @@
 #include "../include/whm/types/HoursAndMinutes.hpp"
 
+#include "../include/whm/types/Time.hpp"
+
 namespace whm {
 
 namespace {
@@ -21,6 +23,11 @@ HoursAndMinutes::HoursAndMinutes(int minutes)
 {
 }
 
+HoursAndMinutes::HoursAndMinutes(const Time &time)
+    : HoursAndMinutes(time.totalMinutes())
+{
+}
+
 QString HoursAndMinutes::toString() const
 {
     auto hourString = toStringWith2Digits(m_hours);
@@ -31,6 +38,11 @@ QString HoursAndMinutes::toString() const
         resultString.push_front('-');
     }
     return resultString;
+}
+
+Time HoursAndMinutes::toTime() const
+{
+    return Time{hours(), minutes()};
 }
 
 int HoursAndMinutes::hours() const

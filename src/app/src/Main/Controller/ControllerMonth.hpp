@@ -5,15 +5,18 @@
 #include <QObject>
 #include <QVector>
 
+#include <memory>
+
 namespace whm {
 
-class ControllerWeek;
+class Day;
 
 class ControllerMonth : public QObject {
     Q_OBJECT
     Q_PROPERTY(QVector<QObject *> controllerWeeks READ controllerWeeks CONSTANT)
+    Q_PROPERTY(int month READ month CONSTANT)
 public:
-    ControllerMonth(QObject *parent = nullptr);
+    ControllerMonth(const QVector<QObject *> &controllerWeeks);
 
     ControllerMonth(const ControllerMonth &) = delete;
     ControllerMonth(ControllerMonth &&) = delete;
@@ -24,14 +27,14 @@ public:
 
     QVector<QObject *> controllerWeeks() const;
 
-    // assume here ControllerWeek memory is managed by someone else
-    void insertControllerWeek(ControllerWeek *controllerWeek);
+    QVector<std::shared_ptr<Day>> days() const;
 
     int month() const;
 
+    int year() const;
+
 private:
     QVector<QObject *> m_controllerWeeks;
-    int m_month{-1};
 };
 } // namespace whm
 

@@ -4,6 +4,7 @@
 #include <whm/types/Day.hpp>
 
 #include "Controller/ControllerDay.hpp"
+#include "Controller/ControllerMonth.hpp"
 #include "Controller/ControllerWeek.hpp"
 #include "Controller/ControllerYear.hpp"
 #include "FileIO/FileReader.hpp"
@@ -11,47 +12,53 @@
 
 #include <QDebug>
 
+#include <map>
+
 namespace whm {
 
 namespace {
 
-QVector<QObject *> makeControllerWeeksUntilCurrentWeek(
-    const Date &firstDate,
-    const Time &defaultWorkTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
-    QObject *parent);
+QVector<std::shared_ptr<Day>>
+makeWorkDays(const Date &firstDate, const Date &lastDate);
 
 Backend makeDefaultBackend();
 
 Backend makeBackendFromFile(const FileReader &fileReader);
 
+QVector<QObject *> makeControllerYears(
+    QVector<std::shared_ptr<Day>> days,
+    const Time &defaultWorkTimePerDay,
+    const std::array<Time, 5> &pauseTimesPerDay);
+
+QVector<QObject *> makeControllerDays(
+    QVector<std::shared_ptr<Day>> days,
+    const Time &defaultWorkTimePerDay,
+    const std::array<Time, 5> &pauseTimesPerDay);
+
+QVector<QObject *>
+makeControllerWeeks(const QVector<QObject *> &controllerDays);
+
+QVector<QObject *>
+makeControllerMonths(const QVector<QObject *> &controllerWeeks);
+
+QVector<QObject *>
+makeControllerYears(const QVector<QObject *> &controllerMonths);
+
+QVector<std::shared_ptr<Day>>
+getDays(const QVector<QObject *> &controllerYears);
+
 } // namespace
 
 Backend::Backend(
-    const Date &firstDate,
+    const QVector<QObject *> &controllerYears,
     const Time &defaultWorkTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
     QObject *parent)
     : QObject{parent}, m_defaultWorkTimePerDay{defaultWorkTimePerDay},
-      m_pauseTimesPerDay{pauseTimesPerDay},
-      m_controllerWeeks{makeControllerWeeksUntilCurrentWeek(
-          firstDate,
-          defaultWorkTimePerDay,
-          pauseTimesPerDay,
-          this)}
+      m_pauseTimesPerDay{pauseTimesPerDay}, m_controllerYears{controllerYears}
 {
-}
-
-Backend::Backend(
-    const QVector<QObject *> &controllerWeeks,
-    const Time &defaultWorkTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
-    QObject *parent)
-    : QObject{parent}, m_defaultWorkTimePerDay{defaultWorkTimePerDay},
-      m_pauseTimesPerDay{pauseTimesPerDay}, m_controllerWeeks{controllerWeeks}
-{
-    for (auto &controllerWeek : m_controllerWeeks) {
-        controllerWeek->setParent(this);
+    for (auto &controllerYear : m_controllerYears) {
+        controllerYear->setParent(this);
     }
 }
 
@@ -66,11 +73,6 @@ Backend Backend::fromFile()
     return makeBackendFromFile(fileReader);
 }
 
-QVector<QObject *> Backend::controllerWeeks() const
-{
-    return m_controllerWeeks;
-}
-
 QVector<QObject *> Backend::controllerYears() const
 {
     return m_controllerYears;
@@ -80,22 +82,7 @@ void Backend::saveToFile()
 {
     FileWriter fileWriter{"save.json"};
 
-    QVector<std::shared_ptr<Day>> days;
-    days.reserve(m_controllerWeeks.size() * 5);
-
-    for (const auto &controllerWeekAsQObject : m_controllerWeeks) {
-        auto controllerWeek =
-            qobject_cast<ControllerWeek *>(controllerWeekAsQObject);
-        auto controllerDays = controllerWeek->controllerDays();
-
-        for (const auto &controllerDayAsQObject : controllerDays) {
-            auto controllerDay =
-                qobject_cast<ControllerDay *>(controllerDayAsQObject);
-
-            auto day = controllerDay->day();
-            days.emplace_back(day);
-        }
-    }
+    auto days = getDays(m_controllerYears);
 
     auto writeOk = fileWriter.writeToFile(
         m_defaultWorkTimePerDay, m_pauseTimesPerDay, days);
@@ -106,41 +93,37 @@ void Backend::saveToFile()
 }
 
 namespace {
-QVector<QObject *> makeControllerWeeksUntilCurrentWeek(
-    const Date &firstDate,
-    const Time &defaultWorkTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
-    QObject *parent)
+
+QVector<std::shared_ptr<Day>>
+makeWorkDays(const Date &firstDate, const Date &lastDate)
 {
     constexpr int mondayIdx = 1;
     auto date = firstDate.getPreviouseDateWithDayOfWeek(mondayIdx);
 
-    // auto startDate = firstDate;
-    auto endDate = Date::currentDate();
+    // TODO this way we can end up in the middle of a week. Move forward
+    // until friday here. instead of second while loop.
+    auto endDate = lastDate;
 
-    QVector<std::shared_ptr<Day>> weekdays;
-    QVector<QObject *> controllerWeeks;
-    while (date <= endDate) {
+    QVector<std::shared_ptr<Day>> days;
+    while (date <= lastDate) {
         auto weekday = date.weekday();
         if (weekday != "Saturday" && weekday != "Sunday") {
             auto day = std::make_shared<Day>(date);
-            weekdays.emplace_back(day);
-        }
-        if (weekday == "Friday") {
-            std::array<std::shared_ptr<Day>, 5> days{
-                weekdays[0],
-                weekdays[1],
-                weekdays[2],
-                weekdays[3],
-                weekdays[4]};
-            weekdays.clear();
-            controllerWeeks.emplace_back(new ControllerWeek{
-                defaultWorkTimePerDay, pauseTimesPerDay, days});
+            days.emplace_back(day);
         }
         date.addDays(1);
     }
 
-    return controllerWeeks;
+    // to fill up whole working week.
+    while (date.weekday() != "Saturday") {
+        auto weekday = date.weekday();
+        if (weekday != "Saturday" && weekday != "Sunday") {
+            auto day = std::make_shared<Day>(date);
+            days.emplace_back(day);
+        }
+        date.addDays(1);
+    }
+    return days;
 }
 
 Backend makeDefaultBackend()
@@ -157,13 +140,18 @@ Backend makeDefaultBackend()
         pauseTimeMondayToThursday,
         pauseTimeFriday};
 
-    return Backend{firstDate, defaultWorkTimePerDay, pauseTimesPerDay};
+    auto endDate = Date::currentDate();
+
+    auto days = makeWorkDays(firstDate, endDate);
+
+    auto controllerYears =
+        makeControllerYears(days, defaultWorkTimePerDay, pauseTimesPerDay);
+
+    return Backend{controllerYears, defaultWorkTimePerDay, pauseTimesPerDay};
 }
 
 Backend makeBackendFromFile(const FileReader &fileReader)
 {
-    auto defaultWorkTimesPerDay = fileReader.defaultWorkTimePerDay();
-    auto pauseTimesPerDay = fileReader.pauseTimesPerDay();
     auto days = fileReader.days();
 
     if (days.isEmpty()) {
@@ -176,17 +164,204 @@ Backend makeBackendFromFile(const FileReader &fileReader)
         return makeDefaultBackend();
     }
 
-    QVector<QObject *> controllerWeeks;
-    for (auto it = days.begin(); it < days.end(); it += 5) {
-        std::array<std::shared_ptr<Day>, 5> weekdays{
-            *it, *(it + 1), *(it + 2), *(it + 3), *(it + 4)};
+    auto defaultWorkTimePerDay = fileReader.defaultWorkTimePerDay();
+    auto pauseTimesPerDay = fileReader.pauseTimesPerDay();
 
-        auto controllerWeek = new ControllerWeek{
-            defaultWorkTimesPerDay, pauseTimesPerDay, weekdays};
-        controllerWeeks.emplace_back(controllerWeek);
+    auto controllerYears =
+        makeControllerYears(days, defaultWorkTimePerDay, pauseTimesPerDay);
+
+    return Backend{controllerYears, defaultWorkTimePerDay, pauseTimesPerDay};
+}
+
+QVector<QObject *> makeControllerYears(
+    QVector<std::shared_ptr<Day>> days,
+    const Time &defaultWorkTimePerDay,
+    const std::array<Time, 5> &pauseTimesPerDay)
+{
+    auto controllerDays =
+        makeControllerDays(days, defaultWorkTimePerDay, pauseTimesPerDay);
+    auto controllerWeeks = makeControllerWeeks(controllerDays);
+    auto controllerMonths = makeControllerMonths(controllerWeeks);
+    auto controllerYears = makeControllerYears(controllerMonths);
+    return controllerYears;
+}
+
+QVector<QObject *> makeControllerDays(
+    QVector<std::shared_ptr<Day>> days,
+    const Time &defaultWorkTimePerDay,
+    const std::array<Time, 5> &pauseTimesPerDay)
+{
+    std::map<QString, Time> weekdayToPauseTime{
+        {"Monday", pauseTimesPerDay[0]},
+        {"Tuesday", pauseTimesPerDay[1]},
+        {"Wednesday", pauseTimesPerDay[2]},
+        {"Thursday", pauseTimesPerDay[3]},
+        {"Friday", pauseTimesPerDay[4]},
+    };
+
+    QVector<QObject *> controllerDays;
+    controllerDays.reserve(days.size());
+
+    for (const auto &day : days) {
+
+        auto weekday = day->date().weekday();
+        auto pauseTime = weekdayToPauseTime[weekday];
+        auto controllerDay =
+            new ControllerDay{day, defaultWorkTimePerDay, pauseTime};
+        controllerDays.emplace_back(controllerDay);
+    }
+    return controllerDays;
+}
+
+QVector<QObject *> makeControllerWeeks(const QVector<QObject *> &controllerDays)
+{
+    QVector<QObject *> controllerDaysOfWeek;
+    constexpr int countOfWeekdays = 5;
+    controllerDaysOfWeek.reserve(countOfWeekdays);
+
+    QVector<QObject *> controllerWeeks;
+    controllerWeeks.reserve(controllerDays.size() / countOfWeekdays);
+    for (const auto &controllerDay : controllerDays) {
+        controllerDaysOfWeek.emplace_back(controllerDay);
+
+        if (controllerDaysOfWeek.size() == countOfWeekdays) {
+            auto controllerWeek = new ControllerWeek{controllerDaysOfWeek};
+            controllerWeeks.emplace_back(controllerWeek);
+            controllerDaysOfWeek.clear();
+        }
+    }
+    return controllerWeeks;
+}
+
+QVector<QObject *>
+makeControllerMonths(const QVector<QObject *> &controllerWeeks)
+{
+    // Put weeks into years. Some weeks can show up twice because they are
+    // sliced between december / january
+    std::map<int, QVector<QObject *>> yearsToControllerWeeks;
+    for (const auto &controllerWeekAsQObject : controllerWeeks) {
+        auto controllerWeek =
+            qobject_cast<ControllerWeek *>(controllerWeekAsQObject);
+
+        auto years = controllerWeek->years();
+
+        for (const auto &year : years) {
+            if (yearsToControllerWeeks.find(year) ==
+                yearsToControllerWeeks.end()) {
+                QVector<QObject *> weeks;
+                weeks.emplace_back(controllerWeekAsQObject);
+                yearsToControllerWeeks[year] = weeks;
+            }
+            else {
+                auto weeks = yearsToControllerWeeks[year];
+                weeks.emplace_back(controllerWeekAsQObject);
+                yearsToControllerWeeks[year] = weeks;
+            }
+        }
     }
 
-    return Backend{controllerWeeks, defaultWorkTimesPerDay, pauseTimesPerDay};
+    // transform into flat vector of weeks in years
+    QVector<QVector<QObject *>> controllerWeeksInYears;
+    controllerWeeksInYears.reserve(yearsToControllerWeeks.size());
+    for (const auto &yearToControllerWeeks : yearsToControllerWeeks) {
+        controllerWeeksInYears.emplace_back(yearToControllerWeeks.second);
+    }
+
+    QVector<QObject *> controllerMonths;
+
+    // go over years and order weeks into months
+    for (const auto &controllerWeeksInYear : controllerWeeksInYears) {
+
+        qDebug() << "change year";
+
+        std::map<int, QVector<QObject *>> monthsToControllerWeeks;
+        for (const auto &controllerWeekAsQObject : controllerWeeksInYear) {
+            auto controllerWeek =
+                qobject_cast<ControllerWeek *>(controllerWeekAsQObject);
+
+            auto months = controllerWeek->months();
+
+            for (const auto &month : months) {
+                if (monthsToControllerWeeks.find(month) ==
+                    monthsToControllerWeeks.end()) {
+                    QVector<QObject *> weeks;
+                    weeks.emplace_back(controllerWeekAsQObject);
+                    monthsToControllerWeeks[month] = weeks;
+                }
+                else {
+                    auto weeks = monthsToControllerWeeks[month];
+                    weeks.emplace_back(controllerWeekAsQObject);
+                    monthsToControllerWeeks[month] = weeks;
+                }
+            }
+        }
+
+        for (const auto &monthToControllerWeeks : monthsToControllerWeeks) {
+            auto controllerMonth =
+                new ControllerMonth{monthToControllerWeeks.second};
+
+            auto outputMonth = qobject_cast<ControllerMonth *>(controllerMonth);
+
+            qDebug() << "controller month. year: [" << outputMonth->year()
+                     << "] month: [" << outputMonth->month()
+                     << "] weeksCount : ["
+                     << outputMonth->controllerWeeks().size();
+
+            controllerMonths.emplace_back(controllerMonth);
+        }
+    }
+    return controllerMonths;
+}
+
+QVector<QObject *>
+makeControllerYears(const QVector<QObject *> &controllerMonths)
+{
+    std::map<int, QVector<QObject *>> yearsToControllerMonths;
+
+    for (const auto &controllerMonthsAsQObject : controllerMonths) {
+        auto controllerMonth =
+            qobject_cast<ControllerMonth *>(controllerMonthsAsQObject);
+
+        auto year = controllerMonth->year();
+
+        if (yearsToControllerMonths.find(year) ==
+            yearsToControllerMonths.end()) {
+            QVector<QObject *> weeks;
+            weeks.emplace_back(controllerMonthsAsQObject);
+            yearsToControllerMonths[year] = weeks;
+        }
+        else {
+            auto weeks = yearsToControllerMonths[year];
+            weeks.emplace_back(controllerMonthsAsQObject);
+            yearsToControllerMonths[year] = weeks;
+        }
+    }
+
+    QVector<QObject *> controllerYears;
+    controllerYears.reserve(yearsToControllerMonths.size());
+    for (const auto &yearToControllerMonths : yearsToControllerMonths) {
+        auto controllerYear = new ControllerYear{yearToControllerMonths.second};
+        controllerYears.emplace_back(controllerYear);
+    }
+    return controllerYears;
+}
+
+QVector<std::shared_ptr<Day>> getDays(const QVector<QObject *> &controllerYears)
+{
+    QVector<std::shared_ptr<Day>> days;
+
+    // get all days from years even the ones from previous and next years
+    for (const auto &controllerYearAsQObject : controllerYears) {
+        auto controllerYear =
+            qobject_cast<ControllerWeek *>(controllerYearAsQObject);
+
+        auto yearDays = controllerYear->days();
+
+        days.append(yearDays);
+    }
+
+    days.erase(std::unique(days.begin(), days.end()), days.end());
+    return days;
 }
 
 } // namespace

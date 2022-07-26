@@ -25,11 +25,7 @@ class ControllerWeek : public QObject {
 
     Q_PROPERTY(QVector<QObject *> controllerDays READ controllerDays CONSTANT)
 public:
-    ControllerWeek(
-        const Time &defaultWorkTimePerDay,
-        const std::array<Time, 5> &pauseTimesPerDay,
-        const std::array<std::shared_ptr<Day>, 5> &days,
-        QObject *parent = nullptr);
+    ControllerWeek(const QVector<QObject *> &controllerDays);
 
     ControllerWeek(const ControllerWeek &) = delete;
     ControllerWeek(ControllerWeek &&) = delete;
@@ -50,6 +46,8 @@ public:
 
     // Indicate in which year the week is present
     QVector<int> years() const;
+
+    QVector<std::shared_ptr<Day>> days() const;
 
 signals:
     void workedTimeChanged();
