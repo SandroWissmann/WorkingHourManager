@@ -21,6 +21,10 @@ namespace {
 QVector<std::shared_ptr<Day>>
 makeWorkDays(const Date &firstDate, const Date &lastDate);
 
+int extractFirstYear(const QVector<std::shared_ptr<Day>> &days);
+
+Date getLastDayOfFirstWeekDate(const QVector<std::shared_ptr<Day>> &days);
+
 Backend makeDefaultBackend();
 
 Backend makeBackendFromFile(const FileReader &fileReader);
@@ -39,7 +43,14 @@ QVector<QObject *>
 makeControllerWeeks(const QVector<QObject *> &controllerDays);
 
 QVector<QObject *>
-makeControllerMonths(const QVector<QObject *> &controllerWeeks);
+makeControllerMonths(int firstYear, const QVector<QObject *> &controllerWeeks);
+
+std::map<int, QVector<QObject *>> controllerWeeksToYearsControllerWeekMap(
+    int firstYear,
+    const QVector<QObject *> &controllerWeeks);
+
+QVector<QObject *>
+makeControllerMonths(const QVector<QVector<QObject *>> &controllerWeeksInYears);
 
 QVector<QObject *>
 makeControllerYears(const QVector<QObject *> &controllerMonths);
@@ -111,7 +122,7 @@ makeWorkDays(const Date &firstDate, const Date &lastDate)
             auto day = std::make_shared<Day>(date);
             days.emplace_back(day);
         }
-        date.addDays(1);
+        date = date.addDays(1);
     }
 
     // to fill up whole working week.
@@ -121,9 +132,23 @@ makeWorkDays(const Date &firstDate, const Date &lastDate)
             auto day = std::make_shared<Day>(date);
             days.emplace_back(day);
         }
-        date.addDays(1);
+        date = date.addDays(1);
     }
     return days;
+}
+
+int extractFirstYear(const QVector<std::shared_ptr<Day>> &days)
+{
+    auto date = getLastDayOfFirstWeekDate(days);
+    return date.year();
+}
+
+Date getLastDayOfFirstWeekDate(const QVector<std::shared_ptr<Day>> &days)
+{
+    constexpr auto workDaysCount = 5;
+    Q_ASSERT(days.size() >= workDaysCount);
+
+    return days.at(workDaysCount - 1)->date();
 }
 
 Backend makeDefaultBackend()
@@ -181,7 +206,10 @@ QVector<QObject *> makeControllerYears(
     auto controllerDays =
         makeControllerDays(days, defaultWorkTimePerDay, pauseTimesPerDay);
     auto controllerWeeks = makeControllerWeeks(controllerDays);
-    auto controllerMonths = makeControllerMonths(controllerWeeks);
+
+    auto firstYear = extractFirstYear(days);
+
+    auto controllerMonths = makeControllerMonths(firstYear, controllerWeeks);
     auto controllerYears = makeControllerYears(controllerMonths);
     return controllerYears;
 }
@@ -234,10 +262,29 @@ QVector<QObject *> makeControllerWeeks(const QVector<QObject *> &controllerDays)
 }
 
 QVector<QObject *>
-makeControllerMonths(const QVector<QObject *> &controllerWeeks)
+makeControllerMonths(int firstYear, const QVector<QObject *> &controllerWeeks)
 {
     // Put weeks into years. Some weeks can show up twice because they are
     // sliced between december / january
+    std::map<int, QVector<QObject *>> yearsToControllerWeeks =
+        controllerWeeksToYearsControllerWeekMap(firstYear, controllerWeeks);
+
+    // transform into flat vector of weeks in years
+    QVector<QVector<QObject *>> controllerWeeksInYears;
+    controllerWeeksInYears.reserve(yearsToControllerWeeks.size());
+    for (const auto &yearToControllerWeeks : yearsToControllerWeeks) {
+        controllerWeeksInYears.emplace_back(yearToControllerWeeks.second);
+    }
+
+    QVector<QObject *> controllerMonths =
+        makeControllerMonths(controllerWeeksInYears);
+    return controllerMonths;
+}
+
+std::map<int, QVector<QObject *>> controllerWeeksToYearsControllerWeekMap(
+    int firstYear,
+    const QVector<QObject *> &controllerWeeks)
+{
     std::map<int, QVector<QObject *>> yearsToControllerWeeks;
     for (const auto &controllerWeekAsQObject : controllerWeeks) {
         auto controllerWeek =
@@ -246,6 +293,13 @@ makeControllerMonths(const QVector<QObject *> &controllerWeeks)
         auto years = controllerWeek->years();
 
         for (const auto &year : years) {
+
+            // do not store a year which is smaller for example some days
+            // from december could cause this
+            if (year < firstYear) {
+                continue;
+            }
+
             if (yearsToControllerWeeks.find(year) ==
                 yearsToControllerWeeks.end()) {
                 QVector<QObject *> weeks;
@@ -259,16 +313,13 @@ makeControllerMonths(const QVector<QObject *> &controllerWeeks)
             }
         }
     }
+    return yearsToControllerWeeks;
+}
 
-    // transform into flat vector of weeks in years
-    QVector<QVector<QObject *>> controllerWeeksInYears;
-    controllerWeeksInYears.reserve(yearsToControllerWeeks.size());
-    for (const auto &yearToControllerWeeks : yearsToControllerWeeks) {
-        controllerWeeksInYears.emplace_back(yearToControllerWeeks.second);
-    }
-
+QVector<QObject *>
+makeControllerMonths(const QVector<QVector<QObject *>> &controllerWeeksInYears)
+{
     QVector<QObject *> controllerMonths;
-
     // go over years and order weeks into months
     for (const auto &controllerWeeksInYear : controllerWeeksInYears) {
         std::map<int, QVector<QObject *>> monthsToControllerWeeks;
@@ -296,14 +347,6 @@ makeControllerMonths(const QVector<QObject *> &controllerWeeks)
         for (const auto &monthToControllerWeeks : monthsToControllerWeeks) {
             auto controllerMonth =
                 new ControllerMonth{monthToControllerWeeks.second};
-
-            auto outputMonth = qobject_cast<ControllerMonth *>(controllerMonth);
-
-            qDebug() << "controller month. year: [" << outputMonth->year()
-                     << "] month: [" << outputMonth->month()
-                     << "] weeksCount : ["
-                     << outputMonth->controllerWeeks().size();
-
             controllerMonths.emplace_back(controllerMonth);
         }
     }
