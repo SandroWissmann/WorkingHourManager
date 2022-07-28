@@ -271,9 +271,6 @@ makeControllerMonths(const QVector<QObject *> &controllerWeeks)
 
     // go over years and order weeks into months
     for (const auto &controllerWeeksInYear : controllerWeeksInYears) {
-
-        qDebug() << "change year";
-
         std::map<int, QVector<QObject *>> monthsToControllerWeeks;
         for (const auto &controllerWeekAsQObject : controllerWeeksInYear) {
             auto controllerWeek =
