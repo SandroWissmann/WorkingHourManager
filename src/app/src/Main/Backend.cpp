@@ -393,7 +393,7 @@ QVector<std::shared_ptr<Day>> getDays(const QVector<QObject *> &controllerYears)
     // get all days from years even the ones from previous and next years
     for (const auto &controllerYearAsQObject : controllerYears) {
         auto controllerYear =
-            qobject_cast<ControllerWeek *>(controllerYearAsQObject);
+            qobject_cast<ControllerYear *>(controllerYearAsQObject);
 
         auto yearDays = controllerYear->days();
 
