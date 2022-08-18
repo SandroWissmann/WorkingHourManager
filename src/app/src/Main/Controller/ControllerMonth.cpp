@@ -55,6 +55,14 @@ int ControllerMonth::month() const
     return getCurrentMonth(days);
 }
 
+QString ControllerMonth::nameOfMonth() const
+{
+    // This is a trick to transform month() int into its name by construct a
+    // date with not matter year and day and only output the name of month
+    QDate date{2000, month(), 1};
+    return date.toString("MMMM");
+}
+
 // same code as month except the function call, maybe genralize
 int ControllerMonth::year() const
 {

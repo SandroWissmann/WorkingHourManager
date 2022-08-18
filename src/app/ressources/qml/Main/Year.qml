@@ -40,7 +40,7 @@ Page {
         }
 
         for (var j = 0; j < root.controller.controllerMonths.length; j++) {
-            var month = root.controller.controllerMonths[j].month
+            var month = root.controller.controllerMonths[j].nameOfMonth
             var tabMonth = componentTabButton.createObject(tabBarMonth, {
                                                                "text": month
                                                            })

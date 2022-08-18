@@ -14,7 +14,7 @@ class Day;
 class ControllerMonth : public QObject {
     Q_OBJECT
     Q_PROPERTY(QVector<QObject *> controllerWeeks READ controllerWeeks CONSTANT)
-    Q_PROPERTY(int month READ month CONSTANT)
+    Q_PROPERTY(QString nameOfMonth READ nameOfMonth CONSTANT)
 public:
     ControllerMonth(const QVector<QObject *> &controllerWeeks);
 
@@ -30,6 +30,8 @@ public:
     QVector<std::shared_ptr<Day>> days() const;
 
     int month() const;
+
+    QString nameOfMonth() const;
 
     int year() const;
 
