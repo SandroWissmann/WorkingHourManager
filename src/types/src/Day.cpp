@@ -3,12 +3,19 @@
 namespace whm {
 
 namespace {
-bool hasValidTime(const Time &time, bool isHoliday, bool isVacation)
+bool hasValidTime(
+    const Time &time,
+    bool isHoliday,
+    bool isVacation,
+    bool isIgnore)
 {
     if (isHoliday) {
         return true;
     }
     if (isVacation) {
+        return true;
+    }
+    if (isIgnore) {
         return true;
     }
     if (!time.isValid()) {
@@ -23,18 +30,19 @@ Day::Day(
     const Time &startTime,
     const Time &endTime,
     bool isHoliday,
-    bool isVacation)
-    : m_date{date}, m_startTime{startTime},
-      m_endTime(endTime), m_isHoliday{isHoliday}, m_isVacation{isVacation}
+    bool isVacation,
+    bool isIgnore)
+    : m_date{date}, m_startTime{startTime}, m_endTime(endTime),
+      m_isHoliday{isHoliday}, m_isVacation{isVacation}, m_isIgnore{isIgnore}
 {
 }
 
 Day::Day(const Date &date, const Time &startTime, const Time &endTime)
-    : Day(date, startTime, endTime, false, false)
+    : Day(date, startTime, endTime, false, false, false)
 {
 }
 
-Day::Day(const Date &date) : Day(date, Time{}, Time{}, false, false)
+Day::Day(const Date &date) : Day(date, Time{}, Time{}, false, false, false)
 {
 }
 
@@ -99,7 +107,7 @@ bool Day::isVacation() const
     return m_isVacation;
 }
 
-bool Day::setisVacation(bool isVacation)
+bool Day::setIsVacation(bool isVacation)
 {
     if (m_isVacation == isVacation) {
         return false;
@@ -108,9 +116,23 @@ bool Day::setisVacation(bool isVacation)
     return true;
 }
 
+bool Day::isIgnore() const
+{
+    return m_isIgnore;
+}
+
+bool Day::setIsIgnore(bool isIgnore)
+{
+    if (m_isIgnore == isIgnore) {
+        return false;
+    }
+    m_isIgnore = isIgnore;
+    return true;
+}
+
 bool Day::hasValidStartTime() const
 {
-    if (hasValidTime(startTime(), isHoliday(), isVacation())) {
+    if (hasValidTime(startTime(), isHoliday(), isVacation(), isIgnore())) {
         return true;
     }
     return false;
@@ -118,7 +140,7 @@ bool Day::hasValidStartTime() const
 
 bool Day::hasValidEndTime() const
 {
-    if (hasValidTime(endTime(), isHoliday(), isVacation())) {
+    if (hasValidTime(endTime(), isHoliday(), isVacation(), isIgnore())) {
         return true;
     }
     return false;

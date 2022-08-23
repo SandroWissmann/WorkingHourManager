@@ -31,6 +31,9 @@ class ControllerDay : public QObject {
 
     Q_PROPERTY(bool isVacation READ isVacation WRITE setisVacation NOTIFY
                    isVacationChanged)
+
+    Q_PROPERTY(
+        bool isIgnore READ isIgnore WRITE setisIgnore NOTIFY isIgnoreChanged)
 public:
     ControllerDay(
         std::shared_ptr<Day> day,
@@ -71,6 +74,9 @@ public:
     bool isVacation() const;
     void setisVacation(bool isVacation);
 
+    bool isIgnore() const;
+    void setisIgnore(bool isIgnore);
+
     bool hasValidStartTime() const;
     bool hasValidEndTime() const;
 
@@ -78,8 +84,10 @@ signals:
     void startTimeChanged();
     void endTimeChanged();
     void workTimeChanged();
+
     void isHolidayChanged();
     void isVacationChanged();
+    void isIgnoreChanged();
 
 private:
     void calcWorkTime();

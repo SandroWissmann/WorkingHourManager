@@ -15,7 +15,8 @@ public:
         const Time &startTime,
         const Time &endTime,
         bool isHoliday,
-        bool isVacation);
+        bool isVacation,
+        bool isIgnore);
 
     Day(const Date &date, const Time &startTime, const Time &endTime);
 
@@ -40,7 +41,10 @@ public:
     bool setIsHoliday(bool isHoliday);
 
     bool isVacation() const;
-    bool setisVacation(bool isVacation);
+    bool setIsVacation(bool isVacation);
+
+    bool isIgnore() const;
+    bool setIsIgnore(bool isIgnore);
 
     bool hasValidStartTime() const;
     bool hasValidEndTime() const;
@@ -52,6 +56,7 @@ private:
 
     bool m_isHoliday{false};
     bool m_isVacation{false};
+    bool m_isIgnore{false};
 };
 } // namespace whm
 

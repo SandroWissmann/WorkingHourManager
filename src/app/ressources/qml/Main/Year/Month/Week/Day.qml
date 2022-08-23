@@ -9,12 +9,22 @@ Item {
 
     property QtObject controller
 
+    function blockTimeInput() {
+        startTime_hourMinInput.enabled = false
+        endTime_hourMinInput.enabled = false
+    }
+
+    function unblockTimeInput() {
+        startTime_hourMinInput.enabled = true
+        endTime_hourMinInput.enabled = true
+    }
+
     RowLayout {
         id: rowLayout
         anchors.fill: parent
         spacing: 0
 
-        property int elementWidth: root.width / 8
+        property int elementWidth: root.width / rowLayout.children.length
 
         Text {
             id: date_text
@@ -41,7 +51,7 @@ Item {
             }
         }
         HourMinInput {
-            id: endTime_textField
+            id: endTime_hourMinInput
             Layout.preferredWidth: rowLayout.elementWidth
             text: root.controller.endTime
             readOnly: vacation_checkBox.checked || holiday_checkBox.checked
@@ -70,7 +80,13 @@ Item {
             onCheckedChanged: {
                 if (checked) {
                     vacation_checkBox.checked = false
+                    ignore_checkBox.checked = false
+
+                    root.blockTimeInput()
+                } else {
+                    root.unblockTimeInput()
                 }
+
                 root.controller.isHoliday = checked
             }
         }
@@ -82,8 +98,31 @@ Item {
             onCheckedChanged: {
                 if (checked) {
                     holiday_checkBox.checked = false
+                    ignore_checkBox.checked = false
+
+                    root.blockTimeInput()
+                } else {
+                    root.unblockTimeInput()
                 }
+
                 root.controller.isVacation = checked
+            }
+        }
+        CheckBox {
+            id: ignore_checkBox
+            Layout.preferredWidth: rowLayout.elementWidth
+            checked: root.controller.isIgnore
+
+            onCheckedChanged: {
+                if (checked) {
+                    holiday_checkBox.checked = false
+                    vacation_checkBox.checked = false
+
+                    root.blockTimeInput()
+                } else {
+                    root.unblockTimeInput()
+                }
+                root.controller.isIgnore = checked
             }
         }
     }

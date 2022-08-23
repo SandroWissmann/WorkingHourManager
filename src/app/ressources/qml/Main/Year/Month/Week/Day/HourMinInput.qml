@@ -6,6 +6,9 @@ TextField {
     font.bold: true
     inputMask: "99:99"
     color: {
+        if (!enabled) {
+            return "green"
+        }
         if (!acceptableInput) {
             return "red"
         }

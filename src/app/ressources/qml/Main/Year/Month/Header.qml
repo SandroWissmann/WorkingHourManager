@@ -8,7 +8,7 @@ Item {
         anchors.fill: parent
         spacing: 0
 
-        property int elementWidth: root.width / 8
+        property int elementWidth: root.width / rowLayout.children.length
 
         Text {
             Layout.preferredWidth: rowLayout.elementWidth
@@ -48,6 +48,11 @@ Item {
         Text {
             Layout.preferredWidth: rowLayout.elementWidth
             text: qsTr("Vacation")
+            font.bold: true
+        }
+        Text {
+            Layout.preferredWidth: rowLayout.elementWidth
+            text: qsTr("Ignore")
             font.bold: true
         }
     }

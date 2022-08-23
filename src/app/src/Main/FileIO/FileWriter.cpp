@@ -119,9 +119,9 @@ QJsonObject makeDayJsonObject(std::shared_ptr<Day> day)
     if (auto isVacation = day->isVacation()) {
         jsonObject["isVacation"] = isVacation;
     }
-    // TODO implement ignore function so weeks are not used for calc the
-    // times holidays etc.
-    // jsonObject["isIgnore"] = false;
+    if (auto isIgnore = day->isIgnore()) {
+        jsonObject["isIgnore"] = isIgnore;
+    }
     return jsonObject;
 }
 

@@ -158,9 +158,10 @@ QVector<std::shared_ptr<Day>> FileReader::days() const
         auto endTime = extractEndTimeFromDay(dayObject);
         auto isHoliday = extractIsHolidayFromDay(dayObject);
         auto isVaccation = extractIsVacationFromDay(dayObject);
+        auto isIgnore = extractIsVacationFromDay(dayObject);
 
         auto day = std::make_shared<Day>(
-            *optDate, startTime, endTime, isHoliday, isVaccation);
+            *optDate, startTime, endTime, isHoliday, isVaccation, isIgnore);
 
         days.emplace_back(day);
     }
