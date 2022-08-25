@@ -34,7 +34,7 @@ public:
     bool setStartTime(const QString &startTimeAsString);
 
     Time endTime() const;
-    bool setEndTime(const Time &endTime);
+    bool setEndTime(Time endTime);
     bool setEndTime(const QString &endTimeAsString);
 
     bool isHoliday() const;

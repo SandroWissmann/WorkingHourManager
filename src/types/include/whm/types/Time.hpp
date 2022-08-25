@@ -44,6 +44,11 @@ bool operator!=(const Time &lhs, const Time &rhs);
 Time operator+(Time lhs, const Time &rhs);
 Time operator-(Time lhs, const Time &rhs);
 
+bool operator<(const Time &lhs, const Time &rhs);
+bool operator>(const Time &lhs, const Time &rhs);
+bool operator<=(const Time &lhs, const Time &rhs);
+bool operator>=(const Time &lhs, const Time &rhs);
+
 } // namespace whm
 
 #endif

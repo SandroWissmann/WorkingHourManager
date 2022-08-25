@@ -114,4 +114,23 @@ Time operator-(Time lhs, const Time &rhs)
     return lhs;
 }
 
+bool operator<(const Time &lhs, const Time &rhs)
+{
+    return lhs.totalMinutes() < rhs.totalMinutes();
+}
+
+bool operator>(const Time &lhs, const Time &rhs)
+{
+    return rhs < lhs;
+}
+
+bool operator<=(const Time &lhs, const Time &rhs)
+{
+    return !(lhs > rhs);
+}
+bool operator>=(const Time &lhs, const Time &rhs)
+{
+    return !(lhs < rhs);
+}
+
 } // namespace whm

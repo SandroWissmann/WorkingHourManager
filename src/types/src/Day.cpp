@@ -74,8 +74,16 @@ Time Day::endTime() const
     return m_endTime;
 }
 
-bool Day::setEndTime(const Time &endTime)
+bool Day::setEndTime(Time endTime)
 {
+    // detect input as PM and transform to to 24h format.
+    if (endTime < m_startTime && endTime.hour() < 12) {
+        auto hour = endTime.hour();
+        auto minute = endTime.minute();
+        hour += 12;
+        endTime = Time{hour, minute};
+    }
+
     if (m_endTime == endTime) {
         return false;
     }
@@ -85,7 +93,9 @@ bool Day::setEndTime(const Time &endTime)
 
 bool Day::setEndTime(const QString &endTimeAsString)
 {
-    return m_endTime.set(endTimeAsString);
+    Time endTime;
+    endTime.set(endTimeAsString);
+    return setEndTime(endTime);
 }
 
 bool Day::isHoliday() const
