@@ -253,6 +253,11 @@ Time calculateEarliestEndTime(
         }
     }
 
+    // All days were holiday / vaccation or ignore so no calculation
+    if (lastDayIt == controllerDays.rend()) {
+        return Time{};
+    }
+
     for (auto rit = lastDayIt + 1; rit != controllerDays.rend(); ++rit) {
         auto controllerDay = qobject_cast<ControllerDay *>(*rit);
 
