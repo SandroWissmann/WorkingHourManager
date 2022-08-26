@@ -17,7 +17,7 @@ HoursAndMinutes calculateWorkedTime(const QVector<QObject *> controllerDays);
 Time calculateEarliestEndTime(
     const QVector<QObject *> &controllerDays,
     HoursAndMinutes expectedWorkTime,
-    HoursAndMinutes workTime);
+    HoursAndMinutes workedTime);
 
 } // namespace
 
@@ -180,14 +180,19 @@ void ControllerWeek::makeControllerDayToControllerWeekConnections() const
             qobject_cast<ControllerDay *>(controllerDayQObject);
         connect(
             controllerDay,
-            &ControllerDay::workTimeChanged,
+            &ControllerDay::startTimeChanged,
+            this,
+            &ControllerWeek::onStartTimeOfDayChanged);
+        connect(
+            controllerDay,
+            &ControllerDay::workedTimeChanged,
             this,
             &ControllerWeek::onWorkTimeOfDayChanged);
         connect(
             controllerDay,
-            &ControllerDay::startTimeChanged,
+            &ControllerDay::dayTypeChanged,
             this,
-            &ControllerWeek::onStartTimeOfDayChanged);
+            &ControllerWeek::onWorkTimeOfDayChanged);
     }
 }
 
@@ -197,7 +202,7 @@ Time extractExpectedWorkTime(QVector<QObject *> controllerDays)
     Q_ASSERT(!controllerDays.isEmpty());
 
     auto controllerDay = qobject_cast<ControllerDay *>(controllerDays[0]);
-    return controllerDay->defaultWorkTime();
+    return controllerDay->defaultWorkedTime();
 }
 
 HoursAndMinutes calculateExpectedWorkedTime(QVector<QObject *> controllerDays)
@@ -208,7 +213,7 @@ HoursAndMinutes calculateExpectedWorkedTime(QVector<QObject *> controllerDays)
         auto controllerDay =
             qobject_cast<ControllerDay *>(controllerDayAsQObject);
         HoursAndMinutes expectedWorkedTimeOfDay{
-            controllerDay->defaultWorkTime()};
+            controllerDay->defaultWorkedTime()};
 
         expectedWorkedTime += expectedWorkedTimeOfDay;
     }
@@ -231,7 +236,7 @@ HoursAndMinutes calculateWorkedTime(const QVector<QObject *> controllerDays)
 Time calculateEarliestEndTime(
     const QVector<QObject *> &controllerDays,
     HoursAndMinutes expectedWorkTime,
-    HoursAndMinutes workTime)
+    HoursAndMinutes workedTime)
 {
     auto lastDayIt = controllerDays.rend();
     for (auto rit = controllerDays.rbegin(); rit != controllerDays.rend();
@@ -268,7 +273,7 @@ Time calculateEarliestEndTime(
         }
     }
 
-    auto remainingWorkTime = expectedWorkTime - workTime;
+    auto remainingWorkTime = expectedWorkTime - workedTime;
 
     auto lastDayController = qobject_cast<ControllerDay *>(*lastDayIt);
 

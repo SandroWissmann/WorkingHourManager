@@ -70,7 +70,7 @@ Item {
             id: workedTime_text
             Layout.preferredWidth: rowLayout.elementWidth
             font.bold: true
-            text: root.controller.workTime
+            text: root.controller.workedTime
         }
         CheckBox {
             id: holiday_checkBox

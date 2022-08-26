@@ -41,6 +41,9 @@ Date Day::date() const
 
 Time Day::startTime() const
 {
+    if (m_dayType != DayType::work) {
+        return Time{};
+    }
     return m_startTime;
 }
 bool Day::setStartTime(const Time &startTime)
@@ -67,6 +70,9 @@ bool Day::hasValidStartTime() const
 
 Time Day::endTime() const
 {
+    if (m_dayType != DayType::work) {
+        return Time{};
+    }
     return m_endTime;
 }
 

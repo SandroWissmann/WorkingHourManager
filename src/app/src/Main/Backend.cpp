@@ -31,12 +31,12 @@ Backend makeBackendFromFile(const FileReader &fileReader);
 
 QVector<QObject *> makeControllerYears(
     QVector<std::shared_ptr<Day>> days,
-    const Time &defaultWorkTimePerDay,
+    const Time &defaultWorkedTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay);
 
 QVector<QObject *> makeControllerDays(
     QVector<std::shared_ptr<Day>> days,
-    const Time &defaultWorkTimePerDay,
+    const Time &defaultWorkedTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay);
 
 QVector<QObject *>
@@ -62,10 +62,10 @@ getDays(const QVector<QObject *> &controllerYears);
 
 Backend::Backend(
     const QVector<QObject *> &controllerYears,
-    const Time &defaultWorkTimePerDay,
+    const Time &defaultWorkedTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
     QObject *parent)
-    : QObject{parent}, m_defaultWorkTimePerDay{defaultWorkTimePerDay},
+    : QObject{parent}, m_defaultWorkedTimePerDay{defaultWorkedTimePerDay},
       m_pauseTimesPerDay{pauseTimesPerDay}, m_controllerYears{controllerYears}
 {
     for (auto &controllerYear : m_controllerYears) {
@@ -96,7 +96,7 @@ void Backend::saveToFile()
     auto days = getDays(m_controllerYears);
 
     auto writeOk = fileWriter.writeToFile(
-        m_defaultWorkTimePerDay, m_pauseTimesPerDay, days);
+        m_defaultWorkedTimePerDay, m_pauseTimesPerDay, days);
 
     if (!writeOk) {
         qWarning() << Q_FUNC_INFO << "Save to file failed.";
@@ -154,7 +154,7 @@ Date getLastDayOfFirstWeekDate(const QVector<std::shared_ptr<Day>> &days)
 Backend makeDefaultBackend()
 {
     Date firstDate{2021, 01, 01};
-    Time defaultWorkTimePerDay{7, 45};
+    Time defaultWorkedTimePerDay{7, 45};
     Time pauseTimeMondayToThursday{0, 45};
     Time pauseTimeFriday{0, 30};
 
@@ -170,9 +170,9 @@ Backend makeDefaultBackend()
     auto days = makeWorkDays(firstDate, endDate);
 
     auto controllerYears =
-        makeControllerYears(days, defaultWorkTimePerDay, pauseTimesPerDay);
+        makeControllerYears(days, defaultWorkedTimePerDay, pauseTimesPerDay);
 
-    return Backend{controllerYears, defaultWorkTimePerDay, pauseTimesPerDay};
+    return Backend{controllerYears, defaultWorkedTimePerDay, pauseTimesPerDay};
 }
 
 Backend makeBackendFromFile(const FileReader &fileReader)
@@ -189,22 +189,22 @@ Backend makeBackendFromFile(const FileReader &fileReader)
         return makeDefaultBackend();
     }
 
-    auto defaultWorkTimePerDay = fileReader.defaultWorkTimePerDay();
+    auto defaultWorkedTimePerDay = fileReader.defaultWorkedTimePerDay();
     auto pauseTimesPerDay = fileReader.pauseTimesPerDay();
 
     auto controllerYears =
-        makeControllerYears(days, defaultWorkTimePerDay, pauseTimesPerDay);
+        makeControllerYears(days, defaultWorkedTimePerDay, pauseTimesPerDay);
 
-    return Backend{controllerYears, defaultWorkTimePerDay, pauseTimesPerDay};
+    return Backend{controllerYears, defaultWorkedTimePerDay, pauseTimesPerDay};
 }
 
 QVector<QObject *> makeControllerYears(
     QVector<std::shared_ptr<Day>> days,
-    const Time &defaultWorkTimePerDay,
+    const Time &defaultWorkedTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay)
 {
     auto controllerDays =
-        makeControllerDays(days, defaultWorkTimePerDay, pauseTimesPerDay);
+        makeControllerDays(days, defaultWorkedTimePerDay, pauseTimesPerDay);
     auto controllerWeeks = makeControllerWeeks(controllerDays);
 
     auto firstYear = extractFirstYear(days);
@@ -216,7 +216,7 @@ QVector<QObject *> makeControllerYears(
 
 QVector<QObject *> makeControllerDays(
     QVector<std::shared_ptr<Day>> days,
-    const Time &defaultWorkTimePerDay,
+    const Time &defaultWorkedTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay)
 {
     std::map<QString, Time> weekdayToPauseTime{
@@ -235,7 +235,7 @@ QVector<QObject *> makeControllerDays(
         auto weekday = day->date().weekday();
         auto pauseTime = weekdayToPauseTime[weekday];
         auto controllerDay =
-            new ControllerDay{day, defaultWorkTimePerDay, pauseTime};
+            new ControllerDay{day, defaultWorkedTimePerDay, pauseTime};
         controllerDays.emplace_back(controllerDay);
     }
     return controllerDays;

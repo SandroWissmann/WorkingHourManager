@@ -14,7 +14,7 @@ namespace whm {
 namespace {
 
 QJsonObject makeApplicationDataJsonObject(
-    const Time &defaultWorkTimePerDay,
+    const Time &defaultWorkedTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
     const QVector<std::shared_ptr<Day>> &days);
 
@@ -34,7 +34,7 @@ FileWriter::FileWriter(const QString &filename) : m_filename{filename}
 }
 
 bool FileWriter::writeToFile(
-    const Time &defaultWorkTimePerDay,
+    const Time &defaultWorkedTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
     const QVector<std::shared_ptr<Day>> &days)
 {
@@ -46,7 +46,7 @@ bool FileWriter::writeToFile(
     }
 
     auto jsonObject = makeApplicationDataJsonObject(
-        defaultWorkTimePerDay, pauseTimesPerDay, days);
+        defaultWorkedTimePerDay, pauseTimesPerDay, days);
 
     saveFile.write(QJsonDocument(jsonObject).toJson());
     return true;
@@ -55,12 +55,12 @@ bool FileWriter::writeToFile(
 namespace {
 
 QJsonObject makeApplicationDataJsonObject(
-    const Time &defaultWorkTimePerDay,
+    const Time &defaultWorkedTimePerDay,
     const std::array<Time, 5> &pauseTimesPerDay,
     const QVector<std::shared_ptr<Day>> &days)
 {
     QJsonObject jsonObject;
-    jsonObject["defaultWorkTimePerDay"] = defaultWorkTimePerDay.asString();
+    jsonObject["defaultWorkedTimePerDay"] = defaultWorkedTimePerDay.asString();
     jsonObject["holidaysPerYear"] = makeHolidaysPerYearJsonArray();
     jsonObject["pauseTimesPerDay"] =
         makePauseTimesPerDayJsonArray(pauseTimesPerDay);

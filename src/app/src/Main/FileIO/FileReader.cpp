@@ -40,7 +40,7 @@ bool FileReader::isValidFile() const
     return !m_jsonDocument.isNull();
 }
 
-Time FileReader::defaultWorkTimePerDay() const
+Time FileReader::defaultWorkedTimePerDay() const
 {
     if (!isValidFile()) {
         return Time{};
@@ -48,7 +48,7 @@ Time FileReader::defaultWorkTimePerDay() const
 
     auto jsonObject = m_jsonDocument.object();
 
-    QString key{"defaultWorkTimePerDay"};
+    QString key{"defaultWorkedTimePerDay"};
     if (!jsonObject.contains(key)) {
         return Time{};
     }

@@ -25,14 +25,14 @@ class ControllerDay : public QObject {
 
     Q_PROPERTY(QString pauseTime READ pauseTimeAsString CONSTANT)
 
-    Q_PROPERTY(QString workTime READ workTimeAsString NOTIFY workTimeChanged)
+    Q_PROPERTY(QString workedTime READ workedTimeAsString NOTIFY workedTimeChanged)
 
     Q_PROPERTY(
         DayType dayType READ dayType WRITE setDayType NOTIFY dayTypeChanged)
 public:
     ControllerDay(
         std::shared_ptr<Day> day,
-        const Time &defaultWorkTime,
+        const Time &defaultWorkedTime,
         const Time &pauseTime);
 
     ControllerDay(const ControllerDay &) = delete;
@@ -48,7 +48,7 @@ public:
 
     QString weekday() const;
 
-    Time defaultWorkTime() const;
+    Time defaultWorkedTime() const;
 
     Time startTime() const;
     QString startTimeAsString() const;
@@ -61,7 +61,7 @@ public:
     QString pauseTimeAsString() const;
 
     Time workedTime() const;
-    QString workTimeAsString() const;
+    QString workedTimeAsString() const;
 
     DayType dayType() const;
     void setDayType(DayType dayType);
@@ -72,17 +72,17 @@ public:
 signals:
     void startTimeChanged();
     void endTimeChanged();
-    void workTimeChanged();
+    void workedTimeChanged();
     void dayTypeChanged();
 
 private:
-    void setWorkTime(const Time &workTime);
+    void setWorkTime(const Time &workedTime);
 
     std::shared_ptr<Day> m_day;
 
-    Time m_defaultWorkTime;
+    Time m_defaultWorkedTime;
     Time m_pauseTime;
-    Time m_workTime{};
+    Time m_workedTime{};
 };
 
 } // namespace whm

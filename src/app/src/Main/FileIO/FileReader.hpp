@@ -26,7 +26,7 @@ public:
 
     bool isValidFile() const;
 
-    Time defaultWorkTimePerDay() const;
+    Time defaultWorkedTimePerDay() const;
 
     QVector<int> holidaysPerYear() const;
 

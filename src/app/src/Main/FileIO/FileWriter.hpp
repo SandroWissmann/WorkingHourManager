@@ -24,7 +24,7 @@ public:
     ~FileWriter() = default;
 
     bool writeToFile(
-        const Time &defaultWorkTimePerDay,
+        const Time &defaultWorkedTimePerDay,
         const std::array<Time, 5> &pauseTimesPerDay,
         const QVector<std::shared_ptr<Day>> &days);
 

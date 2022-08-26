@@ -19,7 +19,7 @@ public:
     Backend(
         const QVector<QObject *> &controllerYears,
         // TODO: can be removed and taken from year->month->week->day controller
-        const Time &defaultWorkTimePerDay,
+        const Time &defaultWorkedTimePerDay,
         const std::array<Time, 5> &pauseTimesPerDay,
         QObject *parent = nullptr);
 
@@ -42,7 +42,7 @@ public:
     void saveToFile();
 
 private:
-    Time m_defaultWorkTimePerDay;
+    Time m_defaultWorkedTimePerDay;
     std::array<Time, 5> m_pauseTimesPerDay;
 
     QVector<QObject *> m_controllerYears;
