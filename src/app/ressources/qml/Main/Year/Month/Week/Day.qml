@@ -9,16 +9,6 @@ Item {
 
     property QtObject controller
 
-    function blockTimeInput() {
-        startTime_hourMinInput.enabled = false
-        endTime_hourMinInput.enabled = false
-    }
-
-    function unblockTimeInput() {
-        startTime_hourMinInput.enabled = true
-        endTime_hourMinInput.enabled = true
-    }
-
     RowLayout {
         id: rowLayout
         anchors.fill: parent
@@ -44,7 +34,9 @@ Item {
             id: startTime_hourMinInput
             Layout.preferredWidth: rowLayout.elementWidth
             text: root.controller.startTime
-            readOnly: vacation_checkBox.checked || holiday_checkBox.checked
+            // TODO: Use proper enum value here
+            // 0 -> work
+            enabled: root.controller.dayType === 0
 
             onEditingFinished: {
                 root.controller.startTime = text
@@ -54,7 +46,7 @@ Item {
             id: endTime_hourMinInput
             Layout.preferredWidth: rowLayout.elementWidth
             text: root.controller.endTime
-            readOnly: vacation_checkBox.checked || holiday_checkBox.checked
+            enabled: startTime_hourMinInput.enabled
 
             onEditingFinished: {
                 root.controller.endTime = text
@@ -72,83 +64,37 @@ Item {
             font.bold: true
             text: root.controller.workedTime
         }
-        CheckBox {
-            id: holiday_checkBox
+        SpinBox {
+            id: dayType_spinBox
             Layout.preferredWidth: rowLayout.elementWidth
-            // TODO: Use proper enum value here
-            checked: root.controller.dayType === 1
+            from: 0
+            // TODO: Get max value from the backend
+            to: items.length - 1
+            value: root.controller.dayType
+            wrap: true
 
-            onCheckedChanged: {
-                if (checked) {
-                    vacation_checkBox.checked = false
-                    ignore_checkBox.checked = false
+            // TODO: Provide this list from the backend
+            property var items: ["Work", "Holiday", "Vaccation", "Ignore"]
 
-                    root.blockTimeInput()
+            textFromValue: function (value) {
+                return items[value]
+            }
 
-                    // TODO: Use proper enum value here
-                    root.controller.dayType = 1
-                } else {
-                    root.unblockTimeInput()
-
-                    if (!holiday_checkBox.checked && !vacation_checkBox.checked
-                            && !ignore_checkBox.checked) {
-                        // TODO: Use proper enum value here
-                        root.controller.dayType = 0
-                    }
+            valueFromText: function (text) {
+                for (var i = 0; i < items.length; ++i) {
+                    if (items[i].toLowerCase().indexOf(
+                                text.toLowerCase()) === 0)
+                        return i
                 }
+                return dayType_spinBox.value
+            }
+
+            onValueChanged: {
+                root.controller.dayType = value
             }
         }
-        CheckBox {
-            id: vacation_checkBox
+        Item {
             Layout.preferredWidth: rowLayout.elementWidth
-            // TODO: Use proper enum value here
-            checked: root.controller.dayType === 2
-
-            onCheckedChanged: {
-                if (checked) {
-                    holiday_checkBox.checked = false
-                    ignore_checkBox.checked = false
-
-                    root.blockTimeInput()
-
-                    // TODO: Use proper enum value here
-                    root.controller.dayType = 2
-                } else {
-                    root.unblockTimeInput()
-
-                    if (!holiday_checkBox.checked && !vacation_checkBox.checked
-                            && !ignore_checkBox.checked) {
-                        // TODO: Use proper enum value here
-                        root.controller.dayType = 0
-                    }
-                }
-            }
-        }
-        CheckBox {
-            id: ignore_checkBox
-            Layout.preferredWidth: rowLayout.elementWidth
-            // TODO: Use proper enum value here
-            checked: root.controller.dayType === 3
-
-            onCheckedChanged: {
-                if (checked) {
-                    holiday_checkBox.checked = false
-                    vacation_checkBox.checked = false
-
-                    root.blockTimeInput()
-
-                    // TODO: Use proper enum value here
-                    root.controller.dayType = 3
-                } else {
-                    root.unblockTimeInput()
-
-                    if (!holiday_checkBox.checked && !vacation_checkBox.checked
-                            && !ignore_checkBox.checked) {
-                        // TODO: Use proper enum value here
-                        root.controller.dayType = 0
-                    }
-                }
-            }
         }
     }
 }

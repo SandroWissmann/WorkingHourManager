@@ -42,18 +42,11 @@ Item {
         }
         Text {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("Holiday")
+            text: qsTr("DayType")
             font.bold: true
         }
-        Text {
+        Item {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("Vacation")
-            font.bold: true
-        }
-        Text {
-            Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("Ignore")
-            font.bold: true
         }
     }
 }
