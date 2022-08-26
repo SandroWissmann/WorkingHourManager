@@ -3,14 +3,14 @@
 namespace whm {
 
 namespace {
-QTime stringToTime(const QString hhmmStr)
+QTime stringToTime(QString hhmmStr)
 {
-    return QTime::fromString(hhmmStr, "hh:mm");
+    return QTime::fromString(hhmmStr, "h:mm");
 }
 
 QString timeToString(const QTime &time)
 {
-    return time.toString("hh:mm");
+    return time.toString("h:mm");
 }
 
 QTime minutesToTime(int minutes)
@@ -64,7 +64,7 @@ bool Time::set(const QString &timeAsString)
 
 bool Time::isValid() const
 {
-    if (asString() == "00:00") {
+    if (asString() == "0:00") {
         return false;
     }
     return true;

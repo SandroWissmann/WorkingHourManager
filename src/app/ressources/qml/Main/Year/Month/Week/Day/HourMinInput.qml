@@ -4,7 +4,9 @@ import QtQuick.Controls
 TextField {
     id: root
     font.bold: true
-    inputMask: "99:99"
+    validator: RegularExpressionValidator {
+        regularExpression: /([0123456789]|[1][0123456789]|[2][0123])([:]\d{2})?$/
+    }
     color: {
         if (!enabled) {
             return "green"
@@ -12,9 +14,15 @@ TextField {
         if (!acceptableInput) {
             return "red"
         }
-        if (root.text === "00:00") {
+        if (root.text === "0:00") {
             return "red"
         }
         return "green"
+    }
+
+    onFocusChanged: {
+        if (!acceptableInput) {
+            text = "0:00"
+        }
     }
 }

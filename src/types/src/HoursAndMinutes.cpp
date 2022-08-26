@@ -6,9 +6,14 @@ namespace whm {
 
 namespace {
 
-QString toStringWith2Digits(int hoursOrMinutes)
+QString hoursAsString(int hours)
 {
-    return QStringLiteral("%1").arg(hoursOrMinutes, 2, 10, QLatin1Char('0'));
+    return QString::number(hours);
+}
+
+QString minutesAsString(int minutes)
+{
+    return QStringLiteral("%1").arg(minutes, 2, 10, QLatin1Char('0'));
 }
 
 } // namespace
@@ -30,8 +35,8 @@ HoursAndMinutes::HoursAndMinutes(const Time &time)
 
 QString HoursAndMinutes::toString() const
 {
-    auto hourString = toStringWith2Digits(m_hours);
-    auto minuteString = toStringWith2Digits(m_minutes);
+    auto hourString = hoursAsString(m_hours);
+    auto minuteString = minutesAsString(m_minutes);
     QString resultString{hourString + ":" + minuteString};
     resultString.remove('-');
     if (m_minutes < 0 || m_hours < 0) {

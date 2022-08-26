@@ -13,7 +13,6 @@ QDate removeDay(QDate date)
 
     // we were at start of the month so go back one month
     if (!date.isValid()) {
-
         date.setDate(year, month - 1, 1);
         auto daysInMonth = date.daysInMonth();
         date.setDate(year, month - 1, daysInMonth);

@@ -77,7 +77,7 @@ Time Day::endTime() const
 bool Day::setEndTime(Time endTime)
 {
     // detect input as PM and transform to to 24h format.
-    if (endTime < m_startTime && endTime.hour() < 12) {
+    if (endTime.isValid() && endTime < m_startTime && endTime.hour() < 12) {
         auto hour = endTime.hour();
         auto minute = endTime.minute();
         hour += 12;
