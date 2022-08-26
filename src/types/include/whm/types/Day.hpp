@@ -2,6 +2,7 @@
 #define WORKING_HOUR_MANAGER_DAY_HPP
 
 #include "Date.hpp"
+#include "DayType.hpp"
 #include "Time.hpp"
 
 #include <QDate>
@@ -14,9 +15,7 @@ public:
     Day(const Date &date,
         const Time &startTime,
         const Time &endTime,
-        bool isHoliday,
-        bool isVacation,
-        bool isIgnore);
+        DayType dayType);
 
     Day(const Date &date, const Time &startTime, const Time &endTime);
 
@@ -32,31 +31,21 @@ public:
     Time startTime() const;
     bool setStartTime(const Time &startTime);
     bool setStartTime(const QString &startTimeAsString);
+    bool hasValidStartTime() const;
 
     Time endTime() const;
     bool setEndTime(Time endTime);
     bool setEndTime(const QString &endTimeAsString);
-
-    bool isHoliday() const;
-    bool setIsHoliday(bool isHoliday);
-
-    bool isVacation() const;
-    bool setIsVacation(bool isVacation);
-
-    bool isIgnore() const;
-    bool setIsIgnore(bool isIgnore);
-
-    bool hasValidStartTime() const;
     bool hasValidEndTime() const;
+
+    DayType dayType() const;
+    bool setDayType(DayType dayType);
 
 private:
     Date m_date;
     Time m_startTime;
     Time m_endTime;
-
-    bool m_isHoliday{false};
-    bool m_isVacation{false};
-    bool m_isIgnore{false};
+    DayType m_dayType{DayType::work};
 };
 } // namespace whm
 

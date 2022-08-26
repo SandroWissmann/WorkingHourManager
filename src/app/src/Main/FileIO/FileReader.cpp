@@ -1,6 +1,7 @@
 #include "FileReader.hpp"
 
 #include <whm/types/Day.hpp>
+#include <whm/types/DayType.hpp>
 #include <whm/types/Time.hpp>
 
 #include <QDebug>
@@ -23,13 +24,9 @@ Time extractEndTimeFromDay(const QJsonObject &jsonObject);
 
 Time extractTimeFromDay(const QJsonObject &jsonObject, const QString &key);
 
-bool extractIsHolidayFromDay(const QJsonObject &jsonObject);
+DayType extractDayType(const QJsonObject &jsonObject);
 
-bool extractIsVacationFromDay(const QJsonObject &jsonObject);
-
-bool extractIsIgnoreFromDay(const QJsonObject &jsonObject);
-
-bool extractBoolFromDay(const QJsonObject &jsonObject, const QString &key);
+int extractIntFromDay(const QJsonObject &jsonObject, const QString &key);
 
 } // namespace
 
@@ -156,12 +153,9 @@ QVector<std::shared_ptr<Day>> FileReader::days() const
 
         auto startTime = extractStartTimeFromDay(dayObject);
         auto endTime = extractEndTimeFromDay(dayObject);
-        auto isHoliday = extractIsHolidayFromDay(dayObject);
-        auto isVaccation = extractIsVacationFromDay(dayObject);
-        auto isIgnore = extractIsIgnoreFromDay(dayObject);
+        auto dayType = extractDayType(dayObject);
 
-        auto day = std::make_shared<Day>(
-            *optDate, startTime, endTime, isHoliday, isVaccation, isIgnore);
+        auto day = std::make_shared<Day>(*optDate, startTime, endTime, dayType);
 
         days.emplace_back(day);
     }
@@ -225,35 +219,38 @@ Time extractTimeFromDay(const QJsonObject &jsonObject, const QString &key)
     return Time{timeString};
 }
 
-bool extractIsHolidayFromDay(const QJsonObject &jsonObject)
+DayType extractDayType(const QJsonObject &jsonObject)
 {
-    QString key{"isHoliday"};
-    return extractBoolFromDay(jsonObject, key);
+    QString key{"dayType"};
+    auto dayTypeAsInt = extractIntFromDay(jsonObject, key);
+
+    if (dayTypeAsInt < static_cast<int>(DayType::work)) {
+        return DayType::work;
+    }
+    if (dayTypeAsInt > static_cast<int>(DayType::ignore)) {
+        return DayType::work;
+    }
+    auto dayType = static_cast<DayType>(dayTypeAsInt);
+    return dayType;
 }
 
-bool extractIsVacationFromDay(const QJsonObject &jsonObject)
-{
-    QString key{"isVacation"};
-    return extractBoolFromDay(jsonObject, key);
-}
-
-bool extractIsIgnoreFromDay(const QJsonObject &jsonObject)
-{
-    QString key{"isIgnore"};
-    return extractBoolFromDay(jsonObject, key);
-}
-
-bool extractBoolFromDay(const QJsonObject &jsonObject, const QString &key)
+int extractIntFromDay(const QJsonObject &jsonObject, const QString &key)
 {
     if (!jsonObject.contains(key)) {
-        return false;
-    }
-    if (!jsonObject[key].isBool()) {
-        qDebug() << Q_FUNC_INFO << "Invalid type";
-        return false;
+        return 0;
     }
 
-    return jsonObject[key].toBool();
+    auto value = jsonObject.value(key);
+    auto variant = value.toVariant();
+
+    auto ok = false;
+    auto result = variant.toInt(&ok);
+
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "Invalid type";
+        return 0;
+    }
+    return result;
 }
 
 } // namespace

@@ -2,6 +2,7 @@
 #define WORKING_HOUR_MANAGER_CONTROLLER_DAY_HPP
 
 #include <whm/types/Date.hpp>
+#include <whm/types/DayType.hpp>
 #include <whm/types/Time.hpp>
 
 #include <QObject>
@@ -26,14 +27,8 @@ class ControllerDay : public QObject {
 
     Q_PROPERTY(QString workTime READ workTimeAsString NOTIFY workTimeChanged)
 
-    Q_PROPERTY(bool isHoliday READ isHoliday WRITE setIsHoliday NOTIFY
-                   isHolidayChanged)
-
-    Q_PROPERTY(bool isVacation READ isVacation WRITE setisVacation NOTIFY
-                   isVacationChanged)
-
     Q_PROPERTY(
-        bool isIgnore READ isIgnore WRITE setisIgnore NOTIFY isIgnoreChanged)
+        DayType dayType READ dayType WRITE setDayType NOTIFY dayTypeChanged)
 public:
     ControllerDay(
         std::shared_ptr<Day> day,
@@ -68,14 +63,8 @@ public:
     Time workedTime() const;
     QString workTimeAsString() const;
 
-    bool isHoliday() const;
-    void setIsHoliday(bool isHoliday);
-
-    bool isVacation() const;
-    void setisVacation(bool isVacation);
-
-    bool isIgnore() const;
-    void setisIgnore(bool isIgnore);
+    DayType dayType() const;
+    void setDayType(DayType dayType);
 
     bool hasValidStartTime() const;
     bool hasValidEndTime() const;
@@ -84,13 +73,9 @@ signals:
     void startTimeChanged();
     void endTimeChanged();
     void workTimeChanged();
-
-    void isHolidayChanged();
-    void isVacationChanged();
-    void isIgnoreChanged();
+    void dayTypeChanged();
 
 private:
-    void calcWorkTime();
     void setWorkTime(const Time &workTime);
 
     std::shared_ptr<Day> m_day;

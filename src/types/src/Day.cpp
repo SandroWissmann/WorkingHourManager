@@ -3,19 +3,9 @@
 namespace whm {
 
 namespace {
-bool hasValidTime(
-    const Time &time,
-    bool isHoliday,
-    bool isVacation,
-    bool isIgnore)
+bool hasValidTime(const Time &time, DayType dayType)
 {
-    if (isHoliday) {
-        return true;
-    }
-    if (isVacation) {
-        return true;
-    }
-    if (isIgnore) {
+    if (dayType != DayType::work) {
         return true;
     }
     if (!time.isValid()) {
@@ -29,20 +19,18 @@ Day::Day(
     const Date &date,
     const Time &startTime,
     const Time &endTime,
-    bool isHoliday,
-    bool isVacation,
-    bool isIgnore)
-    : m_date{date}, m_startTime{startTime}, m_endTime(endTime),
-      m_isHoliday{isHoliday}, m_isVacation{isVacation}, m_isIgnore{isIgnore}
+    DayType dayType)
+    : m_date{date}, m_startTime{startTime},
+      m_endTime(endTime), m_dayType{dayType}
 {
 }
 
 Day::Day(const Date &date, const Time &startTime, const Time &endTime)
-    : Day(date, startTime, endTime, false, false, false)
+    : Day(date, startTime, endTime, DayType::work)
 {
 }
 
-Day::Day(const Date &date) : Day(date, Time{}, Time{}, false, false, false)
+Day::Day(const Date &date) : Day(date, Time{}, Time{}, DayType::work)
 {
 }
 
@@ -67,6 +55,14 @@ bool Day::setStartTime(const Time &startTime)
 bool Day::setStartTime(const QString &startTimeAsString)
 {
     return m_startTime.set(startTimeAsString);
+}
+
+bool Day::hasValidStartTime() const
+{
+    if (hasValidTime(startTime(), dayType())) {
+        return true;
+    }
+    return false;
 }
 
 Time Day::endTime() const
@@ -98,62 +94,26 @@ bool Day::setEndTime(const QString &endTimeAsString)
     return setEndTime(endTime);
 }
 
-bool Day::isHoliday() const
-{
-    return m_isHoliday;
-}
-
-bool Day::setIsHoliday(bool isHoliday)
-{
-    if (m_isHoliday == isHoliday) {
-        return false;
-    }
-    m_isHoliday = isHoliday;
-    return true;
-}
-
-bool Day::isVacation() const
-{
-    return m_isVacation;
-}
-
-bool Day::setIsVacation(bool isVacation)
-{
-    if (m_isVacation == isVacation) {
-        return false;
-    }
-    m_isVacation = isVacation;
-    return true;
-}
-
-bool Day::isIgnore() const
-{
-    return m_isIgnore;
-}
-
-bool Day::setIsIgnore(bool isIgnore)
-{
-    if (m_isIgnore == isIgnore) {
-        return false;
-    }
-    m_isIgnore = isIgnore;
-    return true;
-}
-
-bool Day::hasValidStartTime() const
-{
-    if (hasValidTime(startTime(), isHoliday(), isVacation(), isIgnore())) {
-        return true;
-    }
-    return false;
-}
-
 bool Day::hasValidEndTime() const
 {
-    if (hasValidTime(endTime(), isHoliday(), isVacation(), isIgnore())) {
+    if (hasValidTime(endTime(), dayType())) {
         return true;
     }
     return false;
+}
+
+DayType Day::dayType() const
+{
+    return m_dayType;
+}
+
+bool Day::setDayType(DayType dayType)
+{
+    if (m_dayType == dayType) {
+        return false;
+    }
+    m_dayType = dayType;
+    return true;
 }
 
 } // namespace whm

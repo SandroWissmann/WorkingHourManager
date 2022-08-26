@@ -75,7 +75,8 @@ Item {
         CheckBox {
             id: holiday_checkBox
             Layout.preferredWidth: rowLayout.elementWidth
-            checked: root.controller.isHoliday
+            // TODO: Use proper enum value here
+            checked: root.controller.dayType === 1
 
             onCheckedChanged: {
                 if (checked) {
@@ -83,17 +84,25 @@ Item {
                     ignore_checkBox.checked = false
 
                     root.blockTimeInput()
+
+                    // TODO: Use proper enum value here
+                    root.controller.dayType = 1
                 } else {
                     root.unblockTimeInput()
-                }
 
-                root.controller.isHoliday = checked
+                    if (!holiday_checkBox.checked && !vacation_checkBox.checked
+                            && !ignore_checkBox.checked) {
+                        // TODO: Use proper enum value here
+                        root.controller.dayType = 0
+                    }
+                }
             }
         }
         CheckBox {
             id: vacation_checkBox
             Layout.preferredWidth: rowLayout.elementWidth
-            checked: root.controller.isVacation
+            // TODO: Use proper enum value here
+            checked: root.controller.dayType === 2
 
             onCheckedChanged: {
                 if (checked) {
@@ -101,17 +110,25 @@ Item {
                     ignore_checkBox.checked = false
 
                     root.blockTimeInput()
+
+                    // TODO: Use proper enum value here
+                    root.controller.dayType = 2
                 } else {
                     root.unblockTimeInput()
-                }
 
-                root.controller.isVacation = checked
+                    if (!holiday_checkBox.checked && !vacation_checkBox.checked
+                            && !ignore_checkBox.checked) {
+                        // TODO: Use proper enum value here
+                        root.controller.dayType = 0
+                    }
+                }
             }
         }
         CheckBox {
             id: ignore_checkBox
             Layout.preferredWidth: rowLayout.elementWidth
-            checked: root.controller.isIgnore
+            // TODO: Use proper enum value here
+            checked: root.controller.dayType === 3
 
             onCheckedChanged: {
                 if (checked) {
@@ -119,10 +136,18 @@ Item {
                     vacation_checkBox.checked = false
 
                     root.blockTimeInput()
+
+                    // TODO: Use proper enum value here
+                    root.controller.dayType = 3
                 } else {
                     root.unblockTimeInput()
+
+                    if (!holiday_checkBox.checked && !vacation_checkBox.checked
+                            && !ignore_checkBox.checked) {
+                        // TODO: Use proper enum value here
+                        root.controller.dayType = 0
+                    }
                 }
-                root.controller.isIgnore = checked
             }
         }
     }

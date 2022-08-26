@@ -107,20 +107,14 @@ QJsonObject makeDayJsonObject(std::shared_ptr<Day> day)
 
     // To save space we only save if values are different from the default
     // values
-    if (day->startTime() != Time{}) {
-        jsonObject["startTime"] = day->startTime().asString();
+    if (auto startTime = day->startTime(); startTime != Time{}) {
+        jsonObject["startTime"] = startTime.asString();
     }
-    if (day->startTime() != Time{}) {
-        jsonObject["endTime"] = day->endTime().asString();
+    if (auto endTime = day->startTime(); endTime != Time{}) {
+        jsonObject["endTime"] = endTime.asString();
     }
-    if (auto isHoliday = day->isHoliday()) {
-        jsonObject["isHoliday"] = isHoliday;
-    }
-    if (auto isVacation = day->isVacation()) {
-        jsonObject["isVacation"] = isVacation;
-    }
-    if (auto isIgnore = day->isIgnore()) {
-        jsonObject["isIgnore"] = isIgnore;
+    if (auto dayType = day->dayType(); dayType != DayType::work) {
+        jsonObject["dayType"] = static_cast<int>(dayType);
     }
     return jsonObject;
 }

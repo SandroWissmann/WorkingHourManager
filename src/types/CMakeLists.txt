@@ -1,5 +1,6 @@
 add_library(whm-types STATIC
     ./include/whm/types/Day.hpp
+    ./include/whm/types/DayType.hpp
     ./include/whm/types/Date.hpp
     ./include/whm/types/HoursAndMinutes.hpp
     ./include/whm/types/Time.hpp

@@ -239,8 +239,7 @@ Time calculateEarliestEndTime(
 
         auto controllerDay = qobject_cast<ControllerDay *>(*rit);
 
-        if (controllerDay->isHoliday() || controllerDay->isVacation() ||
-            controllerDay->isIgnore()) {
+        if (controllerDay->dayType() != DayType::work) {
             continue;
         }
         if (controllerDay->hasValidStartTime()) {
