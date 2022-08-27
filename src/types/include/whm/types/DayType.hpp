@@ -13,6 +13,7 @@ public:
         holiday,
         vaccation,
         sick,
+        party, // party at company generates the default work houts per day
         ignore,
     };
     Q_ENUM(Value)
