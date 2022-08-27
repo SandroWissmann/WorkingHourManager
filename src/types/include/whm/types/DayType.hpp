@@ -14,6 +14,7 @@ public:
         vaccation,
         sick,
         party, // party at company generates the default work houts per day
+        flextime,
         ignore,
     };
     Q_ENUM(Value)

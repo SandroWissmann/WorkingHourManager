@@ -106,6 +106,9 @@ QString ControllerDay::pauseTimeAsString() const
 
 Time ControllerDay::workedTime() const
 {
+    if (m_day->dayType() == DayType::flextime) {
+        return Time{};
+    }
     if (m_day->dayType() != DayType::work) {
         return m_defaultWorkedTime;
     }
@@ -136,15 +139,21 @@ void ControllerDay::setDayType(DayType dayType)
     auto isWorkDayToNotWorkDayTransition =
         oldDayType == DayType::work && newDayType != DayType::work;
 
-    auto notWorkDayToWorkDayTransition =
+    auto isNotWorkDayToWorkDayTransition =
         oldDayType != DayType::work && newDayType == DayType::work;
+
+    auto isNotFlextimeToFlextimeTransition =
+        oldDayType != DayType::flextime && newDayType == DayType::flextime;
+
+    auto isFlextimeToNotFlextimeTransition =
+        oldDayType == DayType::flextime && newDayType != DayType::flextime;
 
     if (isWorkDayToNotWorkDayTransition) {
         emit startTimeChanged();
         emit endTimeChanged();
         emit workedTimeChanged();
     }
-    else if (notWorkDayToWorkDayTransition) {
+    else if (isNotWorkDayToWorkDayTransition) {
         emit startTimeChanged();
         emit endTimeChanged();
 
@@ -153,6 +162,12 @@ void ControllerDay::setDayType(DayType dayType)
         setWorkTime(workedTime);
         // Even if setWorkTime can emit workedTimeChanged we need it here in
         // case
+        emit workedTimeChanged();
+    }
+    else if (isNotFlextimeToFlextimeTransition) {
+        emit workedTimeChanged();
+    }
+    else if (isFlextimeToNotFlextimeTransition) {
         emit workedTimeChanged();
     }
 }
