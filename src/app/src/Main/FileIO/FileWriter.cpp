@@ -110,7 +110,7 @@ QJsonObject makeDayJsonObject(std::shared_ptr<Day> day)
     if (auto startTime = day->startTime(); startTime != Time{}) {
         jsonObject["startTime"] = startTime.asString();
     }
-    if (auto endTime = day->startTime(); endTime != Time{}) {
+    if (auto endTime = day->endTime(); endTime != Time{}) {
         jsonObject["endTime"] = endTime.asString();
     }
     if (auto dayType = day->dayType(); dayType != DayType::work) {
