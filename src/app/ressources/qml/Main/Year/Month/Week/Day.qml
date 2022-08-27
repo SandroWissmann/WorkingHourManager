@@ -74,7 +74,7 @@ Item {
             wrap: true
 
             // TODO: Provide this list from the backend
-            property var items: ["Work", "Holiday", "Vaccation", "Ignore"]
+            property var items: ["Work", "Holiday", "Vaccation", "Sick", "Ignore"]
 
             textFromValue: function (value) {
                 return items[value]

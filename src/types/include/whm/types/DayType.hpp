@@ -12,7 +12,8 @@ public:
         work,
         holiday,
         vaccation,
-        ignore
+        sick,
+        ignore,
     };
     Q_ENUM(Value)
 
@@ -22,6 +23,6 @@ private:
 
 typedef DayTypeQEnum::Value DayType;
 
-}
+} // namespace whm
 
 #endif
