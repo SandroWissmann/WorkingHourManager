@@ -67,7 +67,7 @@ bool Time::isValid() const
     if (asString() == "0:00") {
         return false;
     }
-    return true;
+    return m_time.isValid();
 }
 
 int Time::totalMinutes() const

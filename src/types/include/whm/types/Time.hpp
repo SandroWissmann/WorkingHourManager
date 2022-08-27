@@ -35,7 +35,7 @@ public:
     Time &operator-=(const Time &rhs);
 
 private:
-    QTime m_time;
+    QTime m_time{};
 };
 
 bool operator==(const Time &lhs, const Time &rhs);

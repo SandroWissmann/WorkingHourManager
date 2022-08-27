@@ -12,7 +12,14 @@ Time calcWorkTime(Time startTime, Time endTime, Time pauseTime)
     if (!timesAreValid) {
         return Time{};
     }
-    return endTime - startTime - pauseTime;
+    auto workTime = endTime - startTime - pauseTime;
+
+    // If result would be negative time gets invalid and has empty string so
+    // we correct it to 0:00
+    if (workTime.asString().isEmpty()) {
+        return Time{};
+    }
+    return workTime;
 }
 } // namespace
 
@@ -82,6 +89,7 @@ void ControllerDay::setEndTime(const QString &endTime)
         emit endTimeChanged();
         auto workedTime =
             calcWorkTime(m_day->startTime(), m_day->endTime(), m_pauseTime);
+        qDebug() << "time" << workedTime.asString();
         setWorkTime(workedTime);
     }
 }
