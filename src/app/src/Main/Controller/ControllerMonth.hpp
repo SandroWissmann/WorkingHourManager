@@ -5,8 +5,6 @@
 #include <QObject>
 #include <QVector>
 
-#include <memory>
-
 #include <whm/types/HoursAndMinutes.hpp>
 
 namespace whm {
@@ -17,7 +15,7 @@ class ControllerMonth : public QObject {
     Q_OBJECT
     Q_PROPERTY(QVector<QObject *> controllerWeeks READ controllerWeeks CONSTANT)
     Q_PROPERTY(QString nameOfMonth READ nameOfMonth CONSTANT)
-    Q_PROPERTY(QString overtime READ overtime NOTIFY overtimeChanged)
+    Q_PROPERTY(QString overtime READ overtimeAsString NOTIFY overtimeChanged)
 public:
     ControllerMonth(const QVector<QObject *> &controllerWeeks);
 
@@ -30,7 +28,9 @@ public:
 
     QVector<QObject *> controllerWeeks() const;
     QString nameOfMonth() const;
-    QString overtime() const;
+
+    HoursAndMinutes overtime() const;
+    QString overtimeAsString() const;
 
     QVector<std::shared_ptr<Day>> days() const;
 

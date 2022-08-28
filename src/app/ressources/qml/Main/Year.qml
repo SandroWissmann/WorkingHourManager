@@ -49,4 +49,10 @@ Page {
 
         loaderMonth.sourceComponent = componentMonth
     }
+
+    footer: Text {
+        text: qsTr("Overtime in %1: %2").arg(controller.year).arg(
+                  controller.overtime)
+        font.bold: true
+    }
 }

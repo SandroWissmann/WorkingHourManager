@@ -31,6 +31,8 @@ ControllerMonth::ControllerMonth(const QVector<QObject *> &controllerWeeks)
     for (auto &controllerWeek : m_controllerWeeks) {
         controllerWeek->setParent(this);
     }
+
+    makeControllerWeeksToThisConnections();
 }
 
 QVector<QObject *> ControllerMonth::controllerWeeks() const
@@ -46,7 +48,12 @@ QString ControllerMonth::nameOfMonth() const
     return date.toString("MMMM");
 }
 
-QString ControllerMonth::overtime() const
+HoursAndMinutes ControllerMonth::overtime() const
+{
+    return m_overtime;
+}
+
+QString ControllerMonth::overtimeAsString() const
 {
     return m_overtime.toString();
 }
