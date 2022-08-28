@@ -19,7 +19,7 @@ class ControllerWeek : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString expectedWorkedTime READ expectedWorkedTime CONSTANT)
     Q_PROPERTY(QString workedTime READ workedTime NOTIFY workedTimeChanged)
-    Q_PROPERTY(QString overTime READ overTime NOTIFY overTimeChanged)
+    Q_PROPERTY(QString overtime READ overtime NOTIFY overtimeChanged)
     Q_PROPERTY(QString earliestEndTime READ earliestEndTime NOTIFY
                    earliestEndTimeChanged)
 
@@ -38,8 +38,12 @@ public:
 
     QString expectedWorkedTime() const;
     QString workedTime() const;
-    QString overTime() const;
+    QString overtime() const;
     QString earliestEndTime() const;
+
+    // If week is in two months we can access here the split overtime for the
+    // days in each month
+    QMap<int, HoursAndMinutes> monthsToOvertime() const;
 
     // Indicate in which month the week is present
     QVector<int> months() const;
@@ -51,24 +55,25 @@ public:
 
 signals:
     void workedTimeChanged();
-    void overTimeChanged();
+    void overtimeChanged();
     void earliestEndTimeChanged();
 
 private slots:
     void onWorkTimeOfDayChanged();
+    void onOvertimeOfDayChanged();
     void onStartTimeOfDayChanged();
 
 private:
     void setWorkedTime(const HoursAndMinutes &workedTime);
-    void setOverTime(const HoursAndMinutes &overTime);
+    void setOvertime(const HoursAndMinutes &overtime);
     void setEarliestEndTime(const Time &earliestEndTime);
-    void makeControllerDayToControllerWeekConnections() const;
+    void makeControllerDaysToThisConnections() const;
 
     QVector<QObject *> m_controllerDays;
 
     HoursAndMinutes m_expectedWorkTime;
     HoursAndMinutes m_workedTime{};
-    HoursAndMinutes m_overTime;
+    HoursAndMinutes m_overtime;
     Time m_earliestEndTime{};
 };
 

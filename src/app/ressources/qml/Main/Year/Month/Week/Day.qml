@@ -64,6 +64,12 @@ Item {
             font.bold: true
             text: root.controller.workedTime
         }
+        Text {
+            id: overtime_text
+            Layout.preferredWidth: rowLayout.elementWidth
+            font.bold: true
+            text: root.controller.overtime
+        }
         SpinBox {
             id: dayType_spinBox
             Layout.preferredWidth: rowLayout.elementWidth

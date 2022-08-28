@@ -17,10 +17,14 @@ allDaysInWeeks(const QVector<QObject *> &m_controllerWeeks);
 int getCurrentMonth(const QVector<std::shared_ptr<Day>> &days);
 
 int getCurrentYear(const QVector<std::shared_ptr<Day>> &days);
+
+HoursAndMinutes
+calculateOvertime(const QVector<QObject *> controllerWeeks, int month);
 } // namespace
 
 ControllerMonth::ControllerMonth(const QVector<QObject *> &controllerWeeks)
-    : m_controllerWeeks{controllerWeeks}
+    : m_controllerWeeks{controllerWeeks},
+      m_overtime{calculateOvertime(m_controllerWeeks, month())}
 {
     Q_ASSERT(controllerWeeks.size() >= 1 && controllerWeeks.size());
 
@@ -32,6 +36,19 @@ ControllerMonth::ControllerMonth(const QVector<QObject *> &controllerWeeks)
 QVector<QObject *> ControllerMonth::controllerWeeks() const
 {
     return m_controllerWeeks;
+}
+
+QString ControllerMonth::nameOfMonth() const
+{
+    // This is a trick to transform month() int into its name by construct a
+    // date with not matter year and day and only output the name of month
+    QDate date{2000, month(), 1};
+    return date.toString("MMMM");
+}
+
+QString ControllerMonth::overtime() const
+{
+    return m_overtime.toString();
 }
 
 QVector<std::shared_ptr<Day>> ControllerMonth::days() const
@@ -55,19 +72,39 @@ int ControllerMonth::month() const
     return getCurrentMonth(days);
 }
 
-QString ControllerMonth::nameOfMonth() const
-{
-    // This is a trick to transform month() int into its name by construct a
-    // date with not matter year and day and only output the name of month
-    QDate date{2000, month(), 1};
-    return date.toString("MMMM");
-}
-
 // same code as month except the function call, maybe genralize
 int ControllerMonth::year() const
 {
     auto days = allDaysInWeeks(m_controllerWeeks);
     return getCurrentYear(days);
+}
+
+void ControllerMonth::onOvertimeOfWeekChanged()
+{
+    auto overtime = calculateOvertime(m_controllerWeeks, month());
+    setOvertime(overtime);
+}
+
+void ControllerMonth::makeControllerWeeksToThisConnections() const
+{
+    for (const auto &controllerWeekQObject : m_controllerWeeks) {
+        auto controllerWeek =
+            qobject_cast<ControllerWeek *>(controllerWeekQObject);
+        connect(
+            controllerWeek,
+            &ControllerWeek::overtimeChanged,
+            this,
+            &ControllerMonth::onOvertimeOfWeekChanged);
+    }
+}
+
+void ControllerMonth::setOvertime(const HoursAndMinutes &overtime)
+{
+    if (m_overtime == overtime) {
+        return;
+    }
+    m_overtime = overtime;
+    emit overtimeChanged();
 }
 
 namespace {
@@ -121,6 +158,23 @@ int getCurrentYear(const QVector<std::shared_ptr<Day>> &days)
         }
     }
     return currentYear;
+}
+
+HoursAndMinutes
+calculateOvertime(const QVector<QObject *> controllerWeeks, int month)
+{
+    HoursAndMinutes overtimeOfMonth;
+    for (const auto &controllerWeekQObject : controllerWeeks) {
+        auto controllerWeek =
+            qobject_cast<ControllerWeek *>(controllerWeekQObject);
+
+        auto monthsToOvertime = controllerWeek->monthsToOvertime();
+
+        Q_ASSERT(monthsToOvertime.find(month) != monthsToOvertime.end());
+
+        overtimeOfMonth += monthsToOvertime[month];
+    }
+    return overtimeOfMonth;
 }
 
 } // namespace

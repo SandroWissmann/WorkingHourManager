@@ -34,6 +34,23 @@ Day::Day(const Date &date) : Day(date, Time{}, Time{}, DayType::work)
 {
 }
 
+bool Day::isValid() const
+{
+    if (m_dayType != DayType::work) {
+        return true;
+    }
+    if (!m_startTime.isValid()) {
+        return false;
+    }
+    if (!m_endTime.isValid()) {
+        return false;
+    }
+    if (m_startTime < m_endTime) {
+        return true;
+    }
+    return false;
+}
+
 Date Day::date() const
 {
     return m_date;

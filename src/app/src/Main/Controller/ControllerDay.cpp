@@ -74,7 +74,8 @@ void ControllerDay::setStartTime(const QString &startTime)
         emit startTimeChanged();
         auto workedTime =
             calcWorkTime(m_day->startTime(), m_day->endTime(), m_pauseTime);
-        setWorkTime(workedTime);
+        setWorkedTime(workedTime);
+        emit overtimeChanged();
     }
 }
 
@@ -90,7 +91,8 @@ void ControllerDay::setEndTime(const QString &endTime)
         auto workedTime =
             calcWorkTime(m_day->startTime(), m_day->endTime(), m_pauseTime);
         qDebug() << "time" << workedTime.asString();
-        setWorkTime(workedTime);
+        setWorkedTime(workedTime);
+        emit overtimeChanged();
     }
 }
 
@@ -106,13 +108,29 @@ QString ControllerDay::pauseTimeAsString() const
 
 Time ControllerDay::workedTime() const
 {
-    if (m_day->dayType() == DayType::flextime) {
-        return Time{};
-    }
     if (m_day->dayType() != DayType::work) {
         return m_defaultWorkedTime;
     }
     return m_workedTime;
+}
+
+HoursAndMinutes ControllerDay::overtime() const
+{
+    if (m_day->dayType() == DayType::flextime) {
+        return HoursAndMinutes{-m_defaultWorkedTime.totalMinutes()};
+    }
+    if (m_day->dayType() != DayType::work) {
+        return HoursAndMinutes{};
+    }
+    if (!m_day->isValid()) {
+        return HoursAndMinutes{};
+    }
+    return HoursAndMinutes{m_workedTime} - HoursAndMinutes{m_defaultWorkedTime};
+}
+
+QString ControllerDay::overtimeAsString() const
+{
+    return overtime().toString();
 }
 
 QString ControllerDay::workedTimeAsString() const
@@ -152,6 +170,7 @@ void ControllerDay::setDayType(DayType dayType)
         emit startTimeChanged();
         emit endTimeChanged();
         emit workedTimeChanged();
+        emit overtimeChanged();
     }
     else if (isNotWorkDayToWorkDayTransition) {
         emit startTimeChanged();
@@ -159,16 +178,19 @@ void ControllerDay::setDayType(DayType dayType)
 
         auto workedTime =
             calcWorkTime(m_day->startTime(), m_day->endTime(), m_pauseTime);
-        setWorkTime(workedTime);
+        setWorkedTime(workedTime);
         // Even if setWorkTime can emit workedTimeChanged we need it here in
         // case
         emit workedTimeChanged();
+        emit overtimeChanged();
     }
     else if (isNotFlextimeToFlextimeTransition) {
         emit workedTimeChanged();
+        emit overtimeChanged();
     }
     else if (isFlextimeToNotFlextimeTransition) {
         emit workedTimeChanged();
+        emit overtimeChanged();
     }
 }
 
@@ -182,7 +204,7 @@ bool ControllerDay::hasValidEndTime() const
     return m_day->hasValidEndTime();
 }
 
-void ControllerDay::setWorkTime(const Time &workedTime)
+void ControllerDay::setWorkedTime(const Time &workedTime)
 {
     if (this->workedTime() == workedTime) {
         return;

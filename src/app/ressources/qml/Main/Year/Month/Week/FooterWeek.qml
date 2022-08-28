@@ -11,25 +11,25 @@ Item {
         anchors.fill: parent
         spacing: 0
 
-        property int elementWidth: root.width / 8
+        property int elementWidth: root.width / rowLayout.children.length
 
         Text {
             id: workedHoursAndExpected_text
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("worked hours: ") + root.controller.workedTime + "/"
+            text: qsTr("Worked hours: ") + root.controller.workedTime + "/"
                   + root.controller.expectedWorkedTime
             font.bold: true
         }
         Text {
-            id: overTime
+            id: overtime
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("over time: ") + root.controller.overTime
+            text: qsTr("Overtime: ") + root.controller.overtime
             font.bold: true
         }
         Text {
             id: earliestEndTime
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("earliest end time: ") + root.controller.earliestEndTime
+            text: qsTr("Earliest end time: ") + root.controller.earliestEndTime
             font.bold: true
         }
     }

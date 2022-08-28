@@ -26,6 +26,8 @@ public:
     Day &operator=(const Day &) = default;
     Day &operator=(Day &&) = default;
 
+    bool isValid() const;
+
     Date date() const;
 
     Time startTime() const;

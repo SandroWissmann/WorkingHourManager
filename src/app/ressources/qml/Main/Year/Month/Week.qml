@@ -25,7 +25,7 @@ Item {
                 controller: model.modelData
             }
         }
-        Footer {
+        FooterWeek {
             Layout.preferredHeight: columnLayout.elementHeigth
             Layout.preferredWidth: parent.width
 

@@ -3,6 +3,7 @@
 
 #include <whm/types/Date.hpp>
 #include <whm/types/DayType.hpp>
+#include <whm/types/HoursAndMinutes.hpp>
 #include <whm/types/Time.hpp>
 
 #include <QObject>
@@ -25,7 +26,9 @@ class ControllerDay : public QObject {
 
     Q_PROPERTY(QString pauseTime READ pauseTimeAsString CONSTANT)
 
-    Q_PROPERTY(QString workedTime READ workedTimeAsString NOTIFY workedTimeChanged)
+    Q_PROPERTY(
+        QString workedTime READ workedTimeAsString NOTIFY workedTimeChanged)
+    Q_PROPERTY(QString overtime READ overtimeAsString NOTIFY overtimeChanged)
 
     Q_PROPERTY(
         DayType dayType READ dayType WRITE setDayType NOTIFY dayTypeChanged)
@@ -63,6 +66,9 @@ public:
     Time workedTime() const;
     QString workedTimeAsString() const;
 
+    HoursAndMinutes overtime() const;
+    QString overtimeAsString() const;
+
     DayType dayType() const;
     void setDayType(DayType dayType);
 
@@ -73,10 +79,11 @@ signals:
     void startTimeChanged();
     void endTimeChanged();
     void workedTimeChanged();
+    void overtimeChanged();
     void dayTypeChanged();
 
 private:
-    void setWorkTime(const Time &workedTime);
+    void setWorkedTime(const Time &workedTime);
 
     std::shared_ptr<Day> m_day;
 

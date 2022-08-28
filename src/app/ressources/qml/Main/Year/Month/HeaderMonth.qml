@@ -22,27 +22,32 @@ Item {
         }
         Text {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("Start hh:mm")
+            text: qsTr("Start time")
             font.bold: true
         }
         Text {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("End hh:mm")
+            text: qsTr("End time")
             font.bold: true
         }
         Text {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("Pause hh:mm")
+            text: qsTr("Pause time")
             font.bold: true
         }
         Text {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("Worked hh:mm")
+            text: qsTr("Worked time")
             font.bold: true
         }
         Text {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("DayType")
+            text: qsTr("Overtime")
+            font.bold: true
+        }
+        Text {
+            Layout.preferredWidth: rowLayout.elementWidth
+            text: qsTr("Day type")
             font.bold: true
         }
         Item {

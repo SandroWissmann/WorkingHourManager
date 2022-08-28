@@ -16,7 +16,7 @@ Item {
 
         property int elementHeigth: 30
 
-        Header {
+        HeaderMonth {
             Layout.preferredHeight: columnLayout.elementHeigth
             Layout.preferredWidth: parent.width
         }
@@ -42,8 +42,11 @@ Item {
                 }
             }
         }
-        Item {
-            Layout.fillHeight: true
+        FooterMonth {
+            Layout.preferredHeight: columnLayout.elementHeigth
+            Layout.preferredWidth: parent.width
+
+            controller: root.controller
         }
     }
 }
