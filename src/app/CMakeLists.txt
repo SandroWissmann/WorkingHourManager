@@ -33,6 +33,7 @@ qt_add_qml_module(appWorkingHourManager
     ressources/qml/Main/Year/Month/Week/Day.qml
     ressources/qml/Main/Year/Month/Week/Day/HourMinInput.qml
     ressources/qml/Main/Year/Month/Week/FooterWeek.qml
+    ressources/qml/Main/Year/SettingsYear.qml
 )
 
 target_compile_definitions(appWorkingHourManager

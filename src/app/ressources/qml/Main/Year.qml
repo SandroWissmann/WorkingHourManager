@@ -11,19 +11,23 @@ Page {
 
     header: TabBar {
         id: tabBarMonth
+
+        onCurrentIndexChanged: {
+            console.warn("currentIndex: " + currentIndex)
+            console.warn(" tabBarMonth.contentData.length: " + tabBarMonth.contentData.length)
+            if (currentIndex < tabBarMonth.contentData.length - 1) {
+                loaderPage.setSource("Year/Month.qml", {
+                                         "controller": root.controller.controllerMonths[tabBarMonth.currentIndex]
+                                     })
+            } else {
+                loaderPage.setSource("Year/SettingsYear.qml")
+            }
+        }
     }
 
     Loader {
-        id: loaderMonth
+        id: loaderPage
         anchors.fill: parent
-    }
-
-    Component {
-        id: componentMonth
-
-        Month {
-            controller: root.controller.controllerMonths[tabBarMonth.currentIndex]
-        }
     }
 
     Component {
@@ -32,8 +36,9 @@ Page {
     }
 
     onControllerChanged: {
-        loaderMonth.sourceComponent = undefined
-
+        console.warn("controller changed")
+        var indexTabSettings = tabBarMonth.contentData.length
+        tabBarMonth.removeItem(indexTabSettings)
         for (var i = tabBarMonth.contentData.length - 1; i >= 0; i--) {
             var object = tabBarMonth.contentData[i]
             tabBarMonth.removeItem(object)
@@ -46,8 +51,20 @@ Page {
                                                            })
             tabBarMonth.addItem(tabMonth)
         }
+        var tabSettings = componentTabButton.createObject(tabBarMonth, {
+                                                              "text": qsTr("Settings")
+                                                          })
+        tabBarMonth.addItem(tabSettings)
 
-        loaderMonth.sourceComponent = componentMonth
+        // This hack is necessary because of bug in tab bar.
+        // After we create the tab  we expect to have here:
+        // tabBarMonth.contentData.length == 13 (months + settings)
+        // but for some reason we have
+        // tabBarMonth.contentData.length == 1
+        // this gets fixed the first time we click on a new tab.
+        // so we hit here very dirty 1 and go back to 0.
+        tabBarMonth.setCurrentIndex(1)
+        tabBarMonth.setCurrentIndex(0)
     }
 
     footer: Text {
