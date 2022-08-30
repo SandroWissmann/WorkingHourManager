@@ -28,31 +28,21 @@ class ControllerSettingsYear : public QObject {
         QString defaultWorkTimeThursday READ defaultWorkTimeThursdayAsString
             WRITE setDefaultWorkTimeThursday NOTIFY
                 defaultWorkTimeThursdayAsStringChanged)
-
     Q_PROPERTY(QString defaultWorkTimeFriday READ defaultWorkTimeFridayAsString
                    WRITE setDefaultWorkTimeFriday NOTIFY
                        defaultWorkTimeFridayAsStringChanged)
 
+    Q_PROPERTY(QString pauseTimeMonday READ pauseTimeMondayAsString WRITE
+                   setPauseTimeMonday NOTIFY pauseTimeMondayAsStringChanged)
+    Q_PROPERTY(QString pauseTimeTuesday READ pauseTimeTuesdayAsString WRITE
+                   setPauseTimeTuesday NOTIFY pauseTimeTuesdayAsStringChanged)
     Q_PROPERTY(
-        QString pauseTimeMonday READ pauseTimeMondayAsString WRITE
-            setPauseTimeMonday NOTIFY
-                pauseTimeMondayAsStringChanged)
-    Q_PROPERTY(
-        QString pauseTimeTuesday READ pauseTimeTuesdayAsString
-            WRITE setPauseTimeTuesday NOTIFY
-                pauseTimeTuesdayAsStringChanged)
-    Q_PROPERTY(
-        QString pauseTimeWednesday READ pauseTimeWednesdayAsString
-            WRITE setPauseTimeWednesday NOTIFY
-                pauseTimeWednesdayAsStringChanged)
-    Q_PROPERTY(
-        QString pauseTimeThursday READ pauseTimeThursdayAsString
-            WRITE setPauseTimeThursday NOTIFY
-                pauseTimeThursdayAsStringChanged)
-
-    Q_PROPERTY(QString defaultWorkTimeFriday READ defaultWorkTimeFridayAsString
-                   WRITE setDefaultWorkTimeFriday NOTIFY
-                       defaultWorkTimeFridayAsStringChanged)
+        QString pauseTimeWednesday READ pauseTimeWednesdayAsString WRITE
+            setPauseTimeWednesday NOTIFY pauseTimeWednesdayAsStringChanged)
+    Q_PROPERTY(QString pauseTimeThursday READ pauseTimeThursdayAsString WRITE
+                   setPauseTimeThursday NOTIFY pauseTimeThursdayAsStringChanged)
+    Q_PROPERTY(QString pauseTimeFriday READ pauseTimeFridayAsString WRITE
+                   setPauseTimeFriday NOTIFY pauseTimeFridayAsStringChanged)
 public:
     ControllerSettingsYear(const SettingsYear &settingsYear);
 

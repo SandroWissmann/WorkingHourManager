@@ -13,14 +13,14 @@ Page {
         id: tabBarMonth
 
         onCurrentIndexChanged: {
-            console.warn("currentIndex: " + currentIndex)
-            console.warn(" tabBarMonth.contentData.length: " + tabBarMonth.contentData.length)
             if (currentIndex < tabBarMonth.contentData.length - 1) {
                 loaderPage.setSource("Year/Month.qml", {
                                          "controller": root.controller.controllerMonths[tabBarMonth.currentIndex]
                                      })
             } else {
-                loaderPage.setSource("Year/SettingsYear.qml")
+                loaderPage.setSource("Year/SettingsYear.qml", {
+                                         "controller": root.controller.controllerSettinsYear
+                                     })
             }
         }
     }
@@ -36,7 +36,6 @@ Page {
     }
 
     onControllerChanged: {
-        console.warn("controller changed")
         var indexTabSettings = tabBarMonth.contentData.length
         tabBarMonth.removeItem(indexTabSettings)
         for (var i = tabBarMonth.contentData.length - 1; i >= 0; i--) {
