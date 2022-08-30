@@ -7,6 +7,7 @@
 #include "Controller/ControllerMonth.hpp"
 #include "Controller/ControllerWeek.hpp"
 #include "Controller/ControllerYear.hpp"
+#include "Controller/ControllerYear/ControllerSettingsYear.hpp"
 #include "FileIO/FileReader.hpp"
 #include "FileIO/FileWriter.hpp"
 
@@ -31,13 +32,11 @@ Backend makeBackendFromFile(const FileReader &fileReader);
 
 QVector<QObject *> makeControllerYears(
     QVector<std::shared_ptr<Day>> days,
-    const Time &defaultWorkedTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay);
+    const SettingsYear &settingsYear);
 
 QVector<QObject *> makeControllerDays(
     QVector<std::shared_ptr<Day>> days,
-    const Time &defaultWorkedTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay);
+    const SettingsYear &settingsYear);
 
 QVector<QObject *>
 makeControllerWeeks(const QVector<QObject *> &controllerDays);
@@ -52,21 +51,17 @@ std::map<int, QVector<QObject *>> controllerWeeksToYearsControllerWeekMap(
 QVector<QObject *>
 makeControllerMonths(const QVector<QVector<QObject *>> &controllerWeeksInYears);
 
-QVector<QObject *>
-makeControllerYears(const QVector<QObject *> &controllerMonths);
+QVector<QObject *> makeControllerYears(
+    const QVector<QObject *> &controllerMonths,
+    QObject *controllerSettingsYear);
 
 QVector<std::shared_ptr<Day>>
 getDays(const QVector<QObject *> &controllerYears);
 
 } // namespace
 
-Backend::Backend(
-    const QVector<QObject *> &controllerYears,
-    const Time &defaultWorkedTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
-    QObject *parent)
-    : QObject{parent}, m_defaultWorkedTimePerDay{defaultWorkedTimePerDay},
-      m_pauseTimesPerDay{pauseTimesPerDay}, m_controllerYears{controllerYears}
+Backend::Backend(const QVector<QObject *> &controllerYears, QObject *parent)
+    : QObject{parent}, m_controllerYears{controllerYears}
 {
     for (auto &controllerYear : m_controllerYears) {
         controllerYear->setParent(this);
@@ -95,8 +90,18 @@ void Backend::saveToFile()
 
     auto days = getDays(m_controllerYears);
 
-    auto writeOk = fileWriter.writeToFile(
-        m_defaultWorkedTimePerDay, m_pauseTimesPerDay, days);
+    // TODO save these values for each year
+    auto controllerYear =
+        qobject_cast<ControllerYear *>(m_controllerYears.at(0));
+    auto controllerSettingsYear = qobject_cast<ControllerSettingsYear *>(
+        controllerYear->controllerSettinsYear());
+    auto settingsYear = controllerSettingsYear->settingsYear();
+
+    auto defaultWorkTimesMoToFr = settingsYear.defaultWorkTimesMoToFr();
+    auto pauseTimesMoToFr = settingsYear.pauseTimesMoToFr();
+
+    auto writeOk =
+        fileWriter.writeToFile(defaultWorkTimesMoToFr, pauseTimesMoToFr, days);
 
     if (!writeOk) {
         qWarning() << Q_FUNC_INFO << "Save to file failed.";
@@ -154,25 +159,14 @@ Date getLastDayOfFirstWeekDate(const QVector<std::shared_ptr<Day>> &days)
 Backend makeDefaultBackend()
 {
     Date firstDate{2021, 01, 01};
-    Time defaultWorkedTimePerDay{7, 45};
-    Time pauseTimeMondayToThursday{0, 45};
-    Time pauseTimeFriday{0, 30};
-
-    std::array<Time, 5> pauseTimesPerDay{
-        pauseTimeMondayToThursday,
-        pauseTimeMondayToThursday,
-        pauseTimeMondayToThursday,
-        pauseTimeMondayToThursday,
-        pauseTimeFriday};
-
     auto endDate = Date::currentDate();
 
     auto days = makeWorkDays(firstDate, endDate);
 
-    auto controllerYears =
-        makeControllerYears(days, defaultWorkedTimePerDay, pauseTimesPerDay);
+    auto settingsYear = SettingsYear{};
+    auto controllerYears = makeControllerYears(days, settingsYear);
 
-    return Backend{controllerYears, defaultWorkedTimePerDay, pauseTimesPerDay};
+    return Backend{controllerYears};
 }
 
 Backend makeBackendFromFile(const FileReader &fileReader)
@@ -189,53 +183,61 @@ Backend makeBackendFromFile(const FileReader &fileReader)
         return makeDefaultBackend();
     }
 
-    auto defaultWorkedTimePerDay = fileReader.defaultWorkedTimePerDay();
-    auto pauseTimesPerDay = fileReader.pauseTimesPerDay();
+    auto defaultWorkTimesMoToFr = fileReader.defaultWorkTimesMoToFr();
+    auto pauseTimesMoToFr = fileReader.pauseTimesMoToFr();
+    SettingsYear settingsYear{defaultWorkTimesMoToFr, pauseTimesMoToFr};
 
-    auto controllerYears =
-        makeControllerYears(days, defaultWorkedTimePerDay, pauseTimesPerDay);
+    auto controllerYears = makeControllerYears(days, settingsYear);
 
-    return Backend{controllerYears, defaultWorkedTimePerDay, pauseTimesPerDay};
+    return Backend{controllerYears};
 }
 
 QVector<QObject *> makeControllerYears(
     QVector<std::shared_ptr<Day>> days,
-    const Time &defaultWorkedTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay)
+    const SettingsYear &settingsYear)
 {
-    auto controllerDays =
-        makeControllerDays(days, defaultWorkedTimePerDay, pauseTimesPerDay);
+    auto controllerDays = makeControllerDays(days, settingsYear);
     auto controllerWeeks = makeControllerWeeks(controllerDays);
 
     auto firstYear = extractFirstYear(days);
 
     auto controllerMonths = makeControllerMonths(firstYear, controllerWeeks);
-    auto controllerYears = makeControllerYears(controllerMonths);
+    auto controllerSettingsYear = new ControllerSettingsYear{settingsYear};
+    auto controllerYears =
+        makeControllerYears(controllerMonths, controllerSettingsYear);
+
     return controllerYears;
 }
 
 QVector<QObject *> makeControllerDays(
     QVector<std::shared_ptr<Day>> days,
-    const Time &defaultWorkedTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay)
+    const SettingsYear &settingsYear)
 {
+    // TODO: Rework this to maybe do this with settingsYear class and avoid
+    // strings which maybe get translated.
     std::map<QString, Time> weekdayToPauseTime{
-        {"Monday", pauseTimesPerDay[0]},
-        {"Tuesday", pauseTimesPerDay[1]},
-        {"Wednesday", pauseTimesPerDay[2]},
-        {"Thursday", pauseTimesPerDay[3]},
-        {"Friday", pauseTimesPerDay[4]},
+        {"Monday", settingsYear.pauseTimeMonday()},
+        {"Tuesday", settingsYear.pauseTimeTuesday()},
+        {"Wednesday", settingsYear.pauseTimeWednesday()},
+        {"Thursday", settingsYear.pauseTimeThursday()},
+        {"Friday", settingsYear.pauseTimeFriday()},
+    };
+
+    std::map<QString, Time> weekdayToDefaultWorkTime{
+        {"Monday", settingsYear.defaultWorkTimeMonday()},
+        {"Tuesday", settingsYear.defaultWorkTimeTuesday()},
+        {"Wednesday", settingsYear.defaultWorkTimeWednesday()},
+        {"Thursday", settingsYear.defaultWorkTimeThursday()},
+        {"Friday", settingsYear.defaultWorkTimeFriday()},
     };
 
     QVector<QObject *> controllerDays;
     controllerDays.reserve(days.size());
-
     for (const auto &day : days) {
-
         auto weekday = day->date().weekday();
-        auto pauseTime = weekdayToPauseTime[weekday];
-        auto controllerDay =
-            new ControllerDay{day, defaultWorkedTimePerDay, pauseTime};
+        auto pauseTime = weekdayToPauseTime.at(weekday);
+        auto defaultWorkTime = weekdayToDefaultWorkTime.at(weekday);
+        auto controllerDay = new ControllerDay{day, defaultWorkTime, pauseTime};
         controllerDays.emplace_back(controllerDay);
     }
     return controllerDays;
@@ -353,8 +355,9 @@ makeControllerMonths(const QVector<QVector<QObject *>> &controllerWeeksInYears)
     return controllerMonths;
 }
 
-QVector<QObject *>
-makeControllerYears(const QVector<QObject *> &controllerMonths)
+QVector<QObject *> makeControllerYears(
+    const QVector<QObject *> &controllerMonths,
+    QObject *controllerSettingsYear)
 {
     std::map<int, QVector<QObject *>> yearsToControllerMonths;
 
@@ -380,7 +383,8 @@ makeControllerYears(const QVector<QObject *> &controllerMonths)
     QVector<QObject *> controllerYears;
     controllerYears.reserve(yearsToControllerMonths.size());
     for (const auto &yearToControllerMonths : yearsToControllerMonths) {
-        auto controllerYear = new ControllerYear{yearToControllerMonths.second};
+        auto controllerYear = new ControllerYear{
+            yearToControllerMonths.second, controllerSettingsYear};
         controllerYears.emplace_back(controllerYear);
     }
     return controllerYears;

@@ -10,10 +10,14 @@ add_executable(appWorkingHourManager
     src/Main/Controller/ControllerWeek.cpp
     src/Main/Controller/ControllerYear.hpp
     src/Main/Controller/ControllerYear.cpp
+    src/Main/Controller/ControllerYear/ControllerSettingsYear.hpp
+    src/Main/Controller/ControllerYear/ControllerSettingsYear.cpp
     src/Main/FileIO/FileReader.hpp
     src/Main/FileIO/FileReader.cpp
     src/Main/FileIO/FileWriter.hpp
     src/Main/FileIO/FileWriter.cpp
+    src/Main/Settings/SettingsYear.hpp
+    src/Main/Settings/SettingsYear.cpp
 )
 
 qt_add_qml_module(appWorkingHourManager

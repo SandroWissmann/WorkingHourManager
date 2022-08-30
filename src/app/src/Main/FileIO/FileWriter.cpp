@@ -14,14 +14,13 @@ namespace whm {
 namespace {
 
 QJsonObject makeApplicationDataJsonObject(
-    const Time &defaultWorkedTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
+    const std::array<Time, 5> &defaultWorkTimesMoToFr,
+    const std::array<Time, 5> &pauseTimesMoToFr,
     const QVector<std::shared_ptr<Day>> &days);
 
 QJsonArray makeHolidaysPerYearJsonArray();
 
-QJsonArray
-makePauseTimesPerDayJsonArray(const std::array<Time, 5> &pauseTimesPerDay);
+QJsonArray makeJsonArray(const std::array<Time, 5> timeArray);
 
 QJsonArray makeDaysJsonArray(const QVector<std::shared_ptr<Day>> &days);
 
@@ -34,8 +33,8 @@ FileWriter::FileWriter(const QString &filename) : m_filename{filename}
 }
 
 bool FileWriter::writeToFile(
-    const Time &defaultWorkedTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
+    const std::array<Time, 5> &defaultWorkTimesMoToFr,
+    const std::array<Time, 5> &pauseTimesMoToFr,
     const QVector<std::shared_ptr<Day>> &days)
 {
     QFile saveFile{m_filename};
@@ -46,7 +45,7 @@ bool FileWriter::writeToFile(
     }
 
     auto jsonObject = makeApplicationDataJsonObject(
-        defaultWorkedTimePerDay, pauseTimesPerDay, days);
+        defaultWorkTimesMoToFr, pauseTimesMoToFr, days);
 
     saveFile.write(QJsonDocument(jsonObject).toJson());
     return true;
@@ -55,15 +54,15 @@ bool FileWriter::writeToFile(
 namespace {
 
 QJsonObject makeApplicationDataJsonObject(
-    const Time &defaultWorkedTimePerDay,
-    const std::array<Time, 5> &pauseTimesPerDay,
+    const std::array<Time, 5> &defaultWorkTimesMoToFr,
+    const std::array<Time, 5> &pauseTimesMoToFr,
     const QVector<std::shared_ptr<Day>> &days)
 {
     QJsonObject jsonObject;
-    jsonObject["defaultWorkedTimePerDay"] = defaultWorkedTimePerDay.asString();
+    jsonObject["defaultWorkTimesMoToFr"] =
+        makeJsonArray(defaultWorkTimesMoToFr);
+    jsonObject["pauseTimesMoToFr"] = makeJsonArray(pauseTimesMoToFr);
     jsonObject["holidaysPerYear"] = makeHolidaysPerYearJsonArray();
-    jsonObject["pauseTimesPerDay"] =
-        makePauseTimesPerDayJsonArray(pauseTimesPerDay);
     jsonObject["days"] = makeDaysJsonArray(days);
     return jsonObject;
 }
@@ -79,12 +78,11 @@ QJsonArray makeHolidaysPerYearJsonArray()
     return jsonArray;
 }
 
-QJsonArray
-makePauseTimesPerDayJsonArray(const std::array<Time, 5> &pauseTimesPerDay)
+QJsonArray makeJsonArray(const std::array<Time, 5> timeArray)
 {
     QJsonArray jsonArray;
-    for (auto i = 0; i < pauseTimesPerDay.size(); ++i) {
-        QJsonValue jsonValue = pauseTimesPerDay[i].asString();
+    for (auto i = 0; i < timeArray.size(); ++i) {
+        QJsonValue jsonValue = timeArray[i].asString();
         jsonArray.insert(i, jsonValue);
     }
     return jsonArray;

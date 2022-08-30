@@ -26,11 +26,11 @@ public:
 
     bool isValidFile() const;
 
-    Time defaultWorkedTimePerDay() const;
+    std::array<Time, 5> defaultWorkTimesMoToFr() const;
+
+    std::array<Time, 5> pauseTimesMoToFr() const;
 
     QVector<int> holidaysPerYear() const;
-
-    std::array<Time, 5> pauseTimesPerDay() const;
 
     QVector<std::shared_ptr<Day>> days() const;
 

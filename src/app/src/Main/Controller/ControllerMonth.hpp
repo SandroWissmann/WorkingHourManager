@@ -27,6 +27,9 @@ public:
     ~ControllerMonth() = default;
 
     QVector<QObject *> controllerWeeks() const;
+
+    QVector<QObject *> controllerDays() const;
+
     QString nameOfMonth() const;
 
     HoursAndMinutes overtime() const;

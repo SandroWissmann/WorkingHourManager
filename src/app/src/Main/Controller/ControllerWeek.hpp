@@ -18,7 +18,7 @@ class Day;
 class ControllerWeek : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString expectedWorkedTime READ expectedWorkedTime CONSTANT)
-    Q_PROPERTY(QString workedTime READ workedTime NOTIFY workedTimeChanged)
+    Q_PROPERTY(QString workTime READ workTime NOTIFY workTimeChanged)
     Q_PROPERTY(QString overtime READ overtime NOTIFY overtimeChanged)
     Q_PROPERTY(QString earliestEndTime READ earliestEndTime NOTIFY
                    earliestEndTimeChanged)
@@ -37,7 +37,7 @@ public:
     QVector<QObject *> controllerDays() const;
 
     QString expectedWorkedTime() const;
-    QString workedTime() const;
+    QString workTime() const;
     QString overtime() const;
     QString earliestEndTime() const;
 
@@ -54,7 +54,7 @@ public:
     QVector<std::shared_ptr<Day>> days() const;
 
 signals:
-    void workedTimeChanged();
+    void workTimeChanged();
     void overtimeChanged();
     void earliestEndTimeChanged();
 
@@ -64,7 +64,7 @@ private slots:
     void onStartTimeOfDayChanged();
 
 private:
-    void setWorkedTime(const HoursAndMinutes &workedTime);
+    void setWorkedTime(const HoursAndMinutes &workTime);
     void setOvertime(const HoursAndMinutes &overtime);
     void setEarliestEndTime(const Time &earliestEndTime);
     void makeControllerDaysToThisConnections() const;
@@ -72,7 +72,7 @@ private:
     QVector<QObject *> m_controllerDays;
 
     HoursAndMinutes m_expectedWorkTime;
-    HoursAndMinutes m_workedTime{};
+    HoursAndMinutes m_workTime{};
     HoursAndMinutes m_overtime;
     Time m_earliestEndTime{};
 };

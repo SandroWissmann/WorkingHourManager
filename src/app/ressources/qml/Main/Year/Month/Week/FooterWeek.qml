@@ -14,9 +14,9 @@ Item {
         property int elementWidth: root.width / rowLayout.children.length
 
         Text {
-            id: workedHoursAndExpected_text
+            id: workHoursAndExpected_text
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("Worked hours: ") + root.controller.workedTime + "/"
+            text: qsTr("Worked hours: ") + root.controller.workTime + "/"
                   + root.controller.expectedWorkedTime
             font.bold: true
         }

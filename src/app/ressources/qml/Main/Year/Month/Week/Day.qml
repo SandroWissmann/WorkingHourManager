@@ -59,10 +59,10 @@ Item {
             text: root.controller.pauseTime
         }
         Text {
-            id: workedTime_text
+            id: workTime_text
             Layout.preferredWidth: rowLayout.elementWidth
             font.bold: true
-            text: root.controller.workedTime
+            text: root.controller.workTime
         }
         Text {
             id: overtime_text

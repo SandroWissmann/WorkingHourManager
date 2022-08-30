@@ -1,5 +1,6 @@
 #include "ControllerMonth.hpp"
 
+#include "ControllerDay.hpp"
 #include "ControllerWeek.hpp"
 
 #include <whm/types/Day.hpp>
@@ -12,7 +13,7 @@ namespace whm {
 namespace {
 
 QVector<std::shared_ptr<Day>>
-allDaysInWeeks(const QVector<QObject *> &m_controllerWeeks);
+allDaysInControllerWeeks(const QVector<QObject *> &m_controllerWeeks);
 
 int getCurrentMonth(const QVector<std::shared_ptr<Day>> &days);
 
@@ -40,6 +41,37 @@ QVector<QObject *> ControllerMonth::controllerWeeks() const
     return m_controllerWeeks;
 }
 
+QVector<QObject *> ControllerMonth::controllerDays() const
+{
+    QVector<QObject *> controllerDaysInMonth;
+    constexpr int workdaysInWeek = 5;
+    controllerDaysInMonth.reserve(m_controllerWeeks.size() * workdaysInWeek);
+
+    for (const auto &controllerWeekAsQObject : m_controllerWeeks) {
+        auto controllerWeek =
+            qobject_cast<ControllerWeek *>(controllerWeekAsQObject);
+
+        auto controllerDays = controllerWeek->controllerDays();
+        controllerDaysInMonth.append(controllerDays);
+    }
+
+    auto month = this->month();
+
+    // erase all controller days which are in the previous or next month
+    controllerDaysInMonth.erase(
+        std::remove_if(
+            controllerDaysInMonth.begin(),
+            controllerDaysInMonth.end(),
+            [month](const auto &controllerDayInMonth) {
+                auto controllerDay =
+                    qobject_cast<ControllerDay *>(controllerDayInMonth);
+
+                return month != controllerDay->day()->date().month();
+            }),
+        controllerDaysInMonth.end());
+    return controllerDaysInMonth;
+}
+
 QString ControllerMonth::nameOfMonth() const
 {
     // This is a trick to transform month() int into its name by construct a
@@ -60,10 +92,10 @@ QString ControllerMonth::overtimeAsString() const
 
 QVector<std::shared_ptr<Day>> ControllerMonth::days() const
 {
-    auto days = allDaysInWeeks(m_controllerWeeks);
+    auto days = allDaysInControllerWeeks(m_controllerWeeks);
     auto month = getCurrentMonth(days);
 
-    // erase all days which are int the previous or next month
+    // erase all days which are in the previous or next month
     days.erase(
         std::remove_if(
             days.begin(),
@@ -75,14 +107,14 @@ QVector<std::shared_ptr<Day>> ControllerMonth::days() const
 
 int ControllerMonth::month() const
 {
-    auto days = allDaysInWeeks(m_controllerWeeks);
+    auto days = allDaysInControllerWeeks(m_controllerWeeks);
     return getCurrentMonth(days);
 }
 
 // same code as month except the function call, maybe genralize
 int ControllerMonth::year() const
 {
-    auto days = allDaysInWeeks(m_controllerWeeks);
+    auto days = allDaysInControllerWeeks(m_controllerWeeks);
     return getCurrentYear(days);
 }
 
@@ -117,7 +149,7 @@ void ControllerMonth::setOvertime(const HoursAndMinutes &overtime)
 namespace {
 
 QVector<std::shared_ptr<Day>>
-allDaysInWeeks(const QVector<QObject *> &m_controllerWeeks)
+allDaysInControllerWeeks(const QVector<QObject *> &m_controllerWeeks)
 {
     QVector<std::shared_ptr<Day>> days;
     // get all days from weeks even the ones from previous and next month

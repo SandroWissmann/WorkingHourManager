@@ -5,9 +5,6 @@
 #include "DayType.hpp"
 #include "Time.hpp"
 
-#include <QDate>
-#include <QTime>
-
 namespace whm {
 
 class Day {

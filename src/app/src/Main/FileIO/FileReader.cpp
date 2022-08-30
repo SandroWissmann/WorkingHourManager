@@ -14,7 +14,11 @@
 namespace whm {
 
 namespace {
+
 QJsonDocument extractJsonDocumentFromFile(const QString &filename);
+
+std::array<Time, 5>
+extractTimeArray(const QJsonObject &jsonObject, const QString &key);
 
 std::optional<Date> extractDateFromDay(const QJsonObject &jsonObject);
 
@@ -40,24 +44,31 @@ bool FileReader::isValidFile() const
     return !m_jsonDocument.isNull();
 }
 
-Time FileReader::defaultWorkedTimePerDay() const
+std::array<Time, 5> FileReader::defaultWorkTimesMoToFr() const
 {
     if (!isValidFile()) {
-        return Time{};
+        // TODO: This can lead to big problems because we emit an invalid time
+        // here better to switch this to optional and handle it outside
+        // with sane defaults
+        return std::array<Time, 5>{};
     }
 
     auto jsonObject = m_jsonDocument.object();
 
-    QString key{"defaultWorkedTimePerDay"};
-    if (!jsonObject.contains(key)) {
-        return Time{};
-    }
-    if (!jsonObject[key].isString()) {
-        return Time{};
+    QString key{"defaultWorkTimesMoToFr"};
+    return extractTimeArray(jsonObject, key);
+}
+
+std::array<Time, 5> FileReader::pauseTimesMoToFr() const
+{
+    if (!isValidFile()) {
+        return std::array<Time, 5>{};
     }
 
-    auto timeString = jsonObject[key].toString();
-    return Time{timeString};
+    auto jsonObject = m_jsonDocument.object();
+
+    QString key{"pauseTimesMoToFr"};
+    return extractTimeArray(jsonObject, key);
 }
 
 QVector<int> FileReader::holidaysPerYear() const
@@ -88,40 +99,6 @@ QVector<int> FileReader::holidaysPerYear() const
         holidaysPerYear.emplace_back(value);
     }
     return holidaysPerYear;
-}
-
-std::array<Time, 5> FileReader::pauseTimesPerDay() const
-{
-    if (!isValidFile()) {
-        return std::array<Time, 5>{};
-    }
-
-    auto jsonObject = m_jsonDocument.object();
-
-    QString key{"pauseTimesPerDay"};
-    if (!jsonObject.contains(key)) {
-        return std::array<Time, 5>{};
-    }
-    if (!jsonObject[key].isArray()) {
-        return std::array<Time, 5>{};
-    }
-
-    auto jsonArray = jsonObject[key].toArray();
-    if (jsonArray.size() != 5) {
-        return std::array<Time, 5>{};
-    }
-
-    for (int i = 0; i < jsonArray.size(); ++i) {
-        if (!jsonArray[i].isString()) {
-            return std::array<Time, 5>{};
-        }
-    }
-    return std::array<Time, 5>{
-        Time{jsonArray[0].toString()},
-        Time{jsonArray[1].toString()},
-        Time{jsonArray[2].toString()},
-        Time{jsonArray[3].toString()},
-        Time{jsonArray[4].toString()}};
 }
 
 QVector<std::shared_ptr<Day>> FileReader::days() const
@@ -175,6 +152,34 @@ QJsonDocument extractJsonDocumentFromFile(const QString &filename)
     QByteArray fileData = loadFile.readAll();
 
     return QJsonDocument::fromJson(fileData);
+}
+
+std::array<Time, 5>
+extractTimeArray(const QJsonObject &jsonObject, const QString &key)
+{
+    if (!jsonObject.contains(key)) {
+        return std::array<Time, 5>{};
+    }
+    if (!jsonObject[key].isArray()) {
+        return std::array<Time, 5>{};
+    }
+
+    auto jsonArray = jsonObject[key].toArray();
+    if (jsonArray.size() != 5) {
+        return std::array<Time, 5>{};
+    }
+
+    for (int i = 0; i < jsonArray.size(); ++i) {
+        if (!jsonArray[i].isString()) {
+            return std::array<Time, 5>{};
+        }
+    }
+    return std::array<Time, 5>{
+        Time{jsonArray[0].toString()},
+        Time{jsonArray[1].toString()},
+        Time{jsonArray[2].toString()},
+        Time{jsonArray[3].toString()},
+        Time{jsonArray[4].toString()}};
 }
 
 std::optional<Date> extractDateFromDay(const QJsonObject &jsonObject)

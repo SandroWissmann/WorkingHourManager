@@ -24,10 +24,9 @@ class ControllerDay : public QObject {
     Q_PROPERTY(QString endTime READ endTimeAsString WRITE setEndTime NOTIFY
                    endTimeChanged)
 
-    Q_PROPERTY(QString pauseTime READ pauseTimeAsString CONSTANT)
+    Q_PROPERTY(QString pauseTime READ pauseTimeAsString NOTIFY pauseTimeChanged)
 
-    Q_PROPERTY(
-        QString workedTime READ workedTimeAsString NOTIFY workedTimeChanged)
+    Q_PROPERTY(QString workTime READ workTimeAsString NOTIFY workTimeChanged)
     Q_PROPERTY(QString overtime READ overtimeAsString NOTIFY overtimeChanged)
 
     Q_PROPERTY(
@@ -35,7 +34,7 @@ class ControllerDay : public QObject {
 public:
     ControllerDay(
         std::shared_ptr<Day> day,
-        const Time &defaultWorkedTime,
+        const Time &defaultWorkTime,
         const Time &pauseTime);
 
     ControllerDay(const ControllerDay &) = delete;
@@ -51,7 +50,7 @@ public:
 
     QString weekday() const;
 
-    Time defaultWorkedTime() const;
+    Time defaultWorkTime() const;
 
     Time startTime() const;
     QString startTimeAsString() const;
@@ -63,8 +62,8 @@ public:
     Time pauseTime() const;
     QString pauseTimeAsString() const;
 
-    Time workedTime() const;
-    QString workedTimeAsString() const;
+    Time workTime() const;
+    QString workTimeAsString() const;
 
     HoursAndMinutes overtime() const;
     QString overtimeAsString() const;
@@ -75,21 +74,29 @@ public:
     bool hasValidStartTime() const;
     bool hasValidEndTime() const;
 
+public slots:
+    void onDefaultWorkTimeChanged(const whm::Time &defaultWorkTime);
+    void onPauseTimeChanged(const whm::Time &pauseTime);
+
 signals:
     void startTimeChanged();
     void endTimeChanged();
-    void workedTimeChanged();
+    void pauseTimeChanged();
+    void workTimeChanged();
+    void defaultWorkTimeChanged();
     void overtimeChanged();
     void dayTypeChanged();
 
 private:
-    void setWorkedTime(const Time &workedTime);
+    void setPauseTime(const Time &pauseTime);
+    void setWorkTime(const Time &workTime);
+    void setDefaultWorkTime(const Time &defaultWorkTime);
 
     std::shared_ptr<Day> m_day;
 
-    Time m_defaultWorkedTime;
+    Time m_defaultWorkTime;
     Time m_pauseTime;
-    Time m_workedTime{};
+    Time m_workTime{};
 };
 
 } // namespace whm
