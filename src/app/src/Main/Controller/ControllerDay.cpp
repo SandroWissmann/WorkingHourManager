@@ -47,9 +47,12 @@ QString ControllerDay::dateAsString() const
     return m_day->date().asString();
 }
 
-QString ControllerDay::weekday() const
+QString ControllerDay::weekdayAsString() const
 {
-    return m_day->date().weekday();
+    auto weekdayEnum = m_day->date().weekday();
+    QString weekday = QVariant::fromValue(weekdayEnum).toString();
+    weekday[0] = weekday[0].toUpper();
+    return weekday;
 }
 
 Time ControllerDay::defaultWorkTime() const

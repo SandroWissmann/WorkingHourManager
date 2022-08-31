@@ -1,5 +1,7 @@
 #include "../include/whm/types/Date.hpp"
 
+#include <QMetaEnum>
+
 namespace whm {
 
 namespace {
@@ -47,9 +49,17 @@ QString Date::asString() const
     return m_date.toString("dd.MM.yyyy");
 }
 
-QString Date::weekday() const
+Weekday Date::weekday() const
 {
-    return m_date.toString("dddd");
+    auto weekdayAsString = m_date.toString("dddd").toLower();
+
+    auto metaEnum = QMetaEnum::fromType<Weekday>();
+    int weekdayAsInt = metaEnum.keyToValue(weekdayAsString.toLatin1());
+
+    if (weekdayAsInt == -1) {
+        return Weekday::unknown;
+    }
+    return static_cast<Weekday>(weekdayAsInt);
 }
 
 int Date::month() const

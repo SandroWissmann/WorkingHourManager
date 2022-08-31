@@ -7,11 +7,7 @@ import "../../../Types"
 Item {
     id: root
 
-    // TODO: We should make a ControllerSettingsDay in backend to provide
-    // it here as controller
-    property string weekday
-    property string defaultWorkTime
-    property string pauseTime
+    property QtObject controller
 
     RowLayout {
         id: rowLayout
@@ -25,24 +21,24 @@ Item {
             Layout.preferredWidth: rowLayout.elementWidth
             font.bold: true
             color: "red"
-            text: root.weekday
+            text: root.controller.weekday
         }
         HourMinInput {
             id: defaultWorkTime_hourMinInput
             Layout.preferredWidth: rowLayout.elementWidth
-            text: root.defaultWorkTime
+            text: root.controller.defaultWorkTime
 
             onEditingFinished: {
-                root.defaultWorkTime = text
+                root.controller.defaultWorkTime = text
             }
         }
         HourMinInput {
             id: pauseTime_hourMinInput
             Layout.preferredWidth: rowLayout.elementWidth
-            text: root.pauseTime
+            text: root.controller.pauseTime
 
             onEditingFinished: {
-                root.pauseTime = text
+                root.controller.pauseTime = text
             }
         }
         Item {

@@ -97,8 +97,21 @@ void Backend::saveToFile()
         controllerYear->controllerSettinsYear());
     auto settingsYear = controllerSettingsYear->settingsYear();
 
-    auto defaultWorkTimesMoToFr = settingsYear.defaultWorkTimesMoToFr();
-    auto pauseTimesMoToFr = settingsYear.pauseTimesMoToFr();
+    std::array<Time, 5> defaultWorkTimesMoToFr{
+        settingsYear.defaultWorkTime(Weekday::monday),
+        settingsYear.defaultWorkTime(Weekday::tuesday),
+        settingsYear.defaultWorkTime(Weekday::wednesday),
+        settingsYear.defaultWorkTime(Weekday::thursday),
+        settingsYear.defaultWorkTime(Weekday::friday),
+    };
+
+    std::array<Time, 5> pauseTimesMoToFr{
+        settingsYear.pauseTime(Weekday::monday),
+        settingsYear.pauseTime(Weekday::tuesday),
+        settingsYear.pauseTime(Weekday::wednesday),
+        settingsYear.pauseTime(Weekday::thursday),
+        settingsYear.pauseTime(Weekday::friday),
+    };
 
     auto writeOk =
         fileWriter.writeToFile(defaultWorkTimesMoToFr, pauseTimesMoToFr, days);
@@ -123,19 +136,45 @@ makeWorkDays(const Date &firstDate, const Date &lastDate)
     QVector<std::shared_ptr<Day>> days;
     while (date <= lastDate) {
         auto weekday = date.weekday();
-        if (weekday != "Saturday" && weekday != "Sunday") {
-            auto day = std::make_shared<Day>(date);
-            days.emplace_back(day);
+
+        switch (weekday) {
+            case Weekday::monday:
+            case Weekday::tuesday:
+            case Weekday::wednesday:
+            case Weekday::thursday:
+            case Weekday::friday: {
+                auto day = std::make_shared<Day>(date);
+                days.emplace_back(day);
+            } break;
+            case Weekday::saturday:
+                break;
+            case Weekday::sunday:
+                break;
+            case Weekday::unknown:
+                break;
         }
         date = date.addDays(1);
     }
 
     // to fill up whole working week.
-    while (date.weekday() != "Saturday") {
+    while (date.weekday() != Weekday::saturday) {
         auto weekday = date.weekday();
-        if (weekday != "Saturday" && weekday != "Sunday") {
-            auto day = std::make_shared<Day>(date);
-            days.emplace_back(day);
+
+        switch (weekday) {
+            case Weekday::monday:
+            case Weekday::tuesday:
+            case Weekday::wednesday:
+            case Weekday::thursday:
+            case Weekday::friday: {
+                auto day = std::make_shared<Day>(date);
+                days.emplace_back(day);
+            } break;
+            case Weekday::saturday:
+                break;
+            case Weekday::sunday:
+                break;
+            case Weekday::unknown:
+                break;
         }
         date = date.addDays(1);
     }
@@ -185,7 +224,29 @@ Backend makeBackendFromFile(const FileReader &fileReader)
 
     auto defaultWorkTimesMoToFr = fileReader.defaultWorkTimesMoToFr();
     auto pauseTimesMoToFr = fileReader.pauseTimesMoToFr();
-    SettingsYear settingsYear{defaultWorkTimesMoToFr, pauseTimesMoToFr};
+
+    std::map<Weekday, SettingsDay> weekdayToSettingsDay{
+        {Weekday::monday,
+         SettingsDay{
+             Weekday::monday, defaultWorkTimesMoToFr[0], pauseTimesMoToFr[0]}},
+        {Weekday::tuesday,
+         SettingsDay{
+             Weekday::tuesday, defaultWorkTimesMoToFr[1], pauseTimesMoToFr[1]}},
+        {Weekday::wednesday,
+         SettingsDay{
+             Weekday::wednesday,
+             defaultWorkTimesMoToFr[2],
+             pauseTimesMoToFr[2]}},
+        {Weekday::thursday,
+         SettingsDay{
+             Weekday::thursday,
+             defaultWorkTimesMoToFr[3],
+             pauseTimesMoToFr[3]}},
+        {Weekday::friday,
+         SettingsDay{
+             Weekday::friday, defaultWorkTimesMoToFr[4], pauseTimesMoToFr[4]}}};
+
+    SettingsYear settingsYear{weekdayToSettingsDay};
 
     auto controllerYears = makeControllerYears(days, settingsYear);
 
@@ -213,30 +274,12 @@ QVector<QObject *> makeControllerDays(
     QVector<std::shared_ptr<Day>> days,
     const SettingsYear &settingsYear)
 {
-    // TODO: Rework this to maybe do this with settingsYear class and avoid
-    // strings which maybe get translated.
-    std::map<QString, Time> weekdayToPauseTime{
-        {"Monday", settingsYear.pauseTimeMonday()},
-        {"Tuesday", settingsYear.pauseTimeTuesday()},
-        {"Wednesday", settingsYear.pauseTimeWednesday()},
-        {"Thursday", settingsYear.pauseTimeThursday()},
-        {"Friday", settingsYear.pauseTimeFriday()},
-    };
-
-    std::map<QString, Time> weekdayToDefaultWorkTime{
-        {"Monday", settingsYear.defaultWorkTimeMonday()},
-        {"Tuesday", settingsYear.defaultWorkTimeTuesday()},
-        {"Wednesday", settingsYear.defaultWorkTimeWednesday()},
-        {"Thursday", settingsYear.defaultWorkTimeThursday()},
-        {"Friday", settingsYear.defaultWorkTimeFriday()},
-    };
-
     QVector<QObject *> controllerDays;
     controllerDays.reserve(days.size());
     for (const auto &day : days) {
         auto weekday = day->date().weekday();
-        auto pauseTime = weekdayToPauseTime.at(weekday);
-        auto defaultWorkTime = weekdayToDefaultWorkTime.at(weekday);
+        auto pauseTime = settingsYear.pauseTime(weekday);
+        auto defaultWorkTime = settingsYear.defaultWorkTime(weekday);
         auto controllerDay = new ControllerDay{day, defaultWorkTime, pauseTime};
         controllerDays.emplace_back(controllerDay);
     }

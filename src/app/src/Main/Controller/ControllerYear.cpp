@@ -4,6 +4,7 @@
 
 #include "ControllerDay.hpp"
 #include "ControllerMonth.hpp"
+#include "ControllerYear/ControllerSettingsDay.hpp"
 #include "ControllerYear/ControllerSettingsYear.hpp"
 
 #include <algorithm>
@@ -121,6 +122,23 @@ void ControllerYear::makeControllerSettingsYearToControllerDaysConnections()
 {
     auto controllerSettingsYear =
         qobject_cast<ControllerSettingsYear *>(m_controllerSettingsYear);
+
+    auto controllerSettingsDaysAsQObject =
+        controllerSettingsYear->controllerSettingsDays();
+
+    std::map<Weekday, ControllerSettingsDay *> controllerSettingsDays;
+    for (const auto &controllerSettingsDayAsQObject :
+         controllerSettingsDaysAsQObject) {
+        auto controllerSettingDay = qobject_cast<ControllerSettingsDay *>(
+            controllerSettingsDayAsQObject);
+
+        auto weekday = controllerSettingDay->weekday();
+        Q_ASSERT(
+            controllerSettingsDays.find(weekday) ==
+            controllerSettingsDays.end());
+        controllerSettingsDays.insert({weekday, controllerSettingDay});
+    }
+
     auto controllerDays = this->controllerDays();
 
     for (const auto &controllerDayAsQObject : controllerDays) {
@@ -129,71 +147,17 @@ void ControllerYear::makeControllerSettingsYearToControllerDaysConnections()
 
         auto weekday = controllerDay->day()->date().weekday();
 
-        if (weekday == "Monday") {
-            connect(
-                controllerSettingsYear,
-                &ControllerSettingsYear::defaultWorkTimeMondayChanged,
-                controllerDay,
-                &ControllerDay::onDefaultWorkTimeChanged);
+        connect(
+            controllerSettingsDays.at(weekday),
+            &ControllerSettingsDay::defaultWorkTimeChanged,
+            controllerDay,
+            &ControllerDay::onDefaultWorkTimeChanged);
 
-            connect(
-                controllerSettingsYear,
-                &ControllerSettingsYear::pauseTimeMondayChanged,
-                controllerDay,
-                &ControllerDay::onPauseTimeChanged);
-        }
-        else if (weekday == "Tuesday") {
-            connect(
-                controllerSettingsYear,
-                &ControllerSettingsYear::defaultWorkTimeTuesdayChanged,
-                controllerDay,
-                &ControllerDay::onDefaultWorkTimeChanged);
-
-            connect(
-                controllerSettingsYear,
-                &ControllerSettingsYear::pauseTimeTuesdayChanged,
-                controllerDay,
-                &ControllerDay::onPauseTimeChanged);
-        }
-        else if (weekday == "Wednesday") {
-            connect(
-                controllerSettingsYear,
-                &ControllerSettingsYear::defaultWorkTimeWednesdayChanged,
-                controllerDay,
-                &ControllerDay::onDefaultWorkTimeChanged);
-
-            connect(
-                controllerSettingsYear,
-                &ControllerSettingsYear::pauseTimeWednesdayChanged,
-                controllerDay,
-                &ControllerDay::onPauseTimeChanged);
-        }
-        else if (weekday == "Thursday") {
-            connect(
-                controllerSettingsYear,
-                &ControllerSettingsYear::defaultWorkTimeThursdayChanged,
-                controllerDay,
-                &ControllerDay::onDefaultWorkTimeChanged);
-
-            connect(
-                controllerSettingsYear,
-                &ControllerSettingsYear::pauseTimeThursdayChanged,
-                controllerDay,
-                &ControllerDay::onPauseTimeChanged);
-        }
-        else if (weekday == "Friday") {
-            connect(
-                controllerSettingsYear,
-                &ControllerSettingsYear::defaultWorkTimeFridayChanged,
-                controllerDay,
-                &ControllerDay::onDefaultWorkTimeChanged);
-
-            connect(
-                controllerSettingsYear,
-                &ControllerSettingsYear::pauseTimeFridayChanged,
-                controllerDay,
-                &ControllerDay::onPauseTimeChanged);
-        }
+        connect(
+            controllerSettingsDays.at(weekday),
+            &ControllerSettingsDay::pauseTimeChanged,
+            controllerDay,
+            &ControllerDay::onPauseTimeChanged);
     }
 }
 

@@ -21,49 +21,15 @@ Item {
             Layout.preferredWidth: parent.width
         }
 
-        SettingsDay {
-            Layout.preferredHeight: columnLayout.elementHeigth
-            Layout.preferredWidth: parent.width
+        Repeater {
+            model: root.controller.controllerSettingsDays
 
-            weekday: qsTr("Monday")
-            defaultWorkTime: root.controller.defaultWorkTimeMonday
-            pauseTime: root.controller.pauseTimeMonday
-        }
+            SettingsDay {
+                Layout.preferredHeight: columnLayout.elementHeigth
+                Layout.preferredWidth: parent.width
 
-        SettingsDay {
-            Layout.preferredHeight: columnLayout.elementHeigth
-            Layout.preferredWidth: parent.width
-
-            weekday: qsTr("Tuesday")
-            defaultWorkTime: root.controller.defaultWorkTimeTuesday
-            pauseTime: root.controller.pauseTimeTuesday
-        }
-
-        SettingsDay {
-            Layout.preferredHeight: columnLayout.elementHeigth
-            Layout.preferredWidth: parent.width
-
-            weekday: qsTr("Wednesday")
-            defaultWorkTime: root.controller.defaultWorkTimeWednesday
-            pauseTime: root.controller.pauseTimeWednesday
-        }
-
-        SettingsDay {
-            Layout.preferredHeight: columnLayout.elementHeigth
-            Layout.preferredWidth: parent.width
-
-            weekday: qsTr("Thursday")
-            defaultWorkTime: root.controller.defaultWorkTimeThursday
-            pauseTime: root.controller.pauseTimeThursday
-        }
-
-        SettingsDay {
-            Layout.preferredHeight: columnLayout.elementHeigth
-            Layout.preferredWidth: parent.width
-
-            weekday: qsTr("Friday")
-            defaultWorkTime: root.controller.defaultWorkTimeFriday
-            pauseTime: root.controller.pauseTimeFriday
+                controller: model.modelData
+            }
         }
 
         Item {

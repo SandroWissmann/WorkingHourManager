@@ -1,9 +1,12 @@
 #ifndef WORKING_HOUR_MANAGER_SETTINGS_YEAR_HPP
 #define WORKING_HOUR_MANAGER_SETTINGS_YEAR_HPP
 
-#include <whm/types/Time.hpp>
+#include "SettingsDay.hpp"
 
-#include <vector>
+#include <whm/types/Time.hpp>
+#include <whm/types/Weekday.hpp>
+
+#include <map>
 
 namespace whm {
 
@@ -11,45 +14,28 @@ class SettingsYear {
 public:
     SettingsYear();
 
-    SettingsYear(
-        const std::array<Time, 5> &defaultWorkTimesMoToFr,
-        const std::array<Time, 5> &pauseTimesMoToFr);
+    SettingsYear(std::map<Weekday, SettingsDay> weekdayToSettingsDay);
 
     SettingsYear(const SettingsYear &) = default;
     SettingsYear(SettingsYear &&) = default;
     SettingsYear &operator=(const SettingsYear &) = default;
     SettingsYear &operator=(SettingsYear &&) = default;
 
-    std::array<Time, 5> defaultWorkTimesMoToFr() const;
-    std::array<Time, 5> pauseTimesMoToFr() const;
+    std::map<Weekday, SettingsDay> weekdayToSettingsDay() const;
 
-    Time defaultWorkTimeMonday() const;
-    Time defaultWorkTimeTuesday() const;
-    Time defaultWorkTimeWednesday() const;
-    Time defaultWorkTimeThursday() const;
-    Time defaultWorkTimeFriday() const;
+    SettingsDay *settingsDay(Weekday weekday);
 
-    bool setDefaultWorkTimeMonday(const QString &defaultWorkTime);
-    bool setDefaultWorkTimeTuesday(const QString &defaultWorkTime);
-    bool setDefaultWorkTimeWednesday(const QString &defaultWorkTime);
-    bool setDefaultWorkTimeThursday(const QString &defaultWorkTime);
-    bool setDefaultWorkTimeFriday(const QString &defaultWorkTime);
+    Time defaultWorkTime(Weekday weekday) const;
 
-    Time pauseTimeMonday() const;
-    Time pauseTimeTuesday() const;
-    Time pauseTimeWednesday() const;
-    Time pauseTimeThursday() const;
-    Time pauseTimeFriday() const;
+    bool
+    setDefaultWorkTime(Weekday weekday, const QString &defaultWorkTimeAsString);
 
-    bool setPauseTimeMonday(const QString &pauseTime);
-    bool setPauseTimeTuesday(const QString &pauseTime);
-    bool setPauseTimeWednesday(const QString &pauseTime);
-    bool setPauseTimeThursday(const QString &pauseTime);
-    bool setPauseTimeFriday(const QString &pauseTime);
+    Time pauseTime(Weekday weekday) const;
+
+    bool setPauseTime(Weekday weekday, const QString &pauseTimeAsString);
 
 private:
-    std::array<Time, 5> m_defaultWorkTimesMoToFr;
-    std::array<Time, 5> m_pauseTimesMoToFr;
+    std::map<Weekday, SettingsDay> m_weekdayToSettingsDay;
 };
 
 } // namespace whm

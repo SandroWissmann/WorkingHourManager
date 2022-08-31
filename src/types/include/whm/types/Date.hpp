@@ -1,6 +1,8 @@
 #ifndef WORKING_HOUR_MANAGER_DATE_HPP
 #define WORKING_HOUR_MANAGER_DATE_HPP
 
+#include "Weekday.hpp"
+
 #include <QDate>
 
 namespace whm {
@@ -22,8 +24,7 @@ public:
     // format dd.MM.yyyy
     QString asString() const;
 
-    // Monday / Tuesday etc.
-    QString weekday() const;
+    Weekday weekday() const;
 
     int month() const;
 

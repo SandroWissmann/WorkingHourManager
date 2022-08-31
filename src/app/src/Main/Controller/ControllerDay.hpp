@@ -17,7 +17,7 @@ class Day;
 class ControllerDay : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString date READ dateAsString CONSTANT)
-    Q_PROPERTY(QString weekday READ weekday CONSTANT)
+    Q_PROPERTY(QString weekday READ weekdayAsString CONSTANT)
 
     Q_PROPERTY(QString startTime READ startTimeAsString WRITE setStartTime
                    NOTIFY startTimeChanged)
@@ -48,7 +48,7 @@ public:
 
     QString dateAsString() const;
 
-    QString weekday() const;
+    QString weekdayAsString() const;
 
     Time defaultWorkTime() const;
 

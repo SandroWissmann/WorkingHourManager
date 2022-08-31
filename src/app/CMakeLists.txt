@@ -10,12 +10,16 @@ add_executable(appWorkingHourManager
     src/Main/Controller/ControllerWeek.cpp
     src/Main/Controller/ControllerYear.hpp
     src/Main/Controller/ControllerYear.cpp
+    src/Main/Controller/ControllerYear/ControllerSettingsDay.hpp
+    src/Main/Controller/ControllerYear/ControllerSettingsDay.cpp
     src/Main/Controller/ControllerYear/ControllerSettingsYear.hpp
     src/Main/Controller/ControllerYear/ControllerSettingsYear.cpp
     src/Main/FileIO/FileReader.hpp
     src/Main/FileIO/FileReader.cpp
     src/Main/FileIO/FileWriter.hpp
     src/Main/FileIO/FileWriter.cpp
+    src/Main/Settings/SettingsDay.hpp
+    src/Main/Settings/SettingsDay.cpp
     src/Main/Settings/SettingsYear.hpp
     src/Main/Settings/SettingsYear.cpp
 )
