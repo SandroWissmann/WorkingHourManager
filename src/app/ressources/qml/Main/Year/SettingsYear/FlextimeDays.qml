@@ -6,7 +6,7 @@ import "../../../Types"
 Item {
     id: root
 
-    property string flextimeDays
+    property QtObject controller
 
     RowLayout {
         id: rowLayout
@@ -24,10 +24,10 @@ Item {
 
         DoubleInput {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: root.flextimeDays
+            text: root.controller.flextimeDays
 
             onEditingFinished: {
-                root.flextimeDays = text
+                root.controller.flextimeDays = text
             }
         }
         Item {

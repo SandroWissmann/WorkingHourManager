@@ -6,7 +6,7 @@ import "../../../Types"
 Item {
     id: root
 
-    property string vacationDays
+    property QtObject controller
 
     RowLayout {
         id: rowLayout
@@ -24,10 +24,10 @@ Item {
 
         DoubleInput {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: root.vacationDays
+            text: root.controller.vacationDays
 
             onEditingFinished: {
-                root.vacationDays = text
+                root.controller.vacationDays = text
             }
         }
         Item {

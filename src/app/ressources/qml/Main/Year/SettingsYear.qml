@@ -42,13 +42,13 @@ Item {
         FlextimeDays {
             Layout.preferredHeight: columnLayout.elementHeigth
             Layout.preferredWidth: parent.width
-            flextimeDays: controller.flextimeDays
+            controller: root.controller
         }
 
         VacationDays {
             Layout.preferredHeight: columnLayout.elementHeigth
             Layout.preferredWidth: parent.width
-            vacationDays: controller.vacationDays
+            controller: root.controller
         }
 
         Item {
