@@ -213,6 +213,14 @@ Backend makeBackendFromFile(const FileReader &fileReader)
         return makeDefaultBackend();
     }
 
+    // TODO: If these days have a new year we should generate a new default
+    // settingsYear
+    auto firstDateNotInFile = days.back()->date();
+    firstDateNotInFile.addDays(1);
+    auto currentDate = Date::currentDate();
+    auto newDaysNotInFile = makeWorkDays(firstDateNotInFile, currentDate);
+    days.append(newDaysNotInFile);
+
     auto settingsYears = fileReader.settingsYears();
     auto controllerYears = makeControllerYears(days, settingsYears);
     return Backend{controllerYears};
