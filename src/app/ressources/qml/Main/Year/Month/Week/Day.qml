@@ -70,33 +70,16 @@ Item {
             font.bold: true
             text: root.controller.overtime
         }
-        SpinBox {
+        ComboBox {
             id: dayType_spinBox
             Layout.preferredWidth: rowLayout.elementWidth
-            from: 0
-            // TODO: Get max value from the backend
-            to: items.length - 1
-            value: root.controller.dayType
-            wrap: true
+            currentIndex: root.controller.dayType
 
-            // TODO: Provide this list from the backend
-            property var items: ["Work", "Holiday", "Vacation", "Sick", "Party", "Flextime", "Ignore"]
+            // TODO: provide this list from the backend
+            model: ["Work", "Holiday", "Vacation", "Sick", "Party", "Flextime", "Ignore"]
 
-            textFromValue: function (value) {
-                return items[value]
-            }
-
-            valueFromText: function (text) {
-                for (var i = 0; i < items.length; ++i) {
-                    if (items[i].toLowerCase().indexOf(
-                                text.toLowerCase()) === 0)
-                        return i
-                }
-                return dayType_spinBox.value
-            }
-
-            onValueChanged: {
-                root.controller.dayType = value
+            onCurrentIndexChanged: {
+                root.controller.dayType = currentIndex
             }
         }
         Item {
