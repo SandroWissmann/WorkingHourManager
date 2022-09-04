@@ -53,23 +53,23 @@ void ControllerSettingsYear::setFlextimeDays(
     emit flextimeDaysChanged();
 }
 
-double ControllerSettingsYear::vaccationDays()
+double ControllerSettingsYear::vacationDays()
 {
-    return m_settingsYear.vaccationDays();
+    return m_settingsYear.vacationDays();
 }
 
-QString ControllerSettingsYear::vaccationDaysAsString()
+QString ControllerSettingsYear::vacationDaysAsString()
 {
-    return QString::number(vaccationDays(), 'f', 1);
+    return QString::number(vacationDays(), 'f', 1);
 }
 
-void ControllerSettingsYear::setVaccationDays(
-    const QString &vaccationDaysAsString)
+void ControllerSettingsYear::setVacationDays(
+    const QString &vacationDaysAsString)
 {
-    if (!m_settingsYear.setVaccationDays(vaccationDaysAsString)) {
+    if (!m_settingsYear.setVacationDays(vacationDaysAsString)) {
         return;
     }
-    emit vaccationDaysChanged();
+    emit vacationDaysChanged();
 }
 
 } // namespace whm

@@ -17,7 +17,11 @@ class ControllerYear : public QObject {
     Q_PROPERTY(
         QObject *controllerSettinsYear READ controllerSettinsYear CONSTANT)
     Q_PROPERTY(int year READ year CONSTANT)
-    Q_PROPERTY(QString overtime READ overtime NOTIFY overtimeChanged)
+    Q_PROPERTY(QString overtime READ overtimeAsString NOTIFY overtimeChanged)
+    Q_PROPERTY(QString usedFlextimeDays READ usedFlextimeDaysAsString()
+                   NOTIFY usedFlextimeDaysChanged)
+    Q_PROPERTY(QString usedVacationDays READ usedVacationDaysAsString NOTIFY
+                   usedVacationDaysChanged)
 public:
     ControllerYear(
         const QVector<QObject *> &controllerMonths,
@@ -33,15 +37,21 @@ public:
     QVector<QObject *> controllerMonths() const;
     QObject *controllerSettinsYear() const;
     int year() const;
-    QString overtime() const;
+    QString overtimeAsString() const;
+    QString usedFlextimeDaysAsString() const;
+    QString usedVacationDaysAsString() const;
 
     QVector<std::shared_ptr<Day>> days() const;
 
 signals:
     void overtimeChanged();
+    void usedFlextimeDaysChanged();
+    void usedVacationDaysChanged();
 
 private slots:
     void onOvertimeOfMonthChanged();
+    void onUsedFlextimeDaysOfMonthChanged();
+    void onUsedVacationDaysOfMonthChanged();
 
 private:
     QVector<QObject *> controllerDays() const;
@@ -51,11 +61,15 @@ private:
     void makeControllerSettingsYearToControllerDaysConnections() const;
 
     void setOvertime(const HoursAndMinutes &overtime);
+    void setUsedFlextimeDays(double usedFlextimeDays);
+    void setUsedVacationDays(double usedVacationDays);
 
     QVector<QObject *> m_controllerMonths;
     QObject *m_controllerSettingsYear;
 
     HoursAndMinutes m_overtime;
+    double m_usedFlextimeDays;
+    double m_usedVacationDays;
 };
 } // namespace whm
 

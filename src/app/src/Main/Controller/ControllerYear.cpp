@@ -24,6 +24,33 @@ HoursAndMinutes calculateOvertime(const QVector<QObject *> controllerMonths)
     }
     return overtimeOfYear;
 }
+
+double calculateUsedFlextimeDays(const QVector<QObject *> controllerMonths)
+{
+    double usedFlextimeDaysInYear{};
+    for (const auto &controllerMonthQObject : controllerMonths) {
+        auto controllerMonth =
+            qobject_cast<ControllerMonth *>(controllerMonthQObject);
+
+        auto usedFlextimeDays = controllerMonth->usedFlextimeDays();
+        usedFlextimeDaysInYear += usedFlextimeDays;
+    }
+    return usedFlextimeDaysInYear;
+}
+
+double calculateUsedVacationDays(const QVector<QObject *> controllerMonths)
+{
+    double usedVacationDaysInYear{};
+    for (const auto &controllerMonthQObject : controllerMonths) {
+        auto controllerMonth =
+            qobject_cast<ControllerMonth *>(controllerMonthQObject);
+
+        auto usedVacationDays = controllerMonth->usedVacationDays();
+        usedVacationDaysInYear += usedVacationDays;
+    }
+    return usedVacationDaysInYear;
+}
+
 } // namespace
 
 ControllerYear::ControllerYear(
@@ -31,7 +58,9 @@ ControllerYear::ControllerYear(
     QObject *controllerSettingsYear)
     : m_controllerMonths{controllerMonths},
       m_controllerSettingsYear{controllerSettingsYear},
-      m_overtime{calculateOvertime(m_controllerMonths)}
+      m_overtime{calculateOvertime(m_controllerMonths)},
+      m_usedFlextimeDays{calculateUsedFlextimeDays(m_controllerMonths)},
+      m_usedVacationDays{calculateUsedVacationDays(m_controllerMonths)}
 {
     m_controllerSettingsYear->setParent(this);
     for (auto &controllerMonth : m_controllerMonths) {
@@ -61,9 +90,19 @@ int ControllerYear::year() const
     return controllerMonth->year();
 }
 
-QString ControllerYear::overtime() const
+QString ControllerYear::overtimeAsString() const
 {
     return m_overtime.toString();
+}
+
+QString ControllerYear::usedFlextimeDaysAsString() const
+{
+    return QString::number(m_usedFlextimeDays, 'f', 1);
+}
+
+QString ControllerYear::usedVacationDaysAsString() const
+{
+    return QString::number(m_usedVacationDays, 'f', 1);
 }
 
 QVector<std::shared_ptr<Day>> ControllerYear::days() const
@@ -86,6 +125,18 @@ void ControllerYear::onOvertimeOfMonthChanged()
 {
     auto overtime = calculateOvertime(m_controllerMonths);
     setOvertime(overtime);
+}
+
+void ControllerYear::onUsedFlextimeDaysOfMonthChanged()
+{
+    auto usedFlextimeDays = calculateUsedFlextimeDays(m_controllerMonths);
+    setUsedFlextimeDays(usedFlextimeDays);
+}
+
+void ControllerYear::onUsedVacationDaysOfMonthChanged()
+{
+    auto usedVacationDays = calculateUsedVacationDays(m_controllerMonths);
+    setUsedVacationDays(usedVacationDays);
 }
 
 QVector<QObject *> ControllerYear::controllerDays() const
@@ -114,6 +165,18 @@ void ControllerYear::makeControllerMonthsToThisConnections() const
             &ControllerMonth::overtimeChanged,
             this,
             &ControllerYear::onOvertimeOfMonthChanged);
+
+        connect(
+            controllerMonth,
+            &ControllerMonth::usedFlextimeDaysChanged,
+            this,
+            &ControllerYear::onUsedFlextimeDaysOfMonthChanged);
+
+        connect(
+            controllerMonth,
+            &ControllerMonth::usedVacationDaysChanged,
+            this,
+            &ControllerYear::onUsedVacationDaysOfMonthChanged);
     }
 }
 
@@ -168,6 +231,24 @@ void ControllerYear::setOvertime(const HoursAndMinutes &overtime)
     }
     m_overtime = overtime;
     emit overtimeChanged();
+}
+
+void ControllerYear::setUsedFlextimeDays(double usedFlextimeDays)
+{
+    if (m_usedFlextimeDays == usedFlextimeDays) {
+        return;
+    }
+    m_usedFlextimeDays = usedFlextimeDays;
+    emit usedFlextimeDaysChanged();
+}
+
+void ControllerYear::setUsedVacationDays(double usedVacationDays)
+{
+    if (m_usedVacationDays == usedVacationDays) {
+        return;
+    }
+    m_usedVacationDays = usedVacationDays;
+    emit usedVacationDaysChanged();
 }
 
 } // namespace whm

@@ -66,9 +66,8 @@ Page {
         tabBarMonth.setCurrentIndex(0)
     }
 
-    footer: Text {
-        text: qsTr("Overtime in %1: %2").arg(controller.year).arg(
-                  controller.overtime)
-        font.bold: true
+    footer: FooterYear {
+        controller: root.controller
+        height: 30
     }
 }

@@ -42,7 +42,7 @@ bool setTime(Time &value, const QString &newValue)
 
 SettingsYear::SettingsYear(int year)
     : m_year{year}, m_flextimeDays{defaultFlextimneDays()},
-      m_vaccationDays{defaultVaccationDays()},
+      m_vacationDays{defaultVacationDays()},
       m_weekdayToSettingsDay{makeDefaultWeekdayToSettingsDay()}
 {
 }
@@ -50,13 +50,13 @@ SettingsYear::SettingsYear(int year)
 SettingsYear::SettingsYear(
     int year,
     double flextimeDays,
-    double vaccationDays,
+    double vacationDays,
     std::map<Weekday, SettingsDay> weekdayToSettingsDay)
     : m_weekdayToSettingsDay{weekdayToSettingsDay},
-      m_flextimeDays{flextimeDays}, m_vaccationDays{vaccationDays}, m_year{year}
+      m_flextimeDays{flextimeDays}, m_vacationDays{vacationDays}, m_year{year}
 {
     Q_ASSERT(m_flextimeDays > 0);
-    Q_ASSERT(m_vaccationDays > 0);
+    Q_ASSERT(m_vacationDays > 0);
 
     Q_ASSERT(m_weekdayToSettingsDay.size() == 5);
     Q_ASSERT(
@@ -175,32 +175,21 @@ bool SettingsYear::setFlextimeDays(const QString &flextimeDaysAsString)
     return true;
 }
 
-double SettingsYear::vaccationDays() const
+double SettingsYear::vacationDays() const
 {
-    return m_vaccationDays;
+    return m_vacationDays;
 }
 
-bool SettingsYear::setVaccationDays(const QString &vaccationDaysAsString)
+bool SettingsYear::setVacationDays(const QString &vacationDaysAsString)
 {
     bool ok;
-    auto vaccationDays = vaccationDaysAsString.toDouble(&ok);
+    auto vacationDays = vacationDaysAsString.toDouble(&ok);
     Q_ASSERT(ok);
 
-    if (qFuzzyCompare(m_vaccationDays, vaccationDays)) {
+    if (qFuzzyCompare(m_vacationDays, vacationDays)) {
         return false;
     }
-    m_vaccationDays = vaccationDays;
+    m_vacationDays = vacationDays;
     return true;
 }
-
-constexpr double SettingsYear::defaultFlextimneDays()
-{
-    return 6.0;
-}
-
-constexpr double SettingsYear::defaultVaccationDays()
-{
-    return 30.0;
-}
-
 } // namespace whm

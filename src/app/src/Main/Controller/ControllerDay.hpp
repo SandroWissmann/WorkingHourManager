@@ -74,6 +74,9 @@ public:
     bool hasValidStartTime() const;
     bool hasValidEndTime() const;
 
+    double usedFlextimeDay() const;
+    double usedVacationDay() const;
+
 public slots:
     void onDefaultWorkTimeChanged(const whm::Time &defaultWorkTime);
     void onPauseTimeChanged(const whm::Time &pauseTime);
@@ -86,17 +89,25 @@ signals:
     void defaultWorkTimeChanged();
     void overtimeChanged();
     void dayTypeChanged();
+    void usedFlextimeDayChanged();
+    void usedVacationDayChanged();
 
 private:
     void setPauseTime(const Time &pauseTime);
     void setWorkTime(const Time &workTime);
     void setDefaultWorkTime(const Time &defaultWorkTime);
 
+    void setUsedFlextimeDay(double usedFlextimeDay);
+    void setUsedVacationDay(double usedVacationDay);
+
     std::shared_ptr<Day> m_day;
 
     Time m_defaultWorkTime;
     Time m_pauseTime;
     Time m_workTime{};
+
+    double m_usedFlextimeDay;
+    double m_usedVacationDay;
 };
 
 } // namespace whm

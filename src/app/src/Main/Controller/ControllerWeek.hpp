@@ -45,6 +45,10 @@ public:
     // days in each month
     QMap<int, HoursAndMinutes> monthsToOvertime() const;
 
+    QMap<int, double> monthsToUsedFlextimeDays() const;
+
+    QMap<int, double> monthsToUsedVacationDays() const;
+
     // Indicate in which month the week is present
     QVector<int> months() const;
 
@@ -57,6 +61,8 @@ signals:
     void workTimeChanged();
     void overtimeChanged();
     void earliestEndTimeChanged();
+    void usedFlextimeDaysChanged();
+    void usedVacationDaysChanged();
 
 private slots:
     void onWorkTimeOfDayChanged();

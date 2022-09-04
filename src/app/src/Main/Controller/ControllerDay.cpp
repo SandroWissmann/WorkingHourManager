@@ -21,6 +21,23 @@ Time calcWorkTime(Time startTime, Time endTime, Time pauseTime)
     }
     return workTime;
 }
+
+double calcUsedFlextimeDay(DayType dayType)
+{
+    if (dayType == DayType::flextime) {
+        return 1.0;
+    }
+    return 0.0;
+}
+
+double calcUsedVacationDay(DayType dayType)
+{
+    if (dayType == DayType::vacation) {
+        return 1.0;
+    }
+    return 0.0;
+}
+
 } // namespace
 
 ControllerDay::ControllerDay(
@@ -29,7 +46,9 @@ ControllerDay::ControllerDay(
     const Time &pauseTime)
     : m_day{day}, m_defaultWorkTime{defaultWorkTime}, m_pauseTime{pauseTime},
       m_workTime{
-          calcWorkTime(m_day->startTime(), m_day->endTime(), m_pauseTime)}
+          calcWorkTime(m_day->startTime(), m_day->endTime(), m_pauseTime)},
+      m_usedFlextimeDay{calcUsedFlextimeDay(m_day->dayType())},
+      m_usedVacationDay{calcUsedVacationDay(m_day->dayType())}
 {
     Q_ASSERT(pauseTime.isValid());
     Q_ASSERT(defaultWorkTime.isValid());
@@ -198,6 +217,13 @@ void ControllerDay::setDayType(DayType dayType)
         emit defaultWorkTimeChanged();
         emit overtimeChanged();
     }
+
+    // TODO: simplification we normally not need to calc this everytime.
+    auto usedFlextimeDay = calcUsedFlextimeDay(dayType);
+    setUsedFlextimeDay(usedFlextimeDay);
+
+    auto usedVacationDay = calcUsedVacationDay(dayType);
+    setUsedVacationDay(usedVacationDay);
 }
 
 bool ControllerDay::hasValidStartTime() const
@@ -208,6 +234,16 @@ bool ControllerDay::hasValidStartTime() const
 bool ControllerDay::hasValidEndTime() const
 {
     return m_day->hasValidEndTime();
+}
+
+double ControllerDay::usedFlextimeDay() const
+{
+    return m_usedFlextimeDay;
+}
+
+double ControllerDay::usedVacationDay() const
+{
+    return m_usedVacationDay;
 }
 
 void ControllerDay::onDefaultWorkTimeChanged(const whm::Time &defaultWorkTime)
@@ -251,6 +287,30 @@ void ControllerDay::setDefaultWorkTime(const Time &defaultWorkTime)
     }
     m_defaultWorkTime = defaultWorkTime;
     emit defaultWorkTimeChanged();
+}
+
+void ControllerDay::setUsedFlextimeDay(double usedFlextimeDay)
+{
+    Q_ASSERT(usedFlextimeDay >= 0.0);
+    Q_ASSERT(usedFlextimeDay <= 1.0);
+
+    if (qFuzzyCompare(m_usedFlextimeDay, usedFlextimeDay)) {
+        return;
+    }
+    m_usedFlextimeDay = usedFlextimeDay;
+    emit usedFlextimeDayChanged();
+}
+
+void ControllerDay::setUsedVacationDay(double usedVacationDay)
+{
+    Q_ASSERT(usedVacationDay >= 0.0);
+    Q_ASSERT(usedVacationDay <= 1.0);
+
+    if (qFuzzyCompare(m_usedVacationDay, usedVacationDay)) {
+        return;
+    }
+    m_usedVacationDay = usedVacationDay;
+    emit usedVacationDayChanged();
 }
 
 } // namespace whm

@@ -17,8 +17,8 @@ class ControllerSettingsYear : public QObject {
                    controllerSettingsDays CONSTANT)
     Q_PROPERTY(QString flextimeDays READ flextimeDaysAsString WRITE
                    setFlextimeDays NOTIFY flextimeDaysChanged)
-    Q_PROPERTY(QString vaccationDays READ vaccationDaysAsString WRITE
-                   setVaccationDays NOTIFY vaccationDaysChanged)
+    Q_PROPERTY(QString vacationDays READ vacationDaysAsString WRITE
+                   setVacationDays NOTIFY vacationDaysChanged)
 public:
     ControllerSettingsYear(const SettingsYear &settingsYear);
 
@@ -35,13 +35,13 @@ public:
     QString flextimeDaysAsString();
     void setFlextimeDays(const QString &flextimeDaysAsString);
 
-    double vaccationDays();
-    QString vaccationDaysAsString();
-    void setVaccationDays(const QString &vaccationDaysAsString);
+    double vacationDays();
+    QString vacationDaysAsString();
+    void setVacationDays(const QString &vacationDaysAsString);
 
 signals:
     void flextimeDaysChanged();
-    void vaccationDaysChanged();
+    void vacationDaysChanged();
 
 private:
     SettingsYear m_settingsYear;

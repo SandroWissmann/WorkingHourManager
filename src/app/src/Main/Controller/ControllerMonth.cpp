@@ -21,11 +21,18 @@ int getCurrentYear(const QVector<std::shared_ptr<Day>> &days);
 
 HoursAndMinutes
 calculateOvertime(const QVector<QObject *> controllerWeeks, int month);
+
+double
+calculateUsedFlextimeDays(const QVector<QObject *> controllerWeeks, int month);
+double
+calculateUsedVacationDays(const QVector<QObject *> controllerWeeks, int month);
 } // namespace
 
 ControllerMonth::ControllerMonth(const QVector<QObject *> &controllerWeeks)
     : m_controllerWeeks{controllerWeeks},
-      m_overtime{calculateOvertime(m_controllerWeeks, month())}
+      m_overtime{calculateOvertime(m_controllerWeeks, month())},
+      m_usedFlextimeDays{calculateUsedFlextimeDays(m_controllerWeeks, month())},
+      m_usedVacationDays{calculateUsedVacationDays(m_controllerWeeks, month())}
 {
     Q_ASSERT(controllerWeeks.size() >= 1 && controllerWeeks.size());
 
@@ -90,6 +97,16 @@ QString ControllerMonth::overtimeAsString() const
     return m_overtime.toString();
 }
 
+double ControllerMonth::usedFlextimeDays() const
+{
+    return m_usedFlextimeDays;
+}
+
+double ControllerMonth::usedVacationDays() const
+{
+    return m_usedVacationDays;
+}
+
 QVector<std::shared_ptr<Day>> ControllerMonth::days() const
 {
     auto days = allDaysInControllerWeeks(m_controllerWeeks);
@@ -124,6 +141,20 @@ void ControllerMonth::onOvertimeOfWeekChanged()
     setOvertime(overtime);
 }
 
+void ControllerMonth::onUsedFlextimeDaysOfWeekChanged()
+{
+    auto usedFlextimeDays =
+        calculateUsedFlextimeDays(m_controllerWeeks, month());
+    setUsedFlextimeDays(usedFlextimeDays);
+}
+
+void ControllerMonth::onUsedVacationDaysOfWeekChanged()
+{
+    auto usedVacationDays =
+        calculateUsedVacationDays(m_controllerWeeks, month());
+    setUsedVacationDays(usedVacationDays);
+}
+
 void ControllerMonth::makeControllerWeeksToThisConnections() const
 {
     for (const auto &controllerWeekQObject : m_controllerWeeks) {
@@ -134,6 +165,16 @@ void ControllerMonth::makeControllerWeeksToThisConnections() const
             &ControllerWeek::overtimeChanged,
             this,
             &ControllerMonth::onOvertimeOfWeekChanged);
+        connect(
+            controllerWeek,
+            &ControllerWeek::usedFlextimeDaysChanged,
+            this,
+            &ControllerMonth::onUsedFlextimeDaysOfWeekChanged);
+        connect(
+            controllerWeek,
+            &ControllerWeek::usedVacationDaysChanged,
+            this,
+            &ControllerMonth::onUsedVacationDaysOfWeekChanged);
     }
 }
 
@@ -144,6 +185,24 @@ void ControllerMonth::setOvertime(const HoursAndMinutes &overtime)
     }
     m_overtime = overtime;
     emit overtimeChanged();
+}
+
+void ControllerMonth::setUsedFlextimeDays(double usedFlextimeDays)
+{
+    if (m_usedFlextimeDays == usedFlextimeDays) {
+        return;
+    }
+    m_usedFlextimeDays = usedFlextimeDays;
+    emit usedFlextimeDaysChanged();
+}
+
+void ControllerMonth::setUsedVacationDays(double usedVacationDays)
+{
+    if (m_usedVacationDays == usedVacationDays) {
+        return;
+    }
+    m_usedVacationDays = usedVacationDays;
+    emit usedVacationDaysChanged();
 }
 
 namespace {
@@ -214,6 +273,46 @@ calculateOvertime(const QVector<QObject *> controllerWeeks, int month)
         overtimeOfMonth += monthsToOvertime[month];
     }
     return overtimeOfMonth;
+}
+
+double
+calculateUsedFlextimeDays(const QVector<QObject *> controllerWeeks, int month)
+{
+    double usedFlextimeDaysInMonth;
+    for (const auto &controllerWeekQObject : controllerWeeks) {
+        auto controllerWeek =
+            qobject_cast<ControllerWeek *>(controllerWeekQObject);
+
+        auto monthsToUsedFlextimeDays =
+            controllerWeek->monthsToUsedFlextimeDays();
+
+        Q_ASSERT(
+            monthsToUsedFlextimeDays.find(month) !=
+            monthsToUsedFlextimeDays.end());
+
+        usedFlextimeDaysInMonth += monthsToUsedFlextimeDays[month];
+    }
+    return usedFlextimeDaysInMonth;
+}
+
+double
+calculateUsedVacationDays(const QVector<QObject *> controllerWeeks, int month)
+{
+    double usedVacationDaysInMonth;
+    for (const auto &controllerWeekQObject : controllerWeeks) {
+        auto controllerWeek =
+            qobject_cast<ControllerWeek *>(controllerWeekQObject);
+
+        auto monthsToUsedVacationDays =
+            controllerWeek->monthsToUsedVacationDays();
+
+        Q_ASSERT(
+            monthsToUsedVacationDays.find(month) !=
+            monthsToUsedVacationDays.end());
+
+        usedVacationDaysInMonth += monthsToUsedVacationDays[month];
+    }
+    return usedVacationDaysInMonth;
 }
 
 } // namespace

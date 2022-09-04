@@ -101,6 +101,54 @@ QMap<int, HoursAndMinutes> ControllerWeek::monthsToOvertime() const
     return monthsToOvertime;
 }
 
+QMap<int, double> ControllerWeek::monthsToUsedFlextimeDays() const
+{
+    QMap<int, double> monthsToUsedFlextimeDays;
+    for (const auto &controllerDayAsQObject : m_controllerDays) {
+        auto controllerDay =
+            qobject_cast<ControllerDay *>(controllerDayAsQObject);
+
+        auto day = controllerDay->day();
+        auto date = day->date();
+        auto month = date.month();
+
+        if (monthsToUsedFlextimeDays.find(month) !=
+            monthsToUsedFlextimeDays.end()) {
+            auto usedFlextimeDay = monthsToUsedFlextimeDays[month];
+            usedFlextimeDay += controllerDay->usedFlextimeDay();
+            monthsToUsedFlextimeDays[month] = usedFlextimeDay;
+        }
+        else {
+            monthsToUsedFlextimeDays[month] = controllerDay->usedFlextimeDay();
+        }
+    }
+    return monthsToUsedFlextimeDays;
+}
+
+QMap<int, double> ControllerWeek::monthsToUsedVacationDays() const
+{
+    QMap<int, double> monthsToUsedVacationDays;
+    for (const auto &controllerDayAsQObject : m_controllerDays) {
+        auto controllerDay =
+            qobject_cast<ControllerDay *>(controllerDayAsQObject);
+
+        auto day = controllerDay->day();
+        auto date = day->date();
+        auto month = date.month();
+
+        if (monthsToUsedVacationDays.find(month) !=
+            monthsToUsedVacationDays.end()) {
+            auto usedVacationDay = monthsToUsedVacationDays[month];
+            usedVacationDay += controllerDay->usedVacationDay();
+            monthsToUsedVacationDays[month] = usedVacationDay;
+        }
+        else {
+            monthsToUsedVacationDays[month] = controllerDay->usedVacationDay();
+        }
+    }
+    return monthsToUsedVacationDays;
+}
+
 QVector<int> ControllerWeek::months() const
 {
     QVector<int> months;
@@ -250,6 +298,16 @@ void ControllerWeek::makeControllerDaysToThisConnections() const
             &ControllerDay::pauseTimeChanged,
             this,
             &ControllerWeek::onOvertimeOfDayChanged);
+        connect(
+            controllerDay,
+            &ControllerDay::usedFlextimeDayChanged,
+            this,
+            &ControllerWeek::usedFlextimeDaysChanged);
+        connect(
+            controllerDay,
+            &ControllerDay::usedVacationDayChanged,
+            this,
+            &ControllerWeek::usedVacationDaysChanged);
     }
 }
 
@@ -326,7 +384,7 @@ Time calculateEarliestEndTime(
         }
     }
 
-    // All days were holiday / vaccation or ignore so no calculation
+    // All days were holiday / vacation or ignore so no calculation
     if (lastDayIt == controllerDays.rend()) {
         return Time{};
     }

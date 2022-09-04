@@ -11,7 +11,7 @@ public:
     enum class Value {
         work,
         holiday,
-        vaccation,
+        vacation,
         sick,
         party, // party at company generates the default work houts per day
         flextime,

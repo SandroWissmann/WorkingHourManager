@@ -126,8 +126,8 @@ QJsonObject makeJsonObject(const SettingsYear &settingYear)
         jsonObject["flextimeDays"] = settingYear.flextimeDays();
     }
     if (!qFuzzyCompare(
-            settingYear.flextimeDays(), SettingsYear::defaultVaccationDays())) {
-        jsonObject["vaccationDays"] = settingYear.vaccationDays();
+            settingYear.flextimeDays(), SettingsYear::defaultVacationDays())) {
+        jsonObject["vacationDays"] = settingYear.vacationDays();
     }
     return jsonObject;
 }

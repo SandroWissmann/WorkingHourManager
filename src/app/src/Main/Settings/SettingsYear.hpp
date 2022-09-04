@@ -17,7 +17,7 @@ public:
     SettingsYear(
         int year,
         double flextimeDays,
-        double vaccationDays,
+        double vacationDays,
         std::map<Weekday, SettingsDay> weekdayToSettingsDay);
 
     SettingsYear(const SettingsYear &) = default;
@@ -44,17 +44,24 @@ public:
     double flextimeDays() const;
     bool setFlextimeDays(const QString &flextimeDaysAsString);
 
-    double vaccationDays() const;
-    bool setVaccationDays(const QString &vaccationDaysAsString);
+    double vacationDays() const;
+    bool setVacationDays(const QString &vacationDaysAsString);
 
-    static constexpr double defaultFlextimneDays();
-    static constexpr double defaultVaccationDays();
+    static constexpr double defaultFlextimneDays()
+    {
+        return 6.0;
+    }
+
+    static constexpr double defaultVacationDays()
+    {
+        return 30.0;
+    }
 
 private:
     int m_year{};
     std::map<Weekday, SettingsDay> m_weekdayToSettingsDay;
     double m_flextimeDays;
-    double m_vaccationDays;
+    double m_vacationDays;
 };
 
 } // namespace whm

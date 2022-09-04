@@ -45,10 +45,10 @@ Item {
             flextimeDays: controller.flextimeDays
         }
 
-        VaccationDays {
+        VacationDays {
             Layout.preferredHeight: columnLayout.elementHeigth
             Layout.preferredWidth: parent.width
-            vaccationDays: controller.vaccationDays
+            vacationDays: controller.vacationDays
         }
 
         Item {

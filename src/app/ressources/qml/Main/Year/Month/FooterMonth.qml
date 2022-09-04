@@ -13,7 +13,6 @@ Item {
 
         property int elementWidth: root.width / rowLayout.children.length
         Text {
-            id: overtime
             Layout.preferredWidth: rowLayout.elementWidth
             text: qsTr("Overtime in %1: %2").arg(
                       root.controller.nameOfMonth).arg(root.controller.overtime)

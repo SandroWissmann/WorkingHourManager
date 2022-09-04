@@ -6,7 +6,7 @@ import "../../../Types"
 Item {
     id: root
 
-    property string vaccationDays
+    property string vacationDays
 
     RowLayout {
         id: rowLayout
@@ -19,15 +19,15 @@ Item {
             Layout.preferredWidth: rowLayout.elementWidth
             font.bold: true
             color: "red"
-            text: qsTr("Vaccation days: ")
+            text: qsTr("Vacation days: ")
         }
 
         DoubleInput {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: root.vaccationDays
+            text: root.vacationDays
 
             onEditingFinished: {
-                root.vaccationDays = text
+                root.vacationDays = text
             }
         }
         Item {

@@ -35,6 +35,9 @@ public:
     HoursAndMinutes overtime() const;
     QString overtimeAsString() const;
 
+    double usedFlextimeDays() const;
+    double usedVacationDays() const;
+
     QVector<std::shared_ptr<Day>> days() const;
 
     int month() const;
@@ -42,18 +45,26 @@ public:
 
 signals:
     void overtimeChanged();
+    void usedFlextimeDaysChanged();
+    void usedVacationDaysChanged();
 
 private slots:
     void onOvertimeOfWeekChanged();
+    void onUsedFlextimeDaysOfWeekChanged();
+    void onUsedVacationDaysOfWeekChanged();
 
 private:
     void makeControllerWeeksToThisConnections() const;
 
     void setOvertime(const HoursAndMinutes &overtime);
+    void setUsedFlextimeDays(double usedFlextimeDays);
+    void setUsedVacationDays(double usedVacationDays);
 
     QVector<QObject *> m_controllerWeeks;
 
     HoursAndMinutes m_overtime;
+    double m_usedFlextimeDays;
+    double m_usedVacationDays;
 };
 } // namespace whm
 
