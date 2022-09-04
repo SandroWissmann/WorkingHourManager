@@ -11,6 +11,7 @@ namespace whm {
 
 class Time;
 class Day;
+class SettingsYear;
 
 class FileWriter {
 public:
@@ -24,9 +25,8 @@ public:
     ~FileWriter() = default;
 
     bool writeToFile(
-        const std::array<Time, 5> &defaultWorkedTimePerDays,
-        const std::array<Time, 5> &pauseTimePerDays,
-        const QVector<std::shared_ptr<Day>> &days);
+        const QVector<std::shared_ptr<Day>> &days,
+        const QVector<SettingsYear> &settingsYears);
 
 private:
     QString m_filename;

@@ -22,6 +22,11 @@ namespace {
 QVector<std::shared_ptr<Day>>
 makeWorkDays(const Date &firstDate, const Date &lastDate);
 
+void addDayOnWorkday(
+    QVector<std::shared_ptr<Day>> &days,
+    Weekday weekday,
+    const Date &date);
+
 int extractFirstYear(const QVector<std::shared_ptr<Day>> &days);
 
 Date getLastDayOfFirstWeekDate(const QVector<std::shared_ptr<Day>> &days);
@@ -32,11 +37,14 @@ Backend makeBackendFromFile(const FileReader &fileReader);
 
 QVector<QObject *> makeControllerYears(
     QVector<std::shared_ptr<Day>> days,
-    const SettingsYear &settingsYear);
+    const QVector<SettingsYear> &settingsYear);
+
+QObject *
+makeControllerDay(const SettingsYear &settingsYear, std::shared_ptr<Day> day);
 
 QVector<QObject *> makeControllerDays(
     QVector<std::shared_ptr<Day>> days,
-    const SettingsYear &settingsYear);
+    const QVector<SettingsYear> &settingsYear);
 
 QVector<QObject *>
 makeControllerWeeks(const QVector<QObject *> &controllerDays);
@@ -53,10 +61,13 @@ makeControllerMonths(const QVector<QVector<QObject *>> &controllerWeeksInYears);
 
 QVector<QObject *> makeControllerYears(
     const QVector<QObject *> &controllerMonths,
-    QObject *controllerSettingsYear);
+    const QVector<QObject *> &controllerSettingsYears);
 
 QVector<std::shared_ptr<Day>>
 getDays(const QVector<QObject *> &controllerYears);
+
+QVector<SettingsYear>
+getSettingsYears(const QVector<QObject *> &controllerYears);
 
 } // namespace
 
@@ -89,32 +100,9 @@ void Backend::saveToFile()
     FileWriter fileWriter{"save.json"};
 
     auto days = getDays(m_controllerYears);
+    auto settingsYears = getSettingsYears(m_controllerYears);
 
-    // TODO save these values for each year
-    auto controllerYear =
-        qobject_cast<ControllerYear *>(m_controllerYears.at(0));
-    auto controllerSettingsYear = qobject_cast<ControllerSettingsYear *>(
-        controllerYear->controllerSettinsYear());
-    auto settingsYear = controllerSettingsYear->settingsYear();
-
-    std::array<Time, 5> defaultWorkTimesMoToFr{
-        settingsYear.defaultWorkTime(Weekday::monday),
-        settingsYear.defaultWorkTime(Weekday::tuesday),
-        settingsYear.defaultWorkTime(Weekday::wednesday),
-        settingsYear.defaultWorkTime(Weekday::thursday),
-        settingsYear.defaultWorkTime(Weekday::friday),
-    };
-
-    std::array<Time, 5> pauseTimesMoToFr{
-        settingsYear.pauseTime(Weekday::monday),
-        settingsYear.pauseTime(Weekday::tuesday),
-        settingsYear.pauseTime(Weekday::wednesday),
-        settingsYear.pauseTime(Weekday::thursday),
-        settingsYear.pauseTime(Weekday::friday),
-    };
-
-    auto writeOk =
-        fileWriter.writeToFile(defaultWorkTimesMoToFr, pauseTimesMoToFr, days);
+    auto writeOk = fileWriter.writeToFile(days, settingsYears);
 
     if (!writeOk) {
         qWarning() << Q_FUNC_INFO << "Save to file failed.";
@@ -136,49 +124,40 @@ makeWorkDays(const Date &firstDate, const Date &lastDate)
     QVector<std::shared_ptr<Day>> days;
     while (date <= lastDate) {
         auto weekday = date.weekday();
-
-        switch (weekday) {
-            case Weekday::monday:
-            case Weekday::tuesday:
-            case Weekday::wednesday:
-            case Weekday::thursday:
-            case Weekday::friday: {
-                auto day = std::make_shared<Day>(date);
-                days.emplace_back(day);
-            } break;
-            case Weekday::saturday:
-                break;
-            case Weekday::sunday:
-                break;
-            case Weekday::unknown:
-                break;
-        }
+        addDayOnWorkday(days, weekday, date);
         date = date.addDays(1);
     }
 
     // to fill up whole working week.
     while (date.weekday() != Weekday::saturday) {
         auto weekday = date.weekday();
-
-        switch (weekday) {
-            case Weekday::monday:
-            case Weekday::tuesday:
-            case Weekday::wednesday:
-            case Weekday::thursday:
-            case Weekday::friday: {
-                auto day = std::make_shared<Day>(date);
-                days.emplace_back(day);
-            } break;
-            case Weekday::saturday:
-                break;
-            case Weekday::sunday:
-                break;
-            case Weekday::unknown:
-                break;
-        }
+        addDayOnWorkday(days, weekday, date);
         date = date.addDays(1);
     }
     return days;
+}
+
+void addDayOnWorkday(
+    QVector<std::shared_ptr<Day>> &days,
+    Weekday weekday,
+    const Date &date)
+{
+    switch (weekday) {
+        case Weekday::monday:
+        case Weekday::tuesday:
+        case Weekday::wednesday:
+        case Weekday::thursday:
+        case Weekday::friday: {
+            auto day = std::make_shared<Day>(date);
+            days.emplace_back(day);
+        } break;
+        case Weekday::saturday:
+            break;
+        case Weekday::sunday:
+            break;
+        case Weekday::unknown:
+            break;
+    }
 }
 
 int extractFirstYear(const QVector<std::shared_ptr<Day>> &days)
@@ -197,13 +176,25 @@ Date getLastDayOfFirstWeekDate(const QVector<std::shared_ptr<Day>> &days)
 
 Backend makeDefaultBackend()
 {
-    Date firstDate{2021, 01, 01};
+    Date startDate{2021, 01, 01};
     auto endDate = Date::currentDate();
 
-    auto days = makeWorkDays(firstDate, endDate);
+    auto startYear = startDate.year();
+    auto endYear = endDate.year();
+    auto countOfYears = endYear - startYear + 1;
 
-    auto settingsYear = SettingsYear{};
-    auto controllerYears = makeControllerYears(days, settingsYear);
+    QVector<int> years{countOfYears};
+    std::iota(years.begin(), years.end(), startYear);
+
+    auto days = makeWorkDays(startDate, endDate);
+
+    QVector<SettingsYear> settingsYears;
+    settingsYears.reserve(years.size());
+    for (const auto &year : years) {
+        SettingsYear settingsYear{year};
+        settingsYears.emplace_back(settingsYear);
+    }
+    auto controllerYears = makeControllerYears(days, settingsYears);
 
     return Backend{controllerYears};
 }
@@ -222,68 +213,90 @@ Backend makeBackendFromFile(const FileReader &fileReader)
         return makeDefaultBackend();
     }
 
-    auto defaultWorkTimesMoToFr = fileReader.defaultWorkTimesMoToFr();
-    auto pauseTimesMoToFr = fileReader.pauseTimesMoToFr();
-
-    std::map<Weekday, SettingsDay> weekdayToSettingsDay{
-        {Weekday::monday,
-         SettingsDay{
-             Weekday::monday, defaultWorkTimesMoToFr[0], pauseTimesMoToFr[0]}},
-        {Weekday::tuesday,
-         SettingsDay{
-             Weekday::tuesday, defaultWorkTimesMoToFr[1], pauseTimesMoToFr[1]}},
-        {Weekday::wednesday,
-         SettingsDay{
-             Weekday::wednesday,
-             defaultWorkTimesMoToFr[2],
-             pauseTimesMoToFr[2]}},
-        {Weekday::thursday,
-         SettingsDay{
-             Weekday::thursday,
-             defaultWorkTimesMoToFr[3],
-             pauseTimesMoToFr[3]}},
-        {Weekday::friday,
-         SettingsDay{
-             Weekday::friday, defaultWorkTimesMoToFr[4], pauseTimesMoToFr[4]}}};
-
-    SettingsYear settingsYear{weekdayToSettingsDay};
-
-    auto controllerYears = makeControllerYears(days, settingsYear);
-
+    auto settingsYears = fileReader.settingsYears();
+    auto controllerYears = makeControllerYears(days, settingsYears);
     return Backend{controllerYears};
 }
 
 QVector<QObject *> makeControllerYears(
     QVector<std::shared_ptr<Day>> days,
-    const SettingsYear &settingsYear)
+    const QVector<SettingsYear> &settingsYears)
 {
-    auto controllerDays = makeControllerDays(days, settingsYear);
+    auto controllerDays = makeControllerDays(days, settingsYears);
     auto controllerWeeks = makeControllerWeeks(controllerDays);
 
     auto firstYear = extractFirstYear(days);
 
     auto controllerMonths = makeControllerMonths(firstYear, controllerWeeks);
-    auto controllerSettingsYear = new ControllerSettingsYear{settingsYear};
+
+    QVector<QObject *> controllerSettingsYears;
+    controllerSettingsYears.reserve(settingsYears.size());
+    for (const auto &settingsYear : settingsYears) {
+        auto controllerSettingsYear = new ControllerSettingsYear{settingsYear};
+        controllerSettingsYears.emplace_back(controllerSettingsYear);
+    }
+
     auto controllerYears =
-        makeControllerYears(controllerMonths, controllerSettingsYear);
+        makeControllerYears(controllerMonths, controllerSettingsYears);
 
     return controllerYears;
 }
 
 QVector<QObject *> makeControllerDays(
     QVector<std::shared_ptr<Day>> days,
-    const SettingsYear &settingsYear)
+    const QVector<SettingsYear> &settingsYears)
 {
+    // TODO Maybe we should give this settings directly out as a map
+    // Then we can also get rid of year in SettingsYear
+    std::map<int, SettingsYear> yearToSettingsYear;
+    for (const auto &settingsYear : settingsYears) {
+        Q_ASSERT(
+            yearToSettingsYear.find(settingsYear.year()) ==
+            yearToSettingsYear.end());
+
+        yearToSettingsYear.insert({settingsYear.year(), settingsYear});
+    }
+
     QVector<QObject *> controllerDays;
     controllerDays.reserve(days.size());
     for (const auto &day : days) {
-        auto weekday = day->date().weekday();
-        auto pauseTime = settingsYear.pauseTime(weekday);
-        auto defaultWorkTime = settingsYear.defaultWorkTime(weekday);
-        auto controllerDay = new ControllerDay{day, defaultWorkTime, pauseTime};
-        controllerDays.emplace_back(controllerDay);
+        auto year = day->date().year();
+
+        if (yearToSettingsYear.find(year) != yearToSettingsYear.end()) {
+            auto controllerDay =
+                makeControllerDay(yearToSettingsYear.at(year), day);
+            controllerDays.emplace_back(controllerDay);
+        }
+        // TODO: This is a hack. If first year is 2021 and we have some days
+        // from 2020 because of the first week we try to just taje
+        // defaultWorkTime from there.
+        else if (
+            yearToSettingsYear.find(year - 1) != yearToSettingsYear.end()) {
+
+            auto controllerDay =
+                makeControllerDay(yearToSettingsYear.at(year - 1), day);
+            controllerDays.emplace_back(controllerDay);
+        }
+        // TODO Same as before but for last december week
+        else if (
+            yearToSettingsYear.find(year + 1) != yearToSettingsYear.end()) {
+
+            auto controllerDay =
+                makeControllerDay(yearToSettingsYear.at(year + 1), day);
+            controllerDays.emplace_back(controllerDay);
+        }
     }
     return controllerDays;
+}
+
+QObject *
+makeControllerDay(const SettingsYear &settingsYear, std::shared_ptr<Day> day)
+{
+    auto weekday = day->date().weekday();
+
+    auto defaultWorkTime = settingsYear.defaultWorkTime(weekday);
+    auto pauseTime = settingsYear.pauseTime(weekday);
+    return new ControllerDay{day, defaultWorkTime, pauseTime};
 }
 
 QVector<QObject *> makeControllerWeeks(const QVector<QObject *> &controllerDays)
@@ -400,7 +413,7 @@ makeControllerMonths(const QVector<QVector<QObject *>> &controllerWeeksInYears)
 
 QVector<QObject *> makeControllerYears(
     const QVector<QObject *> &controllerMonths,
-    QObject *controllerSettingsYear)
+    const QVector<QObject *> &controllerSettingsYears)
 {
     std::map<int, QVector<QObject *>> yearsToControllerMonths;
 
@@ -423,11 +436,30 @@ QVector<QObject *> makeControllerYears(
         }
     }
 
+    // TODO maybe we should story controllerSettingsYears directly in a
+    // map <year, controllerSettingsYears>
+    std::map<int, QObject *> yearToControllerYears;
+    for (const auto &controllerSettingsYearAsQObject :
+         controllerSettingsYears) {
+        auto controllerSettingsYear = qobject_cast<ControllerSettingsYear *>(
+            controllerSettingsYearAsQObject);
+
+        auto year = controllerSettingsYear->settingsYear().year();
+        Q_ASSERT(
+            yearToControllerYears.find(year) == yearToControllerYears.end());
+        yearToControllerYears.insert({year, controllerSettingsYearAsQObject});
+    }
+
     QVector<QObject *> controllerYears;
     controllerYears.reserve(yearsToControllerMonths.size());
     for (const auto &yearToControllerMonths : yearsToControllerMonths) {
-        auto controllerYear = new ControllerYear{
-            yearToControllerMonths.second, controllerSettingsYear};
+
+        auto controllerMonths = yearToControllerMonths.second;
+        auto year = yearToControllerMonths.first;
+        auto controllerSettingsYear = yearToControllerYears.at(year);
+
+        auto controllerYear =
+            new ControllerYear{controllerMonths, controllerSettingsYear};
         controllerYears.emplace_back(controllerYear);
     }
     return controllerYears;
@@ -437,18 +469,34 @@ QVector<std::shared_ptr<Day>> getDays(const QVector<QObject *> &controllerYears)
 {
     QVector<std::shared_ptr<Day>> days;
 
-    // get all days from years even the ones from previous and next years
     for (const auto &controllerYearAsQObject : controllerYears) {
         auto controllerYear =
             qobject_cast<ControllerYear *>(controllerYearAsQObject);
 
         auto yearDays = controllerYear->days();
-
         days.append(yearDays);
     }
-
-    days.erase(std::unique(days.begin(), days.end()), days.end());
     return days;
+}
+
+QVector<SettingsYear>
+getSettingsYears(const QVector<QObject *> &controllerYears)
+{
+    QVector<SettingsYear> settingsYears;
+
+    for (const auto &controllerYearAsQObject : controllerYears) {
+        auto controllerYear =
+            qobject_cast<ControllerYear *>(controllerYearAsQObject);
+
+        auto controllerSettinsYearAsQObject =
+            controllerYear->controllerSettinsYear();
+        auto controllerSetingsYear = qobject_cast<ControllerSettingsYear *>(
+            controllerSettinsYearAsQObject);
+        auto settingsYear = controllerSetingsYear->settingsYear();
+
+        settingsYears.append(settingsYear);
+    }
+    return settingsYears;
 }
 
 } // namespace

@@ -12,6 +12,7 @@ namespace whm {
 
 class Time;
 class Day;
+class SettingsYear;
 
 class FileReader {
 public:
@@ -26,16 +27,14 @@ public:
 
     bool isValidFile() const;
 
-    std::array<Time, 5> defaultWorkTimesMoToFr() const;
-
-    std::array<Time, 5> pauseTimesMoToFr() const;
-
-    QVector<int> holidaysPerYear() const;
-
     QVector<std::shared_ptr<Day>> days() const;
+
+    QVector<SettingsYear> settingsYears() const;
 
 private:
     QJsonDocument m_jsonDocument;
+    QVector<std::shared_ptr<Day>> m_days;
+    QVector<SettingsYear> m_settingsYears;
 };
 
 } // namespace whm

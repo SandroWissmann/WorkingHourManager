@@ -40,13 +40,15 @@ bool setTime(Time &value, const QString &newValue)
 
 } // namespace
 
-SettingsYear::SettingsYear()
-    : m_weekdayToSettingsDay{makeDefaultWeekdayToSettingsDay()}
+SettingsYear::SettingsYear(int year)
+    : m_year{year}, m_weekdayToSettingsDay{makeDefaultWeekdayToSettingsDay()}
 {
 }
 
-SettingsYear::SettingsYear(std::map<Weekday, SettingsDay> weekdayToSettingsDay)
-    : m_weekdayToSettingsDay{weekdayToSettingsDay}
+SettingsYear::SettingsYear(
+    int year,
+    std::map<Weekday, SettingsDay> weekdayToSettingsDay)
+    : m_weekdayToSettingsDay{weekdayToSettingsDay}, m_year{year}
 {
     Q_ASSERT(m_weekdayToSettingsDay.size() == 5);
     Q_ASSERT(
@@ -66,6 +68,11 @@ SettingsYear::SettingsYear(std::map<Weekday, SettingsDay> weekdayToSettingsDay)
         m_weekdayToSettingsDay.end());
 }
 
+int SettingsYear::year() const
+{
+    return m_year;
+}
+
 std::map<Weekday, SettingsDay> SettingsYear::weekdayToSettingsDay() const
 {
     return m_weekdayToSettingsDay;
@@ -76,6 +83,26 @@ SettingsDay *SettingsYear::settingsDay(Weekday weekday)
     Q_ASSERT(
         m_weekdayToSettingsDay.find(weekday) != m_weekdayToSettingsDay.end());
     return &m_weekdayToSettingsDay.at(weekday);
+}
+
+std::array<Time, 5> SettingsYear::defaultWorkTimesMoToFr() const
+{
+    return {
+        m_weekdayToSettingsDay.at(Weekday::monday).defaultWorkTime(),
+        m_weekdayToSettingsDay.at(Weekday::tuesday).defaultWorkTime(),
+        m_weekdayToSettingsDay.at(Weekday::wednesday).defaultWorkTime(),
+        m_weekdayToSettingsDay.at(Weekday::thursday).defaultWorkTime(),
+        m_weekdayToSettingsDay.at(Weekday::friday).defaultWorkTime()};
+}
+
+std::array<Time, 5> SettingsYear::pauseTimesMoToFr() const
+{
+    return {
+        m_weekdayToSettingsDay.at(Weekday::monday).pauseTime(),
+        m_weekdayToSettingsDay.at(Weekday::tuesday).pauseTime(),
+        m_weekdayToSettingsDay.at(Weekday::wednesday).pauseTime(),
+        m_weekdayToSettingsDay.at(Weekday::thursday).pauseTime(),
+        m_weekdayToSettingsDay.at(Weekday::friday).pauseTime()};
 }
 
 Time SettingsYear::defaultWorkTime(Weekday weekday) const

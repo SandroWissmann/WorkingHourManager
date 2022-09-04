@@ -2,6 +2,8 @@
 
 #include <whm/types/Day.hpp>
 
+#include "../Settings/SettingsYear.hpp"
+
 #include <QDebug>
 #include <QFile>
 #include <QJsonArray>
@@ -14,17 +16,18 @@ namespace whm {
 namespace {
 
 QJsonObject makeApplicationDataJsonObject(
-    const std::array<Time, 5> &defaultWorkTimesMoToFr,
-    const std::array<Time, 5> &pauseTimesMoToFr,
-    const QVector<std::shared_ptr<Day>> &days);
+    const QVector<std::shared_ptr<Day>> &days,
+    const QVector<SettingsYear> &settingsYears);
 
-QJsonArray makeHolidaysPerYearJsonArray();
+QJsonArray makeJsonArray(const QVector<std::shared_ptr<Day>> &days);
+
+QJsonObject makeJsonObject(std::shared_ptr<Day> day);
 
 QJsonArray makeJsonArray(const std::array<Time, 5> timeArray);
 
-QJsonArray makeDaysJsonArray(const QVector<std::shared_ptr<Day>> &days);
+QJsonArray makeJsonArray(const QVector<SettingsYear> &settingsYears);
 
-QJsonObject makeDayJsonObject(std::shared_ptr<Day> day);
+QJsonObject makeJsonObject(const SettingsYear &settingYear);
 
 } // namespace
 
@@ -33,9 +36,8 @@ FileWriter::FileWriter(const QString &filename) : m_filename{filename}
 }
 
 bool FileWriter::writeToFile(
-    const std::array<Time, 5> &defaultWorkTimesMoToFr,
-    const std::array<Time, 5> &pauseTimesMoToFr,
-    const QVector<std::shared_ptr<Day>> &days)
+    const QVector<std::shared_ptr<Day>> &days,
+    const QVector<SettingsYear> &settingsYears)
 {
     QFile saveFile{m_filename};
 
@@ -44,8 +46,7 @@ bool FileWriter::writeToFile(
         return false;
     }
 
-    auto jsonObject = makeApplicationDataJsonObject(
-        defaultWorkTimesMoToFr, pauseTimesMoToFr, days);
+    auto jsonObject = makeApplicationDataJsonObject(days, settingsYears);
 
     saveFile.write(QJsonDocument(jsonObject).toJson());
     return true;
@@ -54,51 +55,26 @@ bool FileWriter::writeToFile(
 namespace {
 
 QJsonObject makeApplicationDataJsonObject(
-    const std::array<Time, 5> &defaultWorkTimesMoToFr,
-    const std::array<Time, 5> &pauseTimesMoToFr,
-    const QVector<std::shared_ptr<Day>> &days)
+    const QVector<std::shared_ptr<Day>> &days,
+    const QVector<SettingsYear> &settingsYears)
 {
     QJsonObject jsonObject;
-    jsonObject["defaultWorkTimesMoToFr"] =
-        makeJsonArray(defaultWorkTimesMoToFr);
-    jsonObject["pauseTimesMoToFr"] = makeJsonArray(pauseTimesMoToFr);
-    jsonObject["holidaysPerYear"] = makeHolidaysPerYearJsonArray();
-    jsonObject["days"] = makeDaysJsonArray(days);
+    jsonObject["days"] = makeJsonArray(days);
+    jsonObject["settingsYears"] = makeJsonArray(settingsYears);
     return jsonObject;
 }
 
-// TODO implement holidays calculation and store holidays
-// this has to be array based on many years are show up in the list.
-QJsonArray makeHolidaysPerYearJsonArray()
-{
-    QJsonArray jsonArray;
-    // count should be based on how many years we have
-    jsonArray.insert(0, QJsonValue{20});
-    jsonArray.insert(1, QJsonValue{30});
-    return jsonArray;
-}
-
-QJsonArray makeJsonArray(const std::array<Time, 5> timeArray)
-{
-    QJsonArray jsonArray;
-    for (auto i = 0; i < timeArray.size(); ++i) {
-        QJsonValue jsonValue = timeArray[i].asString();
-        jsonArray.insert(i, jsonValue);
-    }
-    return jsonArray;
-}
-
-QJsonArray makeDaysJsonArray(const QVector<std::shared_ptr<Day>> &days)
+QJsonArray makeJsonArray(const QVector<std::shared_ptr<Day>> &days)
 {
     QJsonArray jsonArray;
     for (const auto &day : days) {
-        QJsonObject jsonObject = makeDayJsonObject(day);
+        QJsonObject jsonObject = makeJsonObject(day);
         jsonArray.append(jsonObject);
     }
     return jsonArray;
 }
 
-QJsonObject makeDayJsonObject(std::shared_ptr<Day> day)
+QJsonObject makeJsonObject(std::shared_ptr<Day> day)
 {
     QJsonObject jsonObject;
     jsonObject["date"] = day->date().asString();
@@ -114,6 +90,38 @@ QJsonObject makeDayJsonObject(std::shared_ptr<Day> day)
     if (auto dayType = day->dayType(); dayType != DayType::work) {
         jsonObject["dayType"] = static_cast<int>(dayType);
     }
+    return jsonObject;
+}
+
+QJsonArray makeJsonArray(const std::array<Time, 5> array)
+{
+    QJsonArray jsonArray;
+    for (auto i = 0; i < array.size(); ++i) {
+        QJsonValue jsonValue = array[i].asString();
+        jsonArray.insert(i, jsonValue);
+    }
+    return jsonArray;
+}
+
+QJsonArray makeJsonArray(const QVector<SettingsYear> &settingsYears)
+{
+    QJsonArray jsonArray;
+    for (const auto &settingsYear : settingsYears) {
+        QJsonObject jsonObject = makeJsonObject(settingsYear);
+        jsonArray.append(jsonObject);
+    }
+    return jsonArray;
+}
+
+QJsonObject makeJsonObject(const SettingsYear &settingYear)
+{
+    QJsonObject jsonObject;
+    jsonObject["defaultWorkTimesMoToFr"] =
+        makeJsonArray(settingYear.defaultWorkTimesMoToFr());
+    jsonObject["pauseTimesMoToFr"] =
+        makeJsonArray(settingYear.pauseTimesMoToFr());
+    jsonObject["vaccationDays"] = 30.0;
+    jsonObject["flextimeDays"] = 6.0;
     return jsonObject;
 }
 

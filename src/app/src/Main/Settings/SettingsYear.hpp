@@ -12,18 +12,24 @@ namespace whm {
 
 class SettingsYear {
 public:
-    SettingsYear();
+    SettingsYear(int year);
 
-    SettingsYear(std::map<Weekday, SettingsDay> weekdayToSettingsDay);
+    SettingsYear(int year, std::map<Weekday, SettingsDay> weekdayToSettingsDay);
 
     SettingsYear(const SettingsYear &) = default;
     SettingsYear(SettingsYear &&) = default;
     SettingsYear &operator=(const SettingsYear &) = default;
     SettingsYear &operator=(SettingsYear &&) = default;
 
+    int year() const;
+
     std::map<Weekday, SettingsDay> weekdayToSettingsDay() const;
 
     SettingsDay *settingsDay(Weekday weekday);
+
+    std::array<Time, 5> defaultWorkTimesMoToFr() const;
+
+    std::array<Time, 5> pauseTimesMoToFr() const;
 
     Time defaultWorkTime(Weekday weekday) const;
 
@@ -35,6 +41,7 @@ public:
     bool setPauseTime(Weekday weekday, const QString &pauseTimeAsString);
 
 private:
+    int m_year{};
     std::map<Weekday, SettingsDay> m_weekdayToSettingsDay;
 };
 
