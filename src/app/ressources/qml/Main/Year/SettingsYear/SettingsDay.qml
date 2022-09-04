@@ -42,7 +42,7 @@ Item {
             }
         }
         Item {
-            Layout.preferredWidth: rowLayout.elementWidth
+            Layout.fillWidth: true
         }
     }
 }

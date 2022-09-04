@@ -41,8 +41,8 @@ public:
 
 signals:
     // parameter needed here because we catch signal in ControllerDay.
-    void defaultWorkTimeChanged(const Time &defaultWorkTime);
-    void pauseTimeChanged(const Time &pauseTime);
+    void defaultWorkTimeChanged(const whm::Time &defaultWorkTime);
+    void pauseTimeChanged(const whm::Time &pauseTime);
 
 private:
     SettingsDay *m_settingsDay;

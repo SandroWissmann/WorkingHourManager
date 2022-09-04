@@ -1,8 +1,13 @@
 import QtQuick
 import QtQuick.Layouts
 
+import "../../../Types"
+
 Item {
     id: root
+
+    property string vaccationDays
+
     RowLayout {
         id: rowLayout
         anchors.fill: parent
@@ -12,18 +17,21 @@ Item {
 
         Text {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("Day")
             font.bold: true
+            color: "red"
+            text: qsTr("Vaccation days: ")
         }
-        Text {
+
+        DoubleInput {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("Default work time")
-            font.bold: true
+            text: root.vaccationDays
+
+            onEditingFinished: {
+                root.vaccationDays = text
+            }
         }
-        Text {
+        Item {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: qsTr("Pause time")
-            font.bold: true
         }
         Item {
             Layout.fillWidth: true

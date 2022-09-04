@@ -34,4 +34,42 @@ QVector<QObject *> ControllerSettingsYear::controllerSettingsDays() const
     return m_controllerSettingsDays;
 }
 
+double ControllerSettingsYear::flextimeDays()
+{
+    return m_settingsYear.flextimeDays();
+}
+
+QString ControllerSettingsYear::flextimeDaysAsString()
+{
+    return QString::number(flextimeDays(), 'f', 1);
+}
+
+void ControllerSettingsYear::setFlextimeDays(
+    const QString &flextimeDaysAsString)
+{
+    if (!m_settingsYear.setFlextimeDays(flextimeDaysAsString)) {
+        return;
+    }
+    emit flextimeDaysChanged();
+}
+
+double ControllerSettingsYear::vaccationDays()
+{
+    return m_settingsYear.vaccationDays();
+}
+
+QString ControllerSettingsYear::vaccationDaysAsString()
+{
+    return QString::number(vaccationDays(), 'f', 1);
+}
+
+void ControllerSettingsYear::setVaccationDays(
+    const QString &vaccationDaysAsString)
+{
+    if (!m_settingsYear.setVaccationDays(vaccationDaysAsString)) {
+        return;
+    }
+    emit vaccationDaysChanged();
+}
+
 } // namespace whm

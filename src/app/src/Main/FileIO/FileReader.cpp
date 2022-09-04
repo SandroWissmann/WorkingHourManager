@@ -49,6 +49,13 @@ extractPauseTimesMoToFr(const QJsonObject &jsonObject);
 std::optional<std::array<Time, 5>>
 extractTimeArray(const QJsonObject &jsonObject, const QString &key);
 
+double extractFlextimeDays(const QJsonObject &jsonObject);
+
+double extractVaccationDays(const QJsonObject &jsonObject);
+
+std::optional<double>
+extractDouble(const QJsonObject &jsonObject, const QString &key);
+
 } // namespace
 
 FileReader::FileReader(const QString &filename)
@@ -224,6 +231,7 @@ QVector<SettingsYear> extractSettingsYears(
 
     Q_ASSERT(years.size() == settingsYearArray.size());
 
+    // TODO Turn this into map with key year
     QVector<SettingsYear> settingsYears;
     settingsYears.reserve(settingsYearArray.size());
     for (int i = 0; i < settingsYearArray.size(); ++i) {
@@ -242,8 +250,9 @@ QVector<SettingsYear> extractSettingsYears(
         }
 
         auto defaultWorkTimesMoToFr = optDefaultWorkTimesMoToFr.value();
-
         auto pauseTimesMoToFr = optPauseTimesMoToFr.value();
+        auto flextimeDays = extractFlextimeDays(settingsYearObject);
+        auto vaccationDays = extractVaccationDays(settingsYearObject);
 
         std::map<Weekday, SettingsDay> weekdayToSettingsDay{
             {Weekday::monday,
@@ -264,7 +273,8 @@ QVector<SettingsYear> extractSettingsYears(
              {Weekday::friday, defaultWorkTimesMoToFr[4], pauseTimesMoToFr[4]}},
         };
 
-        SettingsYear settingsYear{years[i], weekdayToSettingsDay};
+        SettingsYear settingsYear{
+            years[i], flextimeDays, vaccationDays, weekdayToSettingsDay};
         settingsYears.emplaceBack(settingsYear);
     }
     return settingsYears;
@@ -339,6 +349,41 @@ extractTimeArray(const QJsonObject &jsonObject, const QString &key)
         Time{jsonArray[2].toString()},
         Time{jsonArray[3].toString()},
         Time{jsonArray[4].toString()}};
+}
+
+double extractFlextimeDays(const QJsonObject &jsonObject)
+{
+    QString key{"flextimeDays"};
+    auto optFlextimeDays = extractDouble(jsonObject, key);
+    if (optFlextimeDays.has_value()) {
+        return optFlextimeDays.value();
+    }
+    // Default values do not get saved so we get them from SettingsYear
+    return SettingsYear::defaultFlextimneDays();
+}
+
+double extractVaccationDays(const QJsonObject &jsonObject)
+{
+    QString key{"vaccationDays"};
+    auto optVaccationDays = extractDouble(jsonObject, key);
+    if (optVaccationDays.has_value()) {
+        return optVaccationDays.value();
+    }
+    // Default values do not get saved so we get them from SettingsYear
+    return SettingsYear::defaultVaccationDays();
+}
+
+std::optional<double>
+extractDouble(const QJsonObject &jsonObject, const QString &key)
+{
+    if (!jsonObject.contains(key)) {
+        return {};
+    }
+    if (!jsonObject[key].isDouble()) {
+        return {};
+    }
+    auto value = jsonObject[key].toDouble();
+    return {value};
 }
 
 } // namespace

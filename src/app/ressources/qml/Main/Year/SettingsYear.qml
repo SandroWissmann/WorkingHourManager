@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 import "SettingsYear"
+import "../../Types"
 
 Item {
     id: root
@@ -30,6 +31,24 @@ Item {
 
                 controller: model.modelData
             }
+        }
+
+        Rectangle {
+            Layout.preferredHeight: 2
+            Layout.preferredWidth: parent.width
+            color: "black"
+        }
+
+        FlextimeDays {
+            Layout.preferredHeight: columnLayout.elementHeigth
+            Layout.preferredWidth: parent.width
+            flextimeDays: controller.flextimeDays
+        }
+
+        VaccationDays {
+            Layout.preferredHeight: columnLayout.elementHeigth
+            Layout.preferredWidth: parent.width
+            vaccationDays: controller.vaccationDays
         }
 
         Item {

@@ -120,8 +120,15 @@ QJsonObject makeJsonObject(const SettingsYear &settingYear)
         makeJsonArray(settingYear.defaultWorkTimesMoToFr());
     jsonObject["pauseTimesMoToFr"] =
         makeJsonArray(settingYear.pauseTimesMoToFr());
-    jsonObject["vaccationDays"] = 30.0;
-    jsonObject["flextimeDays"] = 6.0;
+
+    if (!qFuzzyCompare(
+            settingYear.flextimeDays(), SettingsYear::defaultFlextimneDays())) {
+        jsonObject["flextimeDays"] = settingYear.flextimeDays();
+    }
+    if (!qFuzzyCompare(
+            settingYear.flextimeDays(), SettingsYear::defaultVaccationDays())) {
+        jsonObject["vaccationDays"] = settingYear.vaccationDays();
+    }
     return jsonObject;
 }
 

@@ -41,15 +41,23 @@ bool setTime(Time &value, const QString &newValue)
 } // namespace
 
 SettingsYear::SettingsYear(int year)
-    : m_year{year}, m_weekdayToSettingsDay{makeDefaultWeekdayToSettingsDay()}
+    : m_year{year}, m_flextimeDays{defaultFlextimneDays()},
+      m_vaccationDays{defaultVaccationDays()},
+      m_weekdayToSettingsDay{makeDefaultWeekdayToSettingsDay()}
 {
 }
 
 SettingsYear::SettingsYear(
     int year,
+    double flextimeDays,
+    double vaccationDays,
     std::map<Weekday, SettingsDay> weekdayToSettingsDay)
-    : m_weekdayToSettingsDay{weekdayToSettingsDay}, m_year{year}
+    : m_weekdayToSettingsDay{weekdayToSettingsDay},
+      m_flextimeDays{flextimeDays}, m_vaccationDays{vaccationDays}, m_year{year}
 {
+    Q_ASSERT(m_flextimeDays > 0);
+    Q_ASSERT(m_vaccationDays > 0);
+
     Q_ASSERT(m_weekdayToSettingsDay.size() == 5);
     Q_ASSERT(
         m_weekdayToSettingsDay.find(Weekday::monday) !=
@@ -147,6 +155,52 @@ bool SettingsYear::setPauseTime(
     settingsYear.setPauseTime(pauseTimeAsString);
     m_weekdayToSettingsDay.at(weekday) = settingsYear;
     return true;
+}
+
+double SettingsYear::flextimeDays() const
+{
+    return m_flextimeDays;
+}
+
+bool SettingsYear::setFlextimeDays(const QString &flextimeDaysAsString)
+{
+    bool ok;
+    auto flextimeDays = flextimeDaysAsString.toDouble(&ok);
+    Q_ASSERT(ok);
+
+    if (qFuzzyCompare(m_flextimeDays, flextimeDays)) {
+        return false;
+    }
+    m_flextimeDays = flextimeDays;
+    return true;
+}
+
+double SettingsYear::vaccationDays() const
+{
+    return m_vaccationDays;
+}
+
+bool SettingsYear::setVaccationDays(const QString &vaccationDaysAsString)
+{
+    bool ok;
+    auto vaccationDays = vaccationDaysAsString.toDouble(&ok);
+    Q_ASSERT(ok);
+
+    if (qFuzzyCompare(m_vaccationDays, vaccationDays)) {
+        return false;
+    }
+    m_vaccationDays = vaccationDays;
+    return true;
+}
+
+constexpr double SettingsYear::defaultFlextimneDays()
+{
+    return 6.0;
+}
+
+constexpr double SettingsYear::defaultVaccationDays()
+{
+    return 30.0;
 }
 
 } // namespace whm
