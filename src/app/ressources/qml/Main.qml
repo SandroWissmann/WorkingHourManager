@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import "Main"
-
 ApplicationWindow {
     id: root
     width: 1024
@@ -11,34 +9,31 @@ ApplicationWindow {
     visible: true
     title: qsTr("Working Hour Manager")
 
-    property QtObject controller: backend
+    property QtObject backend: backendMain
 
-    header: TabBar {
-        id: tabBarYear
-    }
-
-    Year {
+    Loader {
+        id: loader
         anchors.fill: parent
-        controller: root.controller.controllerYears[tabBarYear.currentIndex]
-    }
-
-    Component {
-        id: componentTabButton
-        TabButton {}
     }
 
     Component.onCompleted: {
-        for (var i = 0; i < root.controller.controllerYears.length; i++) {
-            var year = root.controller.controllerYears[i].year
-            var tabYear = componentTabButton.createObject(tabBarYear, {
-                                                              "text": year
-                                                          })
-            tabBarYear.addItem(tabYear)
+        console.warn("readControllerYearsFromFile")
+        if (!root.backend.readControllerYearsFromFile()) {
+            console.warn("generateControllerYears")
+            root.backend.generateControllerYears()
         }
+        loader.sourceComponent = componentYears
     }
 
     Component.onDestruction: {
-        console.warn("save to file")
-        root.controller.saveToFile()
+        root.backend.saveToFile()
+    }
+
+    Component {
+        id: componentYears
+
+        Years {
+            controller: root.backend
+        }
     }
 }

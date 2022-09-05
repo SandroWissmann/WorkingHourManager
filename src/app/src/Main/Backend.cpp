@@ -31,9 +31,9 @@ int extractFirstYear(const QVector<std::shared_ptr<Day>> &days);
 
 Date getLastDayOfFirstWeekDate(const QVector<std::shared_ptr<Day>> &days);
 
-Backend makeDefaultBackend();
+QVector<QObject *> makeDefaultControllerYears();
 
-Backend makeBackendFromFile(const FileReader &fileReader);
+QVector<QObject *> makeControllerYearsFromFile(const FileReader &fileReader);
 
 QVector<QObject *> makeControllerYears(
     QVector<std::shared_ptr<Day>> days,
@@ -71,23 +71,8 @@ getSettingsYears(const QVector<QObject *> &controllerYears);
 
 } // namespace
 
-Backend::Backend(const QVector<QObject *> &controllerYears, QObject *parent)
-    : QObject{parent}, m_controllerYears{controllerYears}
+Backend::Backend(QObject *parent) : QObject{parent}
 {
-    for (auto &controllerYear : m_controllerYears) {
-        controllerYear->setParent(this);
-    }
-}
-
-Backend Backend::fromFile()
-{
-    FileReader fileReader{"save.json"};
-
-    if (!fileReader.isValidFile()) {
-        return makeDefaultBackend();
-    }
-
-    return makeBackendFromFile(fileReader);
 }
 
 QVector<QObject *> Backend::controllerYears() const
@@ -95,8 +80,31 @@ QVector<QObject *> Backend::controllerYears() const
     return m_controllerYears;
 }
 
+bool Backend::readControllerYearsFromFile()
+{
+    FileReader fileReader{"save.json"};
+
+    if (!fileReader.isValidFile()) {
+        return false;
+    }
+
+    auto controllerYears = makeControllerYearsFromFile(fileReader);
+    setControllerYears(controllerYears);
+    return true;
+}
+
+void Backend::generateControllerYears()
+{
+    auto controllerYears = makeDefaultControllerYears();
+    setControllerYears(controllerYears);
+}
+
 void Backend::saveToFile()
 {
+    if (m_controllerYears.isEmpty()) {
+        return;
+    }
+
     FileWriter fileWriter{"save.json"};
 
     auto days = getDays(m_controllerYears);
@@ -107,6 +115,23 @@ void Backend::saveToFile()
     if (!writeOk) {
         qWarning() << Q_FUNC_INFO << "Save to file failed.";
     }
+}
+
+void Backend::setControllerYears(const QVector<QObject *> &controllerYears)
+{
+    if (m_controllerYears == controllerYears) {
+        return;
+    }
+
+    for (auto &controllerYears : m_controllerYears) {
+        controllerYears->deleteLater();
+    }
+    m_controllerYears.clear();
+    m_controllerYears = controllerYears;
+    for (auto &controllerYears : m_controllerYears) {
+        controllerYears->setParent(this);
+    }
+    emit controllerYearsChanged();
 }
 
 namespace {
@@ -174,7 +199,7 @@ Date getLastDayOfFirstWeekDate(const QVector<std::shared_ptr<Day>> &days)
     return days.at(workDaysCount - 1)->date();
 }
 
-Backend makeDefaultBackend()
+QVector<QObject *> makeDefaultControllerYears()
 {
     Date startDate{2021, 01, 01};
     auto endDate = Date::currentDate();
@@ -195,23 +220,15 @@ Backend makeDefaultBackend()
         settingsYears.emplace_back(settingsYear);
     }
     auto controllerYears = makeControllerYears(days, settingsYears);
-
-    return Backend{controllerYears};
+    return controllerYears;
 }
 
-Backend makeBackendFromFile(const FileReader &fileReader)
+QVector<QObject *> makeControllerYearsFromFile(const FileReader &fileReader)
 {
     auto days = fileReader.days();
 
-    if (days.isEmpty()) {
-        qWarning() << Q_FUNC_INFO << "days are empty.";
-        return makeDefaultBackend();
-    }
-
-    if (days.size() % 5 != 0) {
-        qWarning() << Q_FUNC_INFO << "days are not multiplication of 5.";
-        return makeDefaultBackend();
-    }
+    Q_ASSERT(!days.isEmpty());
+    Q_ASSERT(days.size() % 5 == 0);
 
     // TODO: If these days have a new year we should generate a new default
     // settingsYear
@@ -222,8 +239,11 @@ Backend makeBackendFromFile(const FileReader &fileReader)
     days.append(newDaysNotInFile);
 
     auto settingsYears = fileReader.settingsYears();
+
+    Q_ASSERT(!settingsYears.isEmpty());
+
     auto controllerYears = makeControllerYears(days, settingsYears);
-    return Backend{controllerYears};
+    return controllerYears;
 }
 
 QVector<QObject *> makeControllerYears(

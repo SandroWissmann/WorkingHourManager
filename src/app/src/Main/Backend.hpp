@@ -10,11 +10,10 @@ namespace whm {
 
 class Backend : public QObject {
     Q_OBJECT
-    Q_PROPERTY(QVector<QObject *> controllerYears READ controllerYears CONSTANT)
+    Q_PROPERTY(QVector<QObject *> controllerYears READ controllerYears NOTIFY
+                   controllerYearsChanged)
 public:
-    Backend(
-        const QVector<QObject *> &controllerYears,
-        QObject *parent = nullptr);
+    Backend(QObject *parent = nullptr);
 
     Backend(const Backend &) = delete;
     Backend(Backend &&) = delete;
@@ -23,14 +22,23 @@ public:
 
     ~Backend() = default;
 
-    static Backend fromFile();
-
     QVector<QObject *> controllerYears() const;
+
+    Q_INVOKABLE
+    bool readControllerYearsFromFile();
+
+    Q_INVOKABLE
+    void generateControllerYears();
 
     Q_INVOKABLE
     void saveToFile();
 
+signals:
+    void controllerYearsChanged();
+
 private:
+    void setControllerYears(const QVector<QObject *> &controllerYears);
+
     QVector<QObject *> m_controllerYears;
 };
 } // namespace whm

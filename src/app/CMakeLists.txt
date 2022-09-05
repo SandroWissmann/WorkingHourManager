@@ -23,6 +23,7 @@ qt_add_qml_module(appWorkingHourManager
     ressources/qml/Types/DoubleInput.qml
     ressources/qml/Types/HourMinInput.qml
     ressources/qml/Main.qml
+    ressources/qml/Years.qml
     ressources/qml/Main/Year.qml
     ressources/qml/Main/Year/FooterYear.qml
     ressources/qml/Main/Year/Month.qml

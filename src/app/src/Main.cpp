@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    auto backend = whm::Backend::fromFile();
+    whm::Backend backend;
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     auto qmlContext = engine.rootContext();
-    qmlContext->setContextProperty("backend", &backend);
+    qmlContext->setContextProperty("backendMain", &backend);
 
     const QUrl url(u"qrc:/WorkingHourManager/ressources/qml/Main.qml"_qs);
     QObject::connect(
