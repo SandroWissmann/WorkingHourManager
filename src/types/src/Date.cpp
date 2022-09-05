@@ -87,17 +87,26 @@ Date Date::removeDays(int days) const
     return {returnDate.year(), returnDate.month(), returnDate.day()};
 }
 
-Date Date::getPreviouseDateWithDayOfWeek(int dayOfWeek) const
+Date Date::getPreviouseDateWithWeekday(Weekday weekday) const
 {
-    constexpr int mondayIdx = 1;
-    constexpr int sundayIdx = 7;
-    dayOfWeek = std::clamp(dayOfWeek, mondayIdx, sundayIdx);
+    Q_ASSERT(weekday != Weekday::unknown);
 
-    QDate returnDate = m_date;
-    while (returnDate.dayOfWeek() != dayOfWeek) {
-        returnDate = removeDay(returnDate);
+    Date returnDate = *this;
+    while (returnDate.weekday() != weekday) {
+        returnDate = returnDate.removeDays(1);
     }
-    return {returnDate.year(), returnDate.month(), returnDate.day()};
+    return returnDate;
+}
+
+Date Date::getNextDateWithWeekday(Weekday weekday) const
+{
+    Q_ASSERT(weekday != Weekday::unknown);
+
+    Date returnDate = *this;
+    while (returnDate.weekday() != weekday) {
+        returnDate = returnDate.addDays(1);
+    }
+    return returnDate;
 }
 
 bool operator==(const Date &lhs, const Date &rhs)

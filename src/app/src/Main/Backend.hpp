@@ -12,6 +12,7 @@ class Backend : public QObject {
     Q_OBJECT
     Q_PROPERTY(QVector<QObject *> controllerYears READ controllerYears NOTIFY
                    controllerYearsChanged)
+    Q_PROPERTY(int currentYear READ currentYear CONSTANT)
 public:
     Backend(QObject *parent = nullptr);
 
@@ -24,11 +25,13 @@ public:
 
     QVector<QObject *> controllerYears() const;
 
+    int currentYear() const;
+
     Q_INVOKABLE
     bool readControllerYearsFromFile();
 
     Q_INVOKABLE
-    void generateControllerYears();
+    void generateControllerYears(int year);
 
     Q_INVOKABLE
     void saveToFile();

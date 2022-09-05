@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import "../../../../Types"
+import "../../../../../Types"
 
 Item {
     id: root
@@ -83,7 +83,7 @@ Item {
             }
         }
         Item {
-            Layout.preferredWidth: rowLayout.elementWidth
+            Layout.fillWidth: true
         }
     }
 }

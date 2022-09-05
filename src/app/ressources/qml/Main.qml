@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
+import "Main"
+
 ApplicationWindow {
     id: root
     width: 1024
@@ -17,12 +19,11 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
-        console.warn("readControllerYearsFromFile")
-        if (!root.backend.readControllerYearsFromFile()) {
-            console.warn("generateControllerYears")
-            root.backend.generateControllerYears()
+        if (root.backend.readControllerYearsFromFile()) {
+            loader.sourceComponent = componentYears
+        } else {
+            popup.open()
         }
-        loader.sourceComponent = componentYears
     }
 
     Component.onDestruction: {
@@ -34,6 +35,17 @@ ApplicationWindow {
 
         Years {
             controller: root.backend
+        }
+    }
+
+    PopupEnterStartYear {
+        id: popup
+
+        currentYear: root.backend.currentYear
+
+        onAccepted: {
+            root.backend.generateControllerYears(popup.selectedYear)
+            loader.sourceComponent = componentYears
         }
     }
 }

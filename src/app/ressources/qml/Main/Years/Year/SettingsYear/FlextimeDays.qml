@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import "../../../Types"
+import "../../../../Types"
 
 Item {
     id: root
@@ -19,15 +19,15 @@ Item {
             Layout.preferredWidth: rowLayout.elementWidth
             font.bold: true
             color: "red"
-            text: qsTr("Vacation days: ")
+            text: qsTr("Flextime days: ")
         }
 
         DoubleInput {
             Layout.preferredWidth: rowLayout.elementWidth
-            text: root.controller.vacationDays
+            text: root.controller.flextimeDays
 
             onEditingFinished: {
-                root.controller.vacationDays = text
+                root.controller.flextimeDays = text
             }
         }
         Item {

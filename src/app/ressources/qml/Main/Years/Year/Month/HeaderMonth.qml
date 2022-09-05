@@ -51,7 +51,7 @@ Item {
             font.bold: true
         }
         Item {
-            Layout.preferredWidth: rowLayout.elementWidth
+            Layout.fillWidth: true
         }
     }
 }

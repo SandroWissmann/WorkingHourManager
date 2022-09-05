@@ -22,6 +22,8 @@ namespace {
 QVector<std::shared_ptr<Day>>
 makeWorkDays(const Date &firstDate, const Date &lastDate);
 
+Date calcStartDate(const Date &date);
+
 void addDayOnWorkday(
     QVector<std::shared_ptr<Day>> &days,
     Weekday weekday,
@@ -31,7 +33,7 @@ int extractFirstYear(const QVector<std::shared_ptr<Day>> &days);
 
 Date getLastDayOfFirstWeekDate(const QVector<std::shared_ptr<Day>> &days);
 
-QVector<QObject *> makeDefaultControllerYears();
+QVector<QObject *> makeDefaultControllerYears(int year);
 
 QVector<QObject *> makeControllerYearsFromFile(const FileReader &fileReader);
 
@@ -80,6 +82,12 @@ QVector<QObject *> Backend::controllerYears() const
     return m_controllerYears;
 }
 
+int Backend::currentYear() const
+{
+    auto currentDate = Date::currentDate();
+    return currentDate.year();
+}
+
 bool Backend::readControllerYearsFromFile()
 {
     FileReader fileReader{"save.json"};
@@ -93,9 +101,9 @@ bool Backend::readControllerYearsFromFile()
     return true;
 }
 
-void Backend::generateControllerYears()
+void Backend::generateControllerYears(int year)
 {
-    auto controllerYears = makeDefaultControllerYears();
+    auto controllerYears = makeDefaultControllerYears(year);
     setControllerYears(controllerYears);
 }
 
@@ -139,12 +147,14 @@ namespace {
 QVector<std::shared_ptr<Day>>
 makeWorkDays(const Date &firstDate, const Date &lastDate)
 {
-    constexpr int mondayIdx = 1;
-    auto date = firstDate.getPreviouseDateWithDayOfWeek(mondayIdx);
+    Q_ASSERT(firstDate < lastDate);
 
-    // TODO this way we can end up in the middle of a week. Move forward
-    // until friday here. instead of second while loop.
-    auto endDate = lastDate;
+    auto weekday{Weekday::monday};
+
+    auto date = calcStartDate(firstDate);
+    auto endDate = lastDate.getNextDateWithWeekday(Weekday::friday);
+
+    Q_ASSERT(date <= endDate);
 
     QVector<std::shared_ptr<Day>> days;
     while (date <= lastDate) {
@@ -152,14 +162,29 @@ makeWorkDays(const Date &firstDate, const Date &lastDate)
         addDayOnWorkday(days, weekday, date);
         date = date.addDays(1);
     }
-
-    // to fill up whole working week.
-    while (date.weekday() != Weekday::saturday) {
-        auto weekday = date.weekday();
-        addDayOnWorkday(days, weekday, date);
-        date = date.addDays(1);
-    }
     return days;
+}
+
+Date calcStartDate(const Date &date)
+{
+    Q_ASSERT(date.weekday() != Weekday::unknown);
+
+    switch (date.weekday()) {
+        case Weekday::monday:
+            return date;
+        case Weekday::tuesday:
+        case Weekday::wednesday:
+        case Weekday::thursday:
+        case Weekday::friday:
+            return date.getPreviouseDateWithWeekday(Weekday::monday);
+        case Weekday::saturday:
+        case Weekday::sunday:
+            return date.getNextDateWithWeekday(Weekday::monday);
+        case Weekday::unknown:
+            // case cannot be hit. just here to silence compiler.
+            return date;
+    }
+    return date;
 }
 
 void addDayOnWorkday(
@@ -199,16 +224,16 @@ Date getLastDayOfFirstWeekDate(const QVector<std::shared_ptr<Day>> &days)
     return days.at(workDaysCount - 1)->date();
 }
 
-QVector<QObject *> makeDefaultControllerYears()
+QVector<QObject *> makeDefaultControllerYears(int year)
 {
-    Date startDate{2021, 01, 01};
+    Date startDate{year, 01, 01};
     auto endDate = Date::currentDate();
 
     auto startYear = startDate.year();
     auto endYear = endDate.year();
     auto countOfYears = endYear - startYear + 1;
 
-    QVector<int> years{countOfYears};
+    QVector<int> years(countOfYears);
     std::iota(years.begin(), years.end(), startYear);
 
     auto days = makeWorkDays(startDate, endDate);
@@ -235,8 +260,11 @@ QVector<QObject *> makeControllerYearsFromFile(const FileReader &fileReader)
     auto firstDateNotInFile = days.back()->date();
     firstDateNotInFile.addDays(1);
     auto currentDate = Date::currentDate();
-    auto newDaysNotInFile = makeWorkDays(firstDateNotInFile, currentDate);
-    days.append(newDaysNotInFile);
+
+    if (firstDateNotInFile < currentDate) {
+        auto newDaysNotInFile = makeWorkDays(firstDateNotInFile, currentDate);
+        days.append(newDaysNotInFile);
+    }
 
     auto settingsYears = fileReader.settingsYears();
 

@@ -34,7 +34,9 @@ public:
 
     Date removeDays(int days) const;
 
-    Date getPreviouseDateWithDayOfWeek(int dayOfWeek) const;
+    Date getPreviouseDateWithWeekday(Weekday weekday) const;
+
+    Date getNextDateWithWeekday(Weekday weekday) const;
 
 private:
     QDate m_date;
