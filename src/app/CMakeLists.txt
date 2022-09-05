@@ -14,10 +14,6 @@ add_executable(appWorkingHourManager
     src/Main/Controller/ControllerYear/ControllerSettingsDay.cpp
     src/Main/Controller/ControllerYear/ControllerSettingsYear.hpp
     src/Main/Controller/ControllerYear/ControllerSettingsYear.cpp
-    src/Main/FileIO/FileReader.hpp
-    src/Main/FileIO/FileReader.cpp
-    src/Main/FileIO/FileWriter.hpp
-    src/Main/FileIO/FileWriter.cpp
 )
 
 qt_add_qml_module(appWorkingHourManager
@@ -48,5 +44,6 @@ target_compile_definitions(appWorkingHourManager
 target_link_libraries(appWorkingHourManager
     PRIVATE
     Qt6::Quick
+    whm-file
     whm-types
     whm-settings)

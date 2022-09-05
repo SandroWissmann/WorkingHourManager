@@ -1,5 +1,7 @@
 #include "Backend.hpp"
 
+#include <whm/file/FileReader.hpp>
+#include <whm/file/FileWriter.hpp>
 #include <whm/types/Date.hpp>
 #include <whm/types/Day.hpp>
 
@@ -8,8 +10,6 @@
 #include "Controller/ControllerWeek.hpp"
 #include "Controller/ControllerYear.hpp"
 #include "Controller/ControllerYear/ControllerSettingsYear.hpp"
-#include "FileIO/FileReader.hpp"
-#include "FileIO/FileWriter.hpp"
 
 #include <QDebug>
 

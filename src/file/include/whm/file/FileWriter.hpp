@@ -9,7 +9,6 @@
 
 namespace whm {
 
-class Time;
 class Day;
 class SettingsYear;
 
