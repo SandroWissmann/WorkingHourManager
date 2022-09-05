@@ -9,5 +9,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt6 6.2 COMPONENTS Core Quick REQUIRED)
 
 add_subdirectory(src/app)
+add_subdirectory(src/settings)
 add_subdirectory(src/types)
 

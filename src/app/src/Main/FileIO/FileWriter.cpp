@@ -1,8 +1,7 @@
 #include "FileWriter.hpp"
 
+#include <whm/settings/SettingsYear.hpp>
 #include <whm/types/Day.hpp>
-
-#include "../Settings/SettingsYear.hpp"
 
 #include <QDebug>
 #include <QFile>

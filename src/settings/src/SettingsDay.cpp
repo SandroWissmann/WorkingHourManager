@@ -1,4 +1,4 @@
- #include "SettingsDay.hpp"
+#include "../include/whm/settings/SettingsDay.hpp"
 
 namespace whm{
 

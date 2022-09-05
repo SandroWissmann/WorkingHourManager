@@ -18,10 +18,6 @@ add_executable(appWorkingHourManager
     src/Main/FileIO/FileReader.cpp
     src/Main/FileIO/FileWriter.hpp
     src/Main/FileIO/FileWriter.cpp
-    src/Main/Settings/SettingsDay.hpp
-    src/Main/Settings/SettingsDay.cpp
-    src/Main/Settings/SettingsYear.hpp
-    src/Main/Settings/SettingsYear.cpp
 )
 
 qt_add_qml_module(appWorkingHourManager
@@ -50,5 +46,7 @@ target_compile_definitions(appWorkingHourManager
     PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 
 target_link_libraries(appWorkingHourManager
-    PRIVATE Qt6::Quick
-    whm-types)
+    PRIVATE
+    Qt6::Quick
+    whm-types
+    whm-settings)

@@ -1,5 +1,8 @@
 #include "FileReader.hpp"
 
+#include <whm/settings/SettingsDay.hpp>
+#include <whm/settings/SettingsYear.hpp>
+
 #include <whm/types/Day.hpp>
 #include <whm/types/DayType.hpp>
 #include <whm/types/Time.hpp>
@@ -10,9 +13,6 @@
 #include <QJsonObject>
 
 #include <optional>
-
-#include "../Settings/SettingsDay.hpp"
-#include "../Settings/SettingsYear.hpp"
 
 namespace whm {
 

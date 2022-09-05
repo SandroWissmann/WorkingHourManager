@@ -1,5 +1,4 @@
-#include "SettingsYear.hpp"
-
+#include "../include/whm/settings/SettingsYear.hpp"
 namespace whm {
 
 namespace {
