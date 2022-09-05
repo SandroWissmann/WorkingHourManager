@@ -13,16 +13,6 @@ ApplicationWindow {
 
     property QtObject controller: backend
 
-    menuBar: MenuBar {
-        Menu {
-            title: qsTr("&File")
-            Action {
-                text: qsTr("&Save")
-                onTriggered: root.controller.saveToFile()
-            }
-        }
-    }
-
     header: TabBar {
         id: tabBarYear
     }
@@ -45,5 +35,10 @@ ApplicationWindow {
                                                           })
             tabBarYear.addItem(tabYear)
         }
+    }
+
+    Component.onDestruction: {
+        console.warn("save to file")
+        root.controller.saveToFile()
     }
 }
