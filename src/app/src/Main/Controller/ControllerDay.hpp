@@ -7,6 +7,8 @@
 #include <whm/types/Time.hpp>
 
 #include <QObject>
+#include <QString>
+#include <QStringList>
 
 #include <memory>
 
@@ -34,6 +36,8 @@ class ControllerDay : public QObject {
 
     Q_PROPERTY(
         DayType dayType READ dayType WRITE setDayType NOTIFY dayTypeChanged)
+    Q_PROPERTY(
+        QVector<QVariant> dayTypesAsVariant READ dayTypesAsVariant CONSTANT)
 public:
     ControllerDay(
         std::shared_ptr<Day> day,
@@ -75,6 +79,8 @@ public:
 
     DayType dayType() const;
     void setDayType(DayType dayType);
+
+    QVector<QVariant> dayTypesAsVariant() const;
 
     bool hasValidStartTime() const;
     bool hasValidEndTime() const;

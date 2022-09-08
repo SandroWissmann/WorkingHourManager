@@ -6,6 +6,7 @@ add_library(whm-types STATIC
     ./include/whm/types/HoursAndMinutes.hpp
     ./include/whm/types/Time.hpp
     ./include/whm/types/Weekday.hpp
+    ./src/Daytype.cpp
     ./src/Day.cpp
     ./src/Date.cpp
     ./src/HelperDay.cpp

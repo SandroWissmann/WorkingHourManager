@@ -86,7 +86,7 @@ QJsonObject makeJsonObject(std::shared_ptr<Day> day)
     if (auto endTime = day->endTime(); endTime != Time{}) {
         jsonObject["endTime"] = endTime.asString();
     }
-    if (auto dayType = day->dayType(); dayType != DayType::work) {
+    if (auto dayType = day->dayType(); dayType != DayType::Work) {
         jsonObject["dayType"] = static_cast<int>(dayType);
     }
     return jsonObject;

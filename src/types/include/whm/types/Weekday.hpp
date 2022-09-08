@@ -9,14 +9,14 @@ class WeekdayQEnum {
     Q_GADGET
 public:
     enum class Value {
-        monday,
-        tuesday,
-        wednesday,
-        thursday,
-        friday,
-        saturday,
-        sunday,
-        unknown
+        Monday,
+        Tuesday,
+        Wednesday,
+        Thursday,
+        Friday,
+        Saturday,
+        Sunday,
+        Unknown
     };
     Q_ENUM(Value)
 

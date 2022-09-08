@@ -44,7 +44,7 @@ private:
     Date m_date;
     Time m_startTime;
     Time m_endTime;
-    DayType m_dayType{DayType::work};
+    DayType m_dayType{DayType::Work};
 };
 } // namespace whm
 

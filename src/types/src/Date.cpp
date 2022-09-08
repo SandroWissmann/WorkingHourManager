@@ -51,13 +51,13 @@ QString Date::asString() const
 
 Weekday Date::weekday() const
 {
-    auto weekdayAsString = m_date.toString("dddd").toLower();
+    auto weekdayAsString = m_date.toString("dddd");
 
     auto metaEnum = QMetaEnum::fromType<Weekday>();
     int weekdayAsInt = metaEnum.keyToValue(weekdayAsString.toLatin1());
 
     if (weekdayAsInt == -1) {
-        return Weekday::unknown;
+        return Weekday::Unknown;
     }
     return static_cast<Weekday>(weekdayAsInt);
 }
@@ -89,7 +89,7 @@ Date Date::removeDays(int days) const
 
 Date Date::getPreviouseDateWithWeekday(Weekday weekday) const
 {
-    Q_ASSERT(weekday != Weekday::unknown);
+    Q_ASSERT(weekday != Weekday::Unknown);
 
     Date returnDate = *this;
     while (returnDate.weekday() != weekday) {
@@ -100,7 +100,7 @@ Date Date::getPreviouseDateWithWeekday(Weekday weekday) const
 
 Date Date::getNextDateWithWeekday(Weekday weekday) const
 {
-    Q_ASSERT(weekday != Weekday::unknown);
+    Q_ASSERT(weekday != Weekday::Unknown);
 
     Date returnDate = *this;
     while (returnDate.weekday() != weekday) {

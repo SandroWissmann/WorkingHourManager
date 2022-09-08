@@ -180,11 +180,11 @@ DayType extractDayType(const QJsonObject &jsonObject)
     QString key{"dayType"};
     auto dayTypeAsInt = extractIntFromDay(jsonObject, key);
 
-    if (dayTypeAsInt < static_cast<int>(DayType::work)) {
-        return DayType::work;
+    if (dayTypeAsInt < static_cast<int>(DayType::Work)) {
+        return DayType::Work;
     }
-    if (dayTypeAsInt > static_cast<int>(DayType::ignore)) {
-        return DayType::work;
+    if (dayTypeAsInt > static_cast<int>(DayType::Ignore)) {
+        return DayType::Work;
     }
     auto dayType = static_cast<DayType>(dayTypeAsInt);
     return dayType;
@@ -255,22 +255,22 @@ QVector<SettingsYear> extractSettingsYears(
         auto vacationDays = extractVacationDays(settingsYearObject);
 
         std::map<Weekday, SettingsDay> weekdayToSettingsDay{
-            {Weekday::monday,
-             {Weekday::monday, defaultWorkTimesMoToFr[0], pauseTimesMoToFr[0]}},
-            {Weekday::tuesday,
-             {Weekday::tuesday,
+            {Weekday::Monday,
+             {Weekday::Monday, defaultWorkTimesMoToFr[0], pauseTimesMoToFr[0]}},
+            {Weekday::Tuesday,
+             {Weekday::Tuesday,
               defaultWorkTimesMoToFr[1],
               pauseTimesMoToFr[1]}},
-            {Weekday::wednesday,
-             {Weekday::wednesday,
+            {Weekday::Wednesday,
+             {Weekday::Wednesday,
               defaultWorkTimesMoToFr[2],
               pauseTimesMoToFr[2]}},
-            {Weekday::thursday,
-             {Weekday::thursday,
+            {Weekday::Thursday,
+             {Weekday::Thursday,
               defaultWorkTimesMoToFr[3],
               pauseTimesMoToFr[3]}},
-            {Weekday::friday,
-             {Weekday::friday, defaultWorkTimesMoToFr[4], pauseTimesMoToFr[4]}},
+            {Weekday::Friday,
+             {Weekday::Friday, defaultWorkTimesMoToFr[4], pauseTimesMoToFr[4]}},
         };
 
         SettingsYear settingsYear{

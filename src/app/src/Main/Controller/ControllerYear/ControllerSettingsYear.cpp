@@ -9,11 +9,11 @@ namespace {
 QVector<QObject *> makeControllerSettingsDays(SettingsYear &settingsYear)
 {
     return QVector<QObject *>{
-        new ControllerSettingsDay{settingsYear.settingsDay(Weekday::monday)},
-        new ControllerSettingsDay{settingsYear.settingsDay(Weekday::tuesday)},
-        new ControllerSettingsDay{settingsYear.settingsDay(Weekday::wednesday)},
-        new ControllerSettingsDay{settingsYear.settingsDay(Weekday::thursday)},
-        new ControllerSettingsDay{settingsYear.settingsDay(Weekday::friday)}};
+        new ControllerSettingsDay{settingsYear.settingsDay(Weekday::Monday)},
+        new ControllerSettingsDay{settingsYear.settingsDay(Weekday::Tuesday)},
+        new ControllerSettingsDay{settingsYear.settingsDay(Weekday::Wednesday)},
+        new ControllerSettingsDay{settingsYear.settingsDay(Weekday::Thursday)},
+        new ControllerSettingsDay{settingsYear.settingsDay(Weekday::Friday)}};
 }
 
 } // namespace

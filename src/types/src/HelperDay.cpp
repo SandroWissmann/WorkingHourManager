@@ -8,20 +8,20 @@ namespace whm {
 namespace {
 Date calcStartDate(const Date &date)
 {
-    Q_ASSERT(date.weekday() != Weekday::unknown);
+    Q_ASSERT(date.weekday() != Weekday::Unknown);
 
     switch (date.weekday()) {
-        case Weekday::monday:
+        case Weekday::Monday:
             return date;
-        case Weekday::tuesday:
-        case Weekday::wednesday:
-        case Weekday::thursday:
-        case Weekday::friday:
-            return date.getPreviouseDateWithWeekday(Weekday::monday);
-        case Weekday::saturday:
-        case Weekday::sunday:
-            return date.getNextDateWithWeekday(Weekday::monday);
-        case Weekday::unknown:
+        case Weekday::Tuesday:
+        case Weekday::Wednesday:
+        case Weekday::Thursday:
+        case Weekday::Friday:
+            return date.getPreviouseDateWithWeekday(Weekday::Monday);
+        case Weekday::Saturday:
+        case Weekday::Sunday:
+            return date.getNextDateWithWeekday(Weekday::Monday);
+        case Weekday::Unknown:
             // case cannot be hit. just here to silence compiler.
             return date;
     }
@@ -34,19 +34,19 @@ void addDayOnWorkday(
     const Date &date)
 {
     switch (weekday) {
-        case Weekday::monday:
-        case Weekday::tuesday:
-        case Weekday::wednesday:
-        case Weekday::thursday:
-        case Weekday::friday: {
+        case Weekday::Monday:
+        case Weekday::Tuesday:
+        case Weekday::Wednesday:
+        case Weekday::Thursday:
+        case Weekday::Friday: {
             auto day = std::make_shared<Day>(date);
             days.emplace_back(day);
         } break;
-        case Weekday::saturday:
+        case Weekday::Saturday:
             break;
-        case Weekday::sunday:
+        case Weekday::Sunday:
             break;
-        case Weekday::unknown:
+        case Weekday::Unknown:
             break;
     }
 }
@@ -57,10 +57,10 @@ makeWorkDays(const Date &firstDate, const Date &lastDate)
 {
     Q_ASSERT(firstDate < lastDate);
 
-    auto weekday{Weekday::monday};
+    auto weekday{Weekday::Monday};
 
     auto date = calcStartDate(firstDate);
-    auto endDate = lastDate.getNextDateWithWeekday(Weekday::friday);
+    auto endDate = lastDate.getNextDateWithWeekday(Weekday::Friday);
 
     Q_ASSERT(date <= endDate);
 

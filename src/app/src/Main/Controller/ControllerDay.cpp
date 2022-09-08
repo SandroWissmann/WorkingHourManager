@@ -24,7 +24,7 @@ Time calcWorkTime(Time startTime, Time endTime, Time pauseTime)
 
 double calcUsedFlextimeDay(DayType dayType)
 {
-    if (dayType == DayType::flextime) {
+    if (dayType == DayType::Flextime) {
         return 1.0;
     }
     return 0.0;
@@ -32,7 +32,7 @@ double calcUsedFlextimeDay(DayType dayType)
 
 double calcUsedVacationDay(DayType dayType)
 {
-    if (dayType == DayType::vacation) {
+    if (dayType == DayType::Vacation) {
         return 1.0;
     }
     return 0.0;
@@ -70,7 +70,6 @@ QString ControllerDay::weekdayAsString() const
 {
     auto weekdayEnum = m_day->date().weekday();
     QString weekday = QVariant::fromValue(weekdayEnum).toString();
-    weekday[0] = weekday[0].toUpper();
     return weekday;
 }
 
@@ -129,7 +128,7 @@ QString ControllerDay::pauseTimeAsString() const
 
 Time ControllerDay::workTime() const
 {
-    if (m_day->dayType() != DayType::work) {
+    if (m_day->dayType() != DayType::Work) {
         return m_defaultWorkTime;
     }
     return m_workTime;
@@ -137,10 +136,10 @@ Time ControllerDay::workTime() const
 
 HoursAndMinutes ControllerDay::overtime() const
 {
-    if (m_day->dayType() == DayType::flextime) {
+    if (m_day->dayType() == DayType::Flextime) {
         return HoursAndMinutes{-m_defaultWorkTime.totalMinutes()};
     }
-    if (m_day->dayType() != DayType::work) {
+    if (m_day->dayType() != DayType::Work) {
         return HoursAndMinutes{};
     }
     if (!m_day->isValid()) {
@@ -156,7 +155,7 @@ QString ControllerDay::overtimeAsString() const
 
 bool ControllerDay::timeInputIsEnabled() const
 {
-    return m_day->dayType() == DayType::work;
+    return m_day->dayType() == DayType::Work;
 }
 
 QString ControllerDay::workTimeAsString() const
@@ -169,8 +168,17 @@ DayType ControllerDay::dayType() const
     return m_day->dayType();
 }
 
-// TODO: very ugly and cryptic. We should introduce some kind of state machine here
-// for the types
+QVector<QVariant> ControllerDay::dayTypesAsVariant() const
+{
+    auto stringList = dayTypeAsStringList();
+    QVector<QVariant> variantList(stringList.size());
+    std::copy(stringList.begin(), stringList.end(), variantList.begin());
+
+    return variantList;
+}
+
+// TODO: very ugly and cryptic. We should introduce some kind of state machine
+// here for the types
 void ControllerDay::setDayType(DayType dayType)
 {
     auto oldDayType = m_day->dayType();
@@ -183,16 +191,16 @@ void ControllerDay::setDayType(DayType dayType)
     auto newDayType = m_day->dayType();
 
     auto isWorkDayToNotWorkDayTransition =
-        oldDayType == DayType::work && newDayType != DayType::work;
+        oldDayType == DayType::Work && newDayType != DayType::Work;
 
     auto isNotWorkDayToWorkDayTransition =
-        oldDayType != DayType::work && newDayType == DayType::work;
+        oldDayType != DayType::Work && newDayType == DayType::Work;
 
     auto isNotFlextimeToFlextimeTransition =
-        oldDayType != DayType::flextime && newDayType == DayType::flextime;
+        oldDayType != DayType::Flextime && newDayType == DayType::Flextime;
 
     auto isFlextimeToNotFlextimeTransition =
-        oldDayType == DayType::flextime && newDayType != DayType::flextime;
+        oldDayType == DayType::Flextime && newDayType != DayType::Flextime;
 
     if (isWorkDayToNotWorkDayTransition) {
         emit startTimeChanged();

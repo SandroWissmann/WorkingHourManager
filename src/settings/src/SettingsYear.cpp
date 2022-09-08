@@ -21,11 +21,11 @@ SettingsDay makeDefaultSettingsDay(Weekday weekday)
 std::map<Weekday, SettingsDay> makeDefaultWeekdayToSettingsDay()
 {
     return {
-        {Weekday::monday, makeDefaultSettingsDay(Weekday::monday)},
-        {Weekday::tuesday, makeDefaultSettingsDay(Weekday::tuesday)},
-        {Weekday::wednesday, makeDefaultSettingsDay(Weekday::wednesday)},
-        {Weekday::thursday, makeDefaultSettingsDay(Weekday::thursday)},
-        {Weekday::friday, makeDefaultSettingsDay(Weekday::friday)}};
+        {Weekday::Monday, makeDefaultSettingsDay(Weekday::Monday)},
+        {Weekday::Tuesday, makeDefaultSettingsDay(Weekday::Tuesday)},
+        {Weekday::Wednesday, makeDefaultSettingsDay(Weekday::Wednesday)},
+        {Weekday::Thursday, makeDefaultSettingsDay(Weekday::Thursday)},
+        {Weekday::Friday, makeDefaultSettingsDay(Weekday::Friday)}};
 }
 
 bool setTime(Time &value, const QString &newValue)
@@ -59,19 +59,19 @@ SettingsYear::SettingsYear(
 
     Q_ASSERT(m_weekdayToSettingsDay.size() == 5);
     Q_ASSERT(
-        m_weekdayToSettingsDay.find(Weekday::monday) !=
+        m_weekdayToSettingsDay.find(Weekday::Monday) !=
         m_weekdayToSettingsDay.end());
     Q_ASSERT(
-        m_weekdayToSettingsDay.find(Weekday::tuesday) !=
+        m_weekdayToSettingsDay.find(Weekday::Tuesday) !=
         m_weekdayToSettingsDay.end());
     Q_ASSERT(
-        m_weekdayToSettingsDay.find(Weekday::wednesday) !=
+        m_weekdayToSettingsDay.find(Weekday::Wednesday) !=
         m_weekdayToSettingsDay.end());
     Q_ASSERT(
-        m_weekdayToSettingsDay.find(Weekday::thursday) !=
+        m_weekdayToSettingsDay.find(Weekday::Thursday) !=
         m_weekdayToSettingsDay.end());
     Q_ASSERT(
-        m_weekdayToSettingsDay.find(Weekday::friday) !=
+        m_weekdayToSettingsDay.find(Weekday::Friday) !=
         m_weekdayToSettingsDay.end());
 }
 
@@ -95,21 +95,21 @@ SettingsDay *SettingsYear::settingsDay(Weekday weekday)
 std::array<Time, 5> SettingsYear::defaultWorkTimesMoToFr() const
 {
     return {
-        m_weekdayToSettingsDay.at(Weekday::monday).defaultWorkTime(),
-        m_weekdayToSettingsDay.at(Weekday::tuesday).defaultWorkTime(),
-        m_weekdayToSettingsDay.at(Weekday::wednesday).defaultWorkTime(),
-        m_weekdayToSettingsDay.at(Weekday::thursday).defaultWorkTime(),
-        m_weekdayToSettingsDay.at(Weekday::friday).defaultWorkTime()};
+        m_weekdayToSettingsDay.at(Weekday::Monday).defaultWorkTime(),
+        m_weekdayToSettingsDay.at(Weekday::Tuesday).defaultWorkTime(),
+        m_weekdayToSettingsDay.at(Weekday::Wednesday).defaultWorkTime(),
+        m_weekdayToSettingsDay.at(Weekday::Thursday).defaultWorkTime(),
+        m_weekdayToSettingsDay.at(Weekday::Friday).defaultWorkTime()};
 }
 
 std::array<Time, 5> SettingsYear::pauseTimesMoToFr() const
 {
     return {
-        m_weekdayToSettingsDay.at(Weekday::monday).pauseTime(),
-        m_weekdayToSettingsDay.at(Weekday::tuesday).pauseTime(),
-        m_weekdayToSettingsDay.at(Weekday::wednesday).pauseTime(),
-        m_weekdayToSettingsDay.at(Weekday::thursday).pauseTime(),
-        m_weekdayToSettingsDay.at(Weekday::friday).pauseTime()};
+        m_weekdayToSettingsDay.at(Weekday::Monday).pauseTime(),
+        m_weekdayToSettingsDay.at(Weekday::Tuesday).pauseTime(),
+        m_weekdayToSettingsDay.at(Weekday::Wednesday).pauseTime(),
+        m_weekdayToSettingsDay.at(Weekday::Thursday).pauseTime(),
+        m_weekdayToSettingsDay.at(Weekday::Friday).pauseTime()};
 }
 
 Time SettingsYear::defaultWorkTime(Weekday weekday) const

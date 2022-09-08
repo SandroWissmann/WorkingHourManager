@@ -5,7 +5,7 @@ namespace whm {
 namespace {
 bool hasValidTime(const Time &time, DayType dayType)
 {
-    if (dayType != DayType::work) {
+    if (dayType != DayType::Work) {
         return true;
     }
     if (!time.isValid()) {
@@ -26,17 +26,17 @@ Day::Day(
 }
 
 Day::Day(const Date &date, const Time &startTime, const Time &endTime)
-    : Day(date, startTime, endTime, DayType::work)
+    : Day(date, startTime, endTime, DayType::Work)
 {
 }
 
-Day::Day(const Date &date) : Day(date, Time{}, Time{}, DayType::work)
+Day::Day(const Date &date) : Day(date, Time{}, Time{}, DayType::Work)
 {
 }
 
 bool Day::isValid() const
 {
-    if (m_dayType != DayType::work) {
+    if (m_dayType != DayType::Work) {
         return true;
     }
     if (!m_startTime.isValid()) {
@@ -58,7 +58,7 @@ Date Day::date() const
 
 Time Day::startTime() const
 {
-    if (m_dayType != DayType::work) {
+    if (m_dayType != DayType::Work) {
         return Time{};
     }
     return m_startTime;
@@ -87,7 +87,7 @@ bool Day::hasValidStartTime() const
 
 Time Day::endTime() const
 {
-    if (m_dayType != DayType::work) {
+    if (m_dayType != DayType::Work) {
         return Time{};
     }
     return m_endTime;

@@ -77,8 +77,7 @@ Item {
             Layout.preferredWidth: rowLayout.elementWidth
             currentIndex: root.controller.dayType
 
-            // TODO: provide this list from the backend
-            model: ["Work", "Holiday", "Vacation", "Sick", "Party", "Flextime", "Ignore"]
+            model: root.controller.dayTypesAsVariant
 
             onCurrentIndexChanged: {
                 root.controller.dayType = currentIndex
