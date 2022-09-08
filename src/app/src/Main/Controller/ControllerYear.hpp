@@ -41,6 +41,9 @@ public:
     QString usedFlextimeDaysAsString() const;
     QString usedVacationDaysAsString() const;
 
+    // if first week is parially in the year befefore we can get the day here
+    QVector<std::shared_ptr<Day>> daysFromPreviousYearOfFirstWeek() const;
+
     QVector<std::shared_ptr<Day>> days() const;
 
 signals:

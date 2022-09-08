@@ -14,6 +14,8 @@ add_executable(appWorkingHourManager
     src/Main/Controller/ControllerYear/ControllerSettingsDay.cpp
     src/Main/Controller/ControllerYear/ControllerSettingsYear.hpp
     src/Main/Controller/ControllerYear/ControllerSettingsYear.cpp
+    src/Main/Controller/HelperControllerYear.hpp
+    src/Main/Controller/HelperControllerYear.cpp
 )
 
 qt_add_qml_module(appWorkingHourManager

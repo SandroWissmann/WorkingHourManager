@@ -43,11 +43,13 @@ public:
 
     // If week is in two months we can access here the split overtime for the
     // days in each month
-    QMap<int, HoursAndMinutes> monthsToOvertime() const;
+    std::map<int, HoursAndMinutes> monthsToOvertime() const;
 
-    QMap<int, double> monthsToUsedFlextimeDays() const;
+    std::map<int, QVector<std::shared_ptr<Day>>> yearsToDays() const;
 
-    QMap<int, double> monthsToUsedVacationDays() const;
+    std::map<int, double> monthsToUsedFlextimeDays() const;
+
+    std::map<int, double> monthsToUsedVacationDays() const;
 
     // Indicate in which month the week is present
     QVector<int> months() const;

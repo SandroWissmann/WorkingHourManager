@@ -78,9 +78,9 @@ QString ControllerWeek::earliestEndTime() const
     return m_earliestEndTime.asString();
 }
 
-QMap<int, HoursAndMinutes> ControllerWeek::monthsToOvertime() const
+std::map<int, HoursAndMinutes> ControllerWeek::monthsToOvertime() const
 {
-    QMap<int, HoursAndMinutes> monthsToOvertime;
+    std::map<int, HoursAndMinutes> monthsToOvertime;
     for (const auto &controllerDayAsQObject : m_controllerDays) {
         auto controllerDay =
             qobject_cast<ControllerDay *>(controllerDayAsQObject);
@@ -101,9 +101,32 @@ QMap<int, HoursAndMinutes> ControllerWeek::monthsToOvertime() const
     return monthsToOvertime;
 }
 
-QMap<int, double> ControllerWeek::monthsToUsedFlextimeDays() const
+std::map<int, QVector<std::shared_ptr<Day>>> ControllerWeek::yearsToDays() const
 {
-    QMap<int, double> monthsToUsedFlextimeDays;
+    std::map<int, QVector<std::shared_ptr<Day>>> yearsToDays;
+    for (const auto &controllerDayAsQObject : m_controllerDays) {
+        auto controllerDay =
+            qobject_cast<ControllerDay *>(controllerDayAsQObject);
+
+        auto day = controllerDay->day();
+        auto date = day->date();
+        auto year = date.year();
+
+        if (yearsToDays.find(year) == yearsToDays.end()) {
+            yearsToDays.insert({year, QVector<std::shared_ptr<Day>>{day}});
+        }
+        else {
+            auto days = yearsToDays.at(year);
+            days.emplace_back(day);
+            yearsToDays.at(year) = days;
+        }
+    }
+    return yearsToDays;
+}
+
+std::map<int, double> ControllerWeek::monthsToUsedFlextimeDays() const
+{
+    std::map<int, double> monthsToUsedFlextimeDays;
     for (const auto &controllerDayAsQObject : m_controllerDays) {
         auto controllerDay =
             qobject_cast<ControllerDay *>(controllerDayAsQObject);
@@ -125,9 +148,9 @@ QMap<int, double> ControllerWeek::monthsToUsedFlextimeDays() const
     return monthsToUsedFlextimeDays;
 }
 
-QMap<int, double> ControllerWeek::monthsToUsedVacationDays() const
+std::map<int, double> ControllerWeek::monthsToUsedVacationDays() const
 {
-    QMap<int, double> monthsToUsedVacationDays;
+    std::map<int, double> monthsToUsedVacationDays;
     for (const auto &controllerDayAsQObject : m_controllerDays) {
         auto controllerDay =
             qobject_cast<ControllerDay *>(controllerDayAsQObject);
@@ -378,7 +401,8 @@ Time calculateEarliestEndTime(
             lastDayIt = rit;
             break;
         }
-        // last element has not filled out startTime so we cant calc end time
+        // last element has not filled out startTime so we cant calc end
+        // time
         else {
             return Time{};
         }

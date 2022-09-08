@@ -4,6 +4,7 @@
 
 #include "ControllerDay.hpp"
 #include "ControllerMonth.hpp"
+#include "ControllerWeek.hpp"
 #include "ControllerYear/ControllerSettingsDay.hpp"
 #include "ControllerYear/ControllerSettingsYear.hpp"
 
@@ -103,6 +104,35 @@ QString ControllerYear::usedFlextimeDaysAsString() const
 QString ControllerYear::usedVacationDaysAsString() const
 {
     return QString::number(m_usedVacationDays, 'f', 1);
+}
+
+QVector<std::shared_ptr<Day>>
+ControllerYear::daysFromPreviousYearOfFirstWeek() const
+{
+    auto controllerMonthAsQObject = m_controllerMonths.at(0);
+    auto controllerMonth =
+        qobject_cast<ControllerMonth *>(controllerMonthAsQObject);
+    auto controllerWeekAsQObject = controllerMonth->controllerWeeks().at(0);
+    auto controllerWeek =
+        qobject_cast<ControllerWeek *>(controllerWeekAsQObject);
+    auto yearsToDays = controllerWeek->yearsToDays();
+
+    Q_ASSERT(yearsToDays.find(year()) != yearsToDays.end());
+    Q_ASSERT(yearsToDays.size() > 0);
+    Q_ASSERT(yearsToDays.size() <= 2);
+
+    // first week is still only in this year so no days from previous year
+    if (yearsToDays.size() == 1) {
+        return QVector<std::shared_ptr<Day>>{};
+    }
+
+    for (const auto &[year, days] : yearsToDays) {
+        if (year != this->year()) {
+            return days;
+        }
+    }
+    // Case should never be hit. Q_ASSERTS on top should catch this
+    return QVector<std::shared_ptr<Day>>{};
 }
 
 QVector<std::shared_ptr<Day>> ControllerYear::days() const
