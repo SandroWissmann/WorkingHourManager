@@ -35,12 +35,24 @@ Item {
             enabled: root.controller.timeInputIsEnabled
             Layout.preferredWidth: rowLayout.elementWidth
             text: root.controller.startTime
+
+            // TODO: Understand why we need this. The asignment
+            // text: root.controller.startTime should already upate this always?
+            onEditingFinished: {
+                root.controller.startTime = text
+            }
         }
         HourMinInput {
             id: endTime_hourMinInput
             enabled: root.controller.timeInputIsEnabled
             Layout.preferredWidth: rowLayout.elementWidth
             text: root.controller.endTime
+
+            // TODO: Understand why we need this. The asignment
+            // text: root.controller.startTime should already upate this always?
+            onEditingFinished: {
+                root.controller.endTime = text
+            }
         }
         Text {
             id: pauseTime_text
