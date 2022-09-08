@@ -32,25 +32,15 @@ Item {
         }
         HourMinInput {
             id: startTime_hourMinInput
+            enabled: root.controller.timeInputIsEnabled
             Layout.preferredWidth: rowLayout.elementWidth
             text: root.controller.startTime
-            // TODO: Use proper enum value here
-            // 0 -> work
-            enabled: root.controller.dayType === 0
-
-            onEditingFinished: {
-                root.controller.startTime = text
-            }
         }
         HourMinInput {
             id: endTime_hourMinInput
+            enabled: root.controller.timeInputIsEnabled
             Layout.preferredWidth: rowLayout.elementWidth
             text: root.controller.endTime
-            enabled: startTime_hourMinInput.enabled
-
-            onEditingFinished: {
-                root.controller.endTime = text
-            }
         }
         Text {
             id: pauseTime_text

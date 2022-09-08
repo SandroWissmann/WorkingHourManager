@@ -154,6 +154,11 @@ QString ControllerDay::overtimeAsString() const
     return overtime().toString();
 }
 
+bool ControllerDay::timeInputIsEnabled() const
+{
+    return m_day->dayType() == DayType::work;
+}
+
 QString ControllerDay::workTimeAsString() const
 {
     return workTime().asString();
@@ -164,6 +169,8 @@ DayType ControllerDay::dayType() const
     return m_day->dayType();
 }
 
+// TODO: very ugly and cryptic. We should introduce some kind of state machine here
+// for the types
 void ControllerDay::setDayType(DayType dayType)
 {
     auto oldDayType = m_day->dayType();
@@ -193,6 +200,7 @@ void ControllerDay::setDayType(DayType dayType)
         emit workTimeChanged();
         emit defaultWorkTimeChanged();
         emit overtimeChanged();
+        emit timeInputIsEnabledChanged();
     }
     else if (isNotWorkDayToWorkDayTransition) {
         emit startTimeChanged();
@@ -206,6 +214,7 @@ void ControllerDay::setDayType(DayType dayType)
         emit workTimeChanged();
         emit defaultWorkTimeChanged();
         emit overtimeChanged();
+        emit timeInputIsEnabledChanged();
     }
     else if (isNotFlextimeToFlextimeTransition) {
         emit workTimeChanged();

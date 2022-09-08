@@ -29,6 +29,9 @@ class ControllerDay : public QObject {
     Q_PROPERTY(QString workTime READ workTimeAsString NOTIFY workTimeChanged)
     Q_PROPERTY(QString overtime READ overtimeAsString NOTIFY overtimeChanged)
 
+    Q_PROPERTY(bool timeInputIsEnabled READ timeInputIsEnabled NOTIFY
+                   timeInputIsEnabledChanged)
+
     Q_PROPERTY(
         DayType dayType READ dayType WRITE setDayType NOTIFY dayTypeChanged)
 public:
@@ -68,6 +71,8 @@ public:
     HoursAndMinutes overtime() const;
     QString overtimeAsString() const;
 
+    bool timeInputIsEnabled() const;
+
     DayType dayType() const;
     void setDayType(DayType dayType);
 
@@ -88,6 +93,7 @@ signals:
     void workTimeChanged();
     void defaultWorkTimeChanged();
     void overtimeChanged();
+    void timeInputIsEnabledChanged();
     void dayTypeChanged();
     void usedFlextimeDayChanged();
     void usedVacationDayChanged();
