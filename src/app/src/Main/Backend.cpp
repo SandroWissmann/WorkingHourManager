@@ -74,20 +74,28 @@ bool Backend::readControllerYearsFromFile()
     Q_ASSERT(!days.isEmpty());
     Q_ASSERT(days.size() % 5 == 0);
 
-    // TODO: If these days have a new year we should generate a new default
-    // settingsYear
+    auto yearsToSettingsYears = fileReader.yearsToSettingsYears();
+    Q_ASSERT(!yearsToSettingsYears.empty());
+
     auto firstDateNotInFile = days.back()->date();
     firstDateNotInFile.addDays(1);
     auto currentDate = Date::currentDate();
 
     if (firstDateNotInFile < currentDate) {
         auto newDaysNotInFile = makeWorkDays(firstDateNotInFile, currentDate);
+
+        for (const auto &newDay : newDaysNotInFile) {
+            auto year = newDay->date().year();
+            if (yearsToSettingsYears.find(year) == yearsToSettingsYears.end()) {
+                SettingsYear settingsYear{};
+                yearsToSettingsYears.insert({year, settingsYear});
+            }
+        }
         days.append(newDaysNotInFile);
     }
 
-    auto yearsToSettingsYears = fileReader.yearsToSettingsYears();
-
-    Q_ASSERT(!yearsToSettingsYears.empty());
+    Q_ASSERT(!days.isEmpty());
+    Q_ASSERT(days.size() % 5 == 0);
 
     auto controllerYears = makeControllerYears(days, yearsToSettingsYears);
     setControllerYears(controllerYears);
