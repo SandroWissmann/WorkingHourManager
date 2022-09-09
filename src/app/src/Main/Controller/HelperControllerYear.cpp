@@ -57,7 +57,7 @@ namespace whm {
 namespace {
 QVector<QObject *> makeControllerDays(
     const QVector<std::shared_ptr<Day>> &days,
-    const QVector<SettingsYear> &settingsYears);
+    const std::map<int, SettingsYear> &yearsToSettingsYears);
 
 QObject *
 makeControllerDay(const SettingsYear &settingsYear, std::shared_ptr<Day> day);
@@ -86,30 +86,29 @@ std::map<int, QVector<QObject *>> makeMonthsToControllerWeeks(
 
 QVector<QObject *> makeControllerYears(
     const QVector<QObject *> &controllerMonths,
-    const QVector<QObject *> &controllerSettingsYears);
+    const std::map<int, QObject *> &yearsToControllerSettingsYears);
 
 } // namespace
 
 QVector<QObject *> makeControllerYears(
     const QVector<std::shared_ptr<Day>> &days,
-    const QVector<SettingsYear> &settingsYears)
+    const std::map<int, SettingsYear> &yearsToSettingsYears)
 {
-    auto controllerDays = makeControllerDays(days, settingsYears);
+    auto controllerDays = makeControllerDays(days, yearsToSettingsYears);
     auto controllerWeeks = makeControllerWeeks(controllerDays);
 
     auto firstYear = extractFirstYear(days);
 
     auto controllerMonths = makeControllerMonths(firstYear, controllerWeeks);
 
-    QVector<QObject *> controllerSettingsYears;
-    controllerSettingsYears.reserve(settingsYears.size());
-    for (const auto &settingsYear : settingsYears) {
+    std::map<int, QObject *> yearsToControllerSettingsYears;
+    for (const auto &[year, settingsYear] : yearsToSettingsYears) {
         auto controllerSettingsYear = new ControllerSettingsYear{settingsYear};
-        controllerSettingsYears.emplace_back(controllerSettingsYear);
+        yearsToControllerSettingsYears.insert({year, controllerSettingsYear});
     }
 
     auto controllerYears =
-        makeControllerYears(controllerMonths, controllerSettingsYears);
+        makeControllerYears(controllerMonths, yearsToControllerSettingsYears);
 
     return controllerYears;
 }
@@ -132,47 +131,36 @@ namespace {
 */
 QVector<QObject *> makeControllerDays(
     const QVector<std::shared_ptr<Day>> &days,
-    const QVector<SettingsYear> &settingsYears)
+    const std::map<int, SettingsYear> &yearsToSettingsYears)
 {
-    // TODO Maybe we should give this settings directly out as a map
-    // Then we can also get rid of year in SettingsYear
-    std::map<int, SettingsYear> yearToSettingsYear;
-    for (const auto &settingsYear : settingsYears) {
-        Q_ASSERT(
-            yearToSettingsYear.find(settingsYear.year()) ==
-            yearToSettingsYear.end());
-
-        yearToSettingsYear.insert({settingsYear.year(), settingsYear});
-    }
-
     QVector<QObject *> controllerDays;
     controllerDays.reserve(days.size());
     for (const auto &day : days) {
         auto year = day->date().year();
 
-        if (yearToSettingsYear.find(year) != yearToSettingsYear.end()) {
+        if (yearsToSettingsYears.find(year) != yearsToSettingsYears.end()) {
             auto controllerDay =
-                makeControllerDay(yearToSettingsYear.at(year), day);
+                makeControllerDay(yearsToSettingsYears.at(year), day);
             controllerDays.emplace_back(controllerDay);
         }
         // TODO: This is a hack. If first year is 2021 and we have some days
         // from 2020 because of the first week we try to just taje
         // defaultWorkTime from there.
         else if (
-            yearToSettingsYear.find(year - 1) != yearToSettingsYear.end()) {
+            yearsToSettingsYears.find(year - 1) != yearsToSettingsYears.end()) {
 
             auto controllerDay =
-                makeControllerDay(yearToSettingsYear.at(year - 1), day);
+                makeControllerDay(yearsToSettingsYears.at(year - 1), day);
             controllerDays.emplace_back(controllerDay);
         }
         // TODO Same as before but for last december week
         // This should be replaced by generating annother Setting for the
         // next year
         else if (
-            yearToSettingsYear.find(year + 1) != yearToSettingsYear.end()) {
+            yearsToSettingsYears.find(year + 1) != yearsToSettingsYears.end()) {
 
             auto controllerDay =
-                makeControllerDay(yearToSettingsYear.at(year + 1), day);
+                makeControllerDay(yearsToSettingsYears.at(year + 1), day);
             controllerDays.emplace_back(controllerDay);
         }
     }
@@ -378,7 +366,7 @@ std::map<int, QVector<QObject *>> makeMonthsToControllerWeeks(
 
 QVector<QObject *> makeControllerYears(
     const QVector<QObject *> &controllerMonths,
-    const QVector<QObject *> &controllerSettingsYears)
+    const std::map<int, QObject *> &yearsToControllerSettingsYears)
 {
     std::map<int, QVector<QObject *>> yearsToControllerMonths;
 
@@ -401,17 +389,9 @@ QVector<QObject *> makeControllerYears(
         }
     }
 
-    // TODO maybe we should story controllerSettingsYears directly in a
-    // map <year, controllerSettingsYears>
     std::map<int, QObject *> yearToControllerYears;
-    for (const auto &controllerSettingsYearAsQObject :
-         controllerSettingsYears) {
-        auto controllerSettingsYear = qobject_cast<ControllerSettingsYear *>(
-            controllerSettingsYearAsQObject);
-
-        auto year = controllerSettingsYear->settingsYear().year();
-        Q_ASSERT(
-            yearToControllerYears.find(year) == yearToControllerYears.end());
+    for (const auto &[year, controllerSettingsYearAsQObject] :
+         yearsToControllerSettingsYears) {
         yearToControllerYears.insert({year, controllerSettingsYearAsQObject});
     }
 

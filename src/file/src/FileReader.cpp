@@ -34,7 +34,7 @@ DayType extractDayType(const QJsonObject &jsonObject);
 
 int extractIntFromDay(const QJsonObject &jsonObject, const QString &key);
 
-QVector<SettingsYear> extractSettingsYears(
+std::map<int, SettingsYear> extractYearsToSettingsYears(
     const QJsonDocument &jsonDocument,
     const QVector<std::shared_ptr<Day>> &days);
 
@@ -61,7 +61,8 @@ extractDouble(const QJsonObject &jsonObject, const QString &key);
 FileReader::FileReader(const QString &filename)
     : m_jsonDocument{extractJsonDocumentFromFile(filename)},
       m_days{extractDays(m_jsonDocument)},
-      m_settingsYears{extractSettingsYears(m_jsonDocument, m_days)}
+      m_yearsToSettingsYears{
+          extractYearsToSettingsYears(m_jsonDocument, m_days)}
 {
 }
 
@@ -74,10 +75,9 @@ QVector<std::shared_ptr<Day>> FileReader::days() const
 {
     return m_days;
 }
-
-QVector<SettingsYear> FileReader::settingsYears() const
+std::map<int, SettingsYear> FileReader::yearsToSettingsYears() const
 {
-    return m_settingsYears;
+    return m_yearsToSettingsYears;
 }
 
 namespace {
@@ -209,7 +209,7 @@ int extractIntFromDay(const QJsonObject &jsonObject, const QString &key)
     return result;
 }
 
-QVector<SettingsYear> extractSettingsYears(
+std::map<int, SettingsYear> extractYearsToSettingsYears(
     const QJsonDocument &jsonDocument,
     const QVector<std::shared_ptr<Day>> &days)
 {
@@ -231,9 +231,7 @@ QVector<SettingsYear> extractSettingsYears(
 
     Q_ASSERT(years.size() == settingsYearArray.size());
 
-    // TODO Turn this into map with key year
-    QVector<SettingsYear> settingsYears;
-    settingsYears.reserve(settingsYearArray.size());
+    std::map<int, SettingsYear> yearToSettingsYear;
     for (int i = 0; i < settingsYearArray.size(); ++i) {
         auto settingsYearObject = settingsYearArray[i].toObject();
         auto optDefaultWorkTimesMoToFr =
@@ -274,10 +272,11 @@ QVector<SettingsYear> extractSettingsYears(
         };
 
         SettingsYear settingsYear{
-            years[i], flextimeDays, vacationDays, weekdayToSettingsDay};
-        settingsYears.emplaceBack(settingsYear);
+            flextimeDays, vacationDays, weekdayToSettingsDay};
+
+        yearToSettingsYear.insert({years[i], settingsYear});
     }
-    return settingsYears;
+    return yearToSettingsYear;
 }
 
 QVector<int> extractYears(const QVector<std::shared_ptr<Day>> &days)

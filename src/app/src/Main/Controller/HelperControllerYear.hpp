@@ -28,7 +28,7 @@ void debugPrint(const QVector<QObject *> &controllerYears);
 */
 QVector<QObject *> makeControllerYears(
     const QVector<std::shared_ptr<Day>> &days,
-    const QVector<SettingsYear> &settingsYear);
+    const std::map<int, SettingsYear> &yearsToSettingsYears);
 
 QVector<std::shared_ptr<Day>>
 getDays(const QVector<QObject *> &controllerYears);

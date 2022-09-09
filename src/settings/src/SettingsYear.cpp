@@ -39,20 +39,19 @@ bool setTime(Time &value, const QString &newValue)
 
 } // namespace
 
-SettingsYear::SettingsYear(int year)
-    : m_year{year}, m_flextimeDays{defaultFlextimneDays()},
+SettingsYear::SettingsYear()
+    : m_flextimeDays{defaultFlextimneDays()},
       m_vacationDays{defaultVacationDays()},
       m_weekdayToSettingsDay{makeDefaultWeekdayToSettingsDay()}
 {
 }
 
 SettingsYear::SettingsYear(
-    int year,
     double flextimeDays,
     double vacationDays,
     std::map<Weekday, SettingsDay> weekdayToSettingsDay)
     : m_weekdayToSettingsDay{weekdayToSettingsDay},
-      m_flextimeDays{flextimeDays}, m_vacationDays{vacationDays}, m_year{year}
+      m_flextimeDays{flextimeDays}, m_vacationDays{vacationDays}
 {
     Q_ASSERT(m_flextimeDays > 0);
     Q_ASSERT(m_vacationDays > 0);
@@ -73,11 +72,6 @@ SettingsYear::SettingsYear(
     Q_ASSERT(
         m_weekdayToSettingsDay.find(Weekday::Friday) !=
         m_weekdayToSettingsDay.end());
-}
-
-int SettingsYear::year() const
-{
-    return m_year;
 }
 
 std::map<Weekday, SettingsDay> SettingsYear::weekdayToSettingsDay() const

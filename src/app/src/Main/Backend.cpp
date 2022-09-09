@@ -35,13 +35,12 @@ QVector<QObject *> makeDefaultControllerYears(int year)
 
     auto days = makeWorkDays(startDate, endDate);
 
-    QVector<SettingsYear> settingsYears;
-    settingsYears.reserve(years.size());
+    std::map<int, SettingsYear> yearsToSettingsYears;
     for (const auto &year : years) {
-        SettingsYear settingsYear{year};
-        settingsYears.emplace_back(settingsYear);
+        SettingsYear settingsYear{};
+        yearsToSettingsYears.insert({year, settingsYear});
     }
-    auto controllerYears = makeControllerYears(days, settingsYears);
+    auto controllerYears = makeControllerYears(days, yearsToSettingsYears);
     return controllerYears;
 }
 
@@ -86,11 +85,11 @@ bool Backend::readControllerYearsFromFile()
         days.append(newDaysNotInFile);
     }
 
-    auto settingsYears = fileReader.settingsYears();
+    auto yearsToSettingsYears = fileReader.yearsToSettingsYears();
 
-    Q_ASSERT(!settingsYears.isEmpty());
+    Q_ASSERT(!yearsToSettingsYears.empty());
 
-    auto controllerYears = makeControllerYears(days, settingsYears);
+    auto controllerYears = makeControllerYears(days, yearsToSettingsYears);
     setControllerYears(controllerYears);
     return true;
 }

@@ -12,10 +12,9 @@ namespace whm {
 
 class SettingsYear {
 public:
-    SettingsYear(int year);
+    SettingsYear();
 
     SettingsYear(
-        int year,
         double flextimeDays,
         double vacationDays,
         std::map<Weekday, SettingsDay> weekdayToSettingsDay);
@@ -24,8 +23,6 @@ public:
     SettingsYear(SettingsYear &&) = default;
     SettingsYear &operator=(const SettingsYear &) = default;
     SettingsYear &operator=(SettingsYear &&) = default;
-
-    int year() const;
 
     std::map<Weekday, SettingsDay> weekdayToSettingsDay() const;
 
@@ -58,7 +55,6 @@ public:
     }
 
 private:
-    int m_year{};
     std::map<Weekday, SettingsDay> m_weekdayToSettingsDay;
     double m_flextimeDays;
     double m_vacationDays;

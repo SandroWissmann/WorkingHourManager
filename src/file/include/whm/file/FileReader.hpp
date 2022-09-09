@@ -28,12 +28,12 @@ public:
 
     QVector<std::shared_ptr<Day>> days() const;
 
-    QVector<SettingsYear> settingsYears() const;
+    std::map<int, SettingsYear> yearsToSettingsYears() const;
 
 private:
     QJsonDocument m_jsonDocument;
     QVector<std::shared_ptr<Day>> m_days;
-    QVector<SettingsYear> m_settingsYears;
+    std::map<int, SettingsYear> m_yearsToSettingsYears;
 };
 
 } // namespace whm
