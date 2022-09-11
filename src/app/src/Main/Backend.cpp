@@ -6,9 +6,9 @@
 #include <whm/file/FileReader.hpp>
 #include <whm/file/FileWriter.hpp>
 #include <whm/types/Date.hpp>
+#include <whm/week/ControllerWeek.hpp>
 
 #include "Controller/ControllerMonth.hpp"
-#include "Controller/ControllerWeek.hpp"
 #include "Controller/ControllerYear.hpp"
 #include "Controller/ControllerYear/ControllerSettingsYear.hpp"
 #include "Controller/HelperControllerYear.hpp"

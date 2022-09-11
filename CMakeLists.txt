@@ -13,4 +13,4 @@ add_subdirectory(src/day)
 add_subdirectory(src/file)
 add_subdirectory(src/settings)
 add_subdirectory(src/types)
-
+add_subdirectory(src/week)

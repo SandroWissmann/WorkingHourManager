@@ -1,9 +1,8 @@
 #include "ControllerMonth.hpp"
 
-#include "ControllerWeek.hpp"
-
 #include <whm/day/ControllerDay.hpp>
 #include <whm/day/Day.hpp>
+#include <whm/week/ControllerWeek.hpp>
 
 #include <algorithm>
 #include <map>

@@ -3,9 +3,9 @@
 #include <whm/day/ControllerDay.hpp>
 #include <whm/day/ControllerSettingsDay.hpp>
 #include <whm/day/Day.hpp>
+#include <whm/week/ControllerWeek.hpp>
 
 #include "ControllerMonth.hpp"
-#include "ControllerWeek.hpp"
 #include "ControllerYear/ControllerSettingsYear.hpp"
 
 #include <algorithm>

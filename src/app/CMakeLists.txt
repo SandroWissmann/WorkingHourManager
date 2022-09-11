@@ -4,8 +4,6 @@ add_executable(appWorkingHourManager
     src/Main/Backend.cpp    
     src/Main/Controller/ControllerMonth.hpp
     src/Main/Controller/ControllerMonth.cpp
-    src/Main/Controller/ControllerWeek.hpp
-    src/Main/Controller/ControllerWeek.cpp
     src/Main/Controller/ControllerYear.hpp
     src/Main/Controller/ControllerYear.cpp
     src/Main/Controller/ControllerYear/ControllerSettingsYear.hpp
@@ -47,4 +45,5 @@ target_link_libraries(appWorkingHourManager
     whm-day
     whm-file
     whm-types
-    whm-settings)
+    whm-settings
+    whm-week)
