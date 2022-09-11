@@ -11,5 +11,6 @@ target_include_directories(whm-file
 target_link_libraries(whm-file
     PRIVATE
     Qt6::Core
+    whm-day
     whm-settings
     whm-types)

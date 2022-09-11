@@ -1,10 +1,9 @@
 #include "../include/whm/file/FileReader.hpp"
 
-#include <whm/settings/SettingsDay.hpp>
+#include <whm/day/Day.hpp>
+#include <whm/day/DayType.hpp>
+#include <whm/day/SettingsDay.hpp>
 #include <whm/settings/SettingsYear.hpp>
-
-#include <whm/types/Day.hpp>
-#include <whm/types/DayType.hpp>
 #include <whm/types/Time.hpp>
 
 #include <QDebug>

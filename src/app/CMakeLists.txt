@@ -2,33 +2,12 @@ add_executable(appWorkingHourManager
     src/Main.cpp
     src/Main/Backend.hpp
     src/Main/Backend.cpp    
-    src/Main/Controller/ControllerDay.hpp
-    src/Main/Controller/ControllerDay.cpp
-    src/Main/Controller/ControllerDay/ControllerDayState.hpp
-    src/Main/Controller/ControllerDay/ControllerDayStateFlextime.hpp
-    src/Main/Controller/ControllerDay/ControllerDayStateFlextime.cpp
-    src/Main/Controller/ControllerDay/ControllerDayStateHoliday.hpp
-    src/Main/Controller/ControllerDay/ControllerDayStateHoliday.cpp
-    src/Main/Controller/ControllerDay/ControllerDayStateIgnore.hpp
-    src/Main/Controller/ControllerDay/ControllerDayStateIgnore.cpp
-    src/Main/Controller/ControllerDay/ControllerDayStateParty.hpp
-    src/Main/Controller/ControllerDay/ControllerDayStateParty.cpp
-    src/Main/Controller/ControllerDay/ControllerDayStateSick.hpp
-    src/Main/Controller/ControllerDay/ControllerDayStateSick.cpp
-    src/Main/Controller/ControllerDay/ControllerDayStateVacation.hpp
-    src/Main/Controller/ControllerDay/ControllerDayStateVacation.cpp
-    src/Main/Controller/ControllerDay/ControllerDayStateParty.hpp
-    src/Main/Controller/ControllerDay/ControllerDayStateParty.cpp
-    src/Main/Controller/ControllerDay/ControllerDayStateWork.hpp
-    src/Main/Controller/ControllerDay/ControllerDayStateWork.cpp
     src/Main/Controller/ControllerMonth.hpp
     src/Main/Controller/ControllerMonth.cpp
     src/Main/Controller/ControllerWeek.hpp
     src/Main/Controller/ControllerWeek.cpp
     src/Main/Controller/ControllerYear.hpp
     src/Main/Controller/ControllerYear.cpp
-    src/Main/Controller/ControllerYear/ControllerSettingsDay.hpp
-    src/Main/Controller/ControllerYear/ControllerSettingsDay.cpp
     src/Main/Controller/ControllerYear/ControllerSettingsYear.hpp
     src/Main/Controller/ControllerYear/ControllerSettingsYear.cpp
     src/Main/Controller/HelperControllerYear.hpp
@@ -65,6 +44,7 @@ target_compile_definitions(appWorkingHourManager
 target_link_libraries(appWorkingHourManager
     PRIVATE
     Qt6::Quick
+    whm-day
     whm-file
     whm-types
     whm-settings)

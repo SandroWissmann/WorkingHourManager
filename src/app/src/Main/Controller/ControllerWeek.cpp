@@ -1,8 +1,7 @@
 #include "ControllerWeek.hpp"
 
-#include "ControllerDay.hpp"
-
-#include <whm/types/Day.hpp>
+#include <whm/day/ControllerDay.hpp>
+#include <whm/day/Day.hpp>
 
 #include <algorithm>
 

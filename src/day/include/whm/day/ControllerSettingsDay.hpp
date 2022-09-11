@@ -1,7 +1,8 @@
 #ifndef WORKING_HOUR_MANAGER_CONTROLLER_SETTINGS_DAY_HPP
 #define WORKING_HOUR_MANAGER_CONTROLLER_SETTINGS_DAY_HPP
 
-#include <whm/settings/SettingsDay.hpp>
+#include "SettingsDay.hpp"
+
 #include <whm/types/Time.hpp>
 
 #include <QObject>

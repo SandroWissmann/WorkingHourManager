@@ -1,14 +1,11 @@
-#include "../include/whm/settings/SettingsDay.hpp"
+#include "../include/whm/day/SettingsDay.hpp"
 
-namespace whm{
+namespace whm {
 
-SettingsDay::SettingsDay(
-    Weekday weekday,
-    Time defaultWorkTime,
-    Time pauseTime)
-    :m_weekday{weekday}, m_defaultWorkTime{defaultWorkTime}, m_pauseTime{pauseTime}
+SettingsDay::SettingsDay(Weekday weekday, Time defaultWorkTime, Time pauseTime)
+    : m_weekday{weekday}, m_defaultWorkTime{defaultWorkTime}, m_pauseTime{
+                                                                  pauseTime}
 {
-
 }
 
 Weekday SettingsDay::weekday() const
@@ -30,11 +27,11 @@ Time SettingsDay::defaultWorkTime() const
 
 bool SettingsDay::setDefaultWorkTime(const QString &defaultWorkTime)
 {
-   if( m_defaultWorkTime.asString() == defaultWorkTime) {
-       return false;
-   }
-   m_defaultWorkTime.set(defaultWorkTime);
-   return true;
+    if (m_defaultWorkTime.asString() == defaultWorkTime) {
+        return false;
+    }
+    m_defaultWorkTime.set(defaultWorkTime);
+    return true;
 }
 
 Time SettingsDay::pauseTime() const
@@ -44,11 +41,11 @@ Time SettingsDay::pauseTime() const
 
 bool SettingsDay::setPauseTime(const QString &pauseTime)
 {
-    if( m_pauseTime.asString() == pauseTime) {
+    if (m_pauseTime.asString() == pauseTime) {
         return false;
     }
     m_pauseTime.set(pauseTime);
     return true;
 }
 
-}
+} // namespace whm

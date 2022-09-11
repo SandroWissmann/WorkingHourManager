@@ -1,12 +1,12 @@
 #include "Backend.hpp"
 
+#include <whm/day/ControllerDay.hpp>
+#include <whm/day/Day.hpp>
+#include <whm/day/HelperDay.hpp>
 #include <whm/file/FileReader.hpp>
 #include <whm/file/FileWriter.hpp>
 #include <whm/types/Date.hpp>
-#include <whm/types/Day.hpp>
-#include <whm/types/HelperDay.hpp>
 
-#include "Controller/ControllerDay.hpp"
 #include "Controller/ControllerMonth.hpp"
 #include "Controller/ControllerWeek.hpp"
 #include "Controller/ControllerYear.hpp"

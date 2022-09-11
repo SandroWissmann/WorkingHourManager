@@ -1,9 +1,10 @@
 #ifndef WORKING_HOUR_MANAGER_DAY_HPP
 #define WORKING_HOUR_MANAGER_DAY_HPP
 
-#include "Date.hpp"
 #include "DayType.hpp"
-#include "Time.hpp"
+
+#include <whm/types/Date.hpp>
+#include <whm/types/Time.hpp>
 
 namespace whm {
 

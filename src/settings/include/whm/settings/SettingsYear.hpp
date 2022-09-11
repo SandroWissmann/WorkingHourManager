@@ -1,8 +1,7 @@
 #ifndef WORKING_HOUR_MANAGER_SETTINGS_YEAR_HPP
 #define WORKING_HOUR_MANAGER_SETTINGS_YEAR_HPP
 
-#include "SettingsDay.hpp"
-
+#include <whm/day/SettingsDay.hpp>
 #include <whm/types/Time.hpp>
 #include <whm/types/Weekday.hpp>
 

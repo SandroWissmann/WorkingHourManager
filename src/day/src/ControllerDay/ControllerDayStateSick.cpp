@@ -1,14 +1,14 @@
-#include "ControllerDayStateVacation.hpp"
+#include "ControllerDayStateSick.hpp"
 
-#include "../ControllerDay.hpp"
+#include "../../include/whm/day/ControllerDay.hpp"
 
 namespace whm {
-ControllerDayState &ControllerDayStateVacation::getInstance()
+ControllerDayState &ControllerDayStateSick::getInstance()
 {
-    static ControllerDayStateVacation instance;
+    static ControllerDayStateSick instance;
     return instance;
 }
-void ControllerDayStateVacation::calculate(ControllerDay *controllerDay)
+void ControllerDayStateSick::calculate(ControllerDay *controllerDay)
 {
     controllerDay->setStartTime("0:00");
     controllerDay->setEndTime("0:00");
@@ -19,7 +19,7 @@ void ControllerDayStateVacation::calculate(ControllerDay *controllerDay)
     controllerDay->setOvertime(HoursAndMinutes{});
     controllerDay->setTimeInputIsEnabled(false);
     controllerDay->setUsedFlextimeDay(0.0);
-    controllerDay->setUsedVacationDay(1.0);
+    controllerDay->setUsedVacationDay(0.0);
 }
 
 } // namespace whm

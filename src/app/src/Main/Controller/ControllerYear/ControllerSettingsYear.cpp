@@ -1,6 +1,6 @@
 #include "ControllerSettingsYear.hpp"
 
-#include "ControllerSettingsDay.hpp"
+#include <whm/day/ControllerSettingsDay.hpp>
 
 namespace whm {
 

@@ -1,4 +1,4 @@
-#include "../include/whm/types/DayType.hpp"
+#include "../include/whm/day/DayType.hpp"
 
 #include <QMetaEnum>
 

@@ -1,13 +1,13 @@
 #include "HelperControllerYear.hpp"
 
-#include "ControllerDay.hpp"
 #include "ControllerMonth.hpp"
 #include "ControllerWeek.hpp"
 #include "ControllerYear.hpp"
 #include "ControllerYear/ControllerSettingsYear.hpp"
 
+#include <whm/day/ControllerDay.hpp>
+#include <whm/day/Day.hpp>
 #include <whm/settings/SettingsYear.hpp>
-#include <whm/types/Day.hpp>
 
 #include <QDebug>
 

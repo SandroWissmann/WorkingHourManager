@@ -1,6 +1,6 @@
 #include "ControllerDayStateIgnore.hpp"
 
-#include "../ControllerDay.hpp"
+#include "../../include/whm/day/ControllerDay.hpp"
 
 namespace whm {
 ControllerDayState &ControllerDayStateIgnore::getInstance()

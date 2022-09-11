@@ -1,7 +1,5 @@
 add_library(whm-settings STATIC
-    ./include/whm/settings/SettingsDay.hpp
     ./include/whm/settings/SettingsYear.hpp
-    ./src/SettingsDay.cpp
     ./src/SettingsYear.cpp
 )
 
@@ -11,4 +9,5 @@ target_include_directories(whm-settings
 target_link_libraries(whm-settings
     PRIVATE
     Qt6::Core
+    whm-day
     whm-types)

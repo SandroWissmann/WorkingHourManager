@@ -1,7 +1,8 @@
-#include "../include/whm/types/HelperDay.hpp"
+#include "../include/whm/day/HelperDay.hpp"
 
-#include "../include/whm/types/Date.hpp"
-#include "../include/whm/types/Day.hpp"
+#include "../include/whm/day/Day.hpp"
+
+#include <whm/types/Date.hpp>
 
 namespace whm {
 

@@ -1,6 +1,6 @@
 #include "ControllerDayStateHoliday.hpp"
 
-#include "../ControllerDay.hpp"
+#include "../../include/whm/day/ControllerDay.hpp"
 
 namespace whm {
 ControllerDayState &ControllerDayStateHoliday::getInstance()

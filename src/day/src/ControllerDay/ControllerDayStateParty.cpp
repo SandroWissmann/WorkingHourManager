@@ -1,14 +1,14 @@
-#include "ControllerDayStateSick.hpp"
+#include "ControllerDayStateParty.hpp"
 
-#include "../ControllerDay.hpp"
+#include "../../include/whm/day/ControllerDay.hpp"
 
 namespace whm {
-ControllerDayState &ControllerDayStateSick::getInstance()
+ControllerDayState &ControllerDayStateParty::getInstance()
 {
-    static ControllerDayStateSick instance;
+    static ControllerDayStateParty instance;
     return instance;
 }
-void ControllerDayStateSick::calculate(ControllerDay *controllerDay)
+void ControllerDayStateParty::calculate(ControllerDay *controllerDay)
 {
     controllerDay->setStartTime("0:00");
     controllerDay->setEndTime("0:00");

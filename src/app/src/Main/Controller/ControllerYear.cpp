@@ -1,11 +1,11 @@
 #include "ControllerYear.hpp"
 
-#include <whm/types/Day.hpp>
+#include <whm/day/ControllerDay.hpp>
+#include <whm/day/ControllerSettingsDay.hpp>
+#include <whm/day/Day.hpp>
 
-#include "ControllerDay.hpp"
 #include "ControllerMonth.hpp"
 #include "ControllerWeek.hpp"
-#include "ControllerYear/ControllerSettingsDay.hpp"
 #include "ControllerYear/ControllerSettingsYear.hpp"
 
 #include <algorithm>

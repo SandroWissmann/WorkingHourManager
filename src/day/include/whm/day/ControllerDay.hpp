@@ -1,17 +1,9 @@
 #ifndef WORKING_HOUR_MANAGER_CONTROLLER_DAY_HPP
 #define WORKING_HOUR_MANAGER_CONTROLLER_DAY_HPP
 
-#include "ControllerDay/ControllerDayState.hpp"
-#include "ControllerDay/ControllerDayStateFlextime.hpp"
-#include "ControllerDay/ControllerDayStateHoliday.hpp"
-#include "ControllerDay/ControllerDayStateIgnore.hpp"
-#include "ControllerDay/ControllerDayStateParty.hpp"
-#include "ControllerDay/ControllerDayStateSick.hpp"
-#include "ControllerDay/ControllerDayStateVacation.hpp"
-#include "ControllerDay/ControllerDayStateWork.hpp"
+#include "DayType.hpp"
 
 #include <whm/types/Date.hpp>
-#include <whm/types/DayType.hpp>
 #include <whm/types/HoursAndMinutes.hpp>
 #include <whm/types/Time.hpp>
 
@@ -105,6 +97,17 @@ public:
 
     void setState(ControllerDayState *state);
 
+    // TODO These functions should be only used by ControllerDayState and
+    // derrived classes but we dont want to use private + friend here because
+    // then we need to include all state classes here. Is there a better way?
+    void setStartTime(const QString &startTime);
+    void setEndTime(const QString &endTime);
+    void setWorkTime(const Time &workTime);
+    void setOvertime(const HoursAndMinutes &overtime);
+    void setTimeInputIsEnabled(bool timeInputIsEnabled);
+    void setUsedFlextimeDay(double usedFlextimeDay);
+    void setUsedVacationDay(double usedVacationDay);
+
 public slots:
     void onDefaultWorkTimeChanged(const whm::Time &defaultWorkTime);
     void onPauseTimeChanged(const whm::Time &pauseTime);
@@ -122,22 +125,6 @@ signals:
     void usedVacationDayChanged();
 
 private:
-    friend ControllerDayStateFlextime;
-    friend ControllerDayStateVacation;
-    friend ControllerDayStateHoliday;
-    friend ControllerDayStateIgnore;
-    friend ControllerDayStateParty;
-    friend ControllerDayStateSick;
-    friend ControllerDayStateWork;
-
-    void setStartTime(const QString &startTime);
-    void setEndTime(const QString &endTime);
-    void setWorkTime(const Time &workTime);
-    void setOvertime(const HoursAndMinutes &overtime);
-    void setTimeInputIsEnabled(bool timeInputIsEnabled);
-    void setUsedFlextimeDay(double usedFlextimeDay);
-    void setUsedVacationDay(double usedVacationDay);
-
     std::shared_ptr<Day> m_day;
 
     QString m_enteredStartTime{};

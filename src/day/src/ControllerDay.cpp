@@ -1,4 +1,6 @@
-#include "ControllerDay.hpp"
+#include "../include/whm/day/ControllerDay.hpp"
+
+#include "../include/whm/day/Day.hpp"
 
 #include "ControllerDay/ControllerDayState.hpp"
 #include "ControllerDay/ControllerDayStateFlextime.hpp"
@@ -8,8 +10,6 @@
 #include "ControllerDay/ControllerDayStateSick.hpp"
 #include "ControllerDay/ControllerDayStateVacation.hpp"
 #include "ControllerDay/ControllerDayStateWork.hpp"
-
-#include <whm/types/Day.hpp>
 
 namespace whm {
 
