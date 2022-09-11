@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 import "Month"
+import "../../../Week"
 
 Item {
     id: root
