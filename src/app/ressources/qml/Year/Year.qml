@@ -14,7 +14,7 @@ Page {
 
         onCurrentIndexChanged: {
             if (currentIndex < tabBarMonth.contentData.length - 1) {
-                loaderPage.setSource("../../Month/Month.qml", {
+                loaderPage.setSource("../Month/Month.qml", {
                                          "controller": root.controller.controllerMonths[tabBarMonth.currentIndex]
                                      })
             } else {
