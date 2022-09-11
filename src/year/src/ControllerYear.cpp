@@ -1,12 +1,12 @@
-#include "ControllerYear.hpp"
+#include "../include/whm/year/ControllerYear.hpp"
+
+#include "../include/whm/year/ControllerSettingsYear.hpp"
 
 #include <whm/day/ControllerDay.hpp>
 #include <whm/day/ControllerSettingsDay.hpp>
 #include <whm/day/Day.hpp>
 #include <whm/month/ControllerMonth.hpp>
 #include <whm/week/ControllerWeek.hpp>
-
-#include "ControllerYear/ControllerSettingsYear.hpp"
 
 #include <algorithm>
 

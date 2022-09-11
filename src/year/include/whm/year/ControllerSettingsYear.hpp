@@ -1,7 +1,8 @@
 #ifndef WORKING_HOUR_MANAGER_CONTROLLER_SETTINGS_YEAR_HPP
 #define WORKING_HOUR_MANAGER_CONTROLLER_SETTINGS_YEAR_HPP
 
-#include <whm/settings/SettingsYear.hpp>
+#include "SettingsYear.hpp"
+
 #include <whm/types/Time.hpp>
 
 #include <QObject>

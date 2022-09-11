@@ -8,10 +8,9 @@
 #include <whm/month/ControllerMonth.hpp>
 #include <whm/types/Date.hpp>
 #include <whm/week/ControllerWeek.hpp>
-
-#include "Controller/ControllerYear.hpp"
-#include "Controller/ControllerYear/ControllerSettingsYear.hpp"
-#include "Controller/HelperControllerYear.hpp"
+#include <whm/year/ControllerSettingsYear.hpp>
+#include <whm/year/ControllerYear.hpp>
+#include <whm/year/HelperControllerYear.hpp>
 
 #include <QDebug>
 

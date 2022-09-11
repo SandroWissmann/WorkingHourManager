@@ -2,12 +2,6 @@ add_executable(appWorkingHourManager
     src/Main.cpp
     src/Main/Backend.hpp
     src/Main/Backend.cpp    
-    src/Main/Controller/ControllerYear.hpp
-    src/Main/Controller/ControllerYear.cpp
-    src/Main/Controller/ControllerYear/ControllerSettingsYear.hpp
-    src/Main/Controller/ControllerYear/ControllerSettingsYear.cpp
-    src/Main/Controller/HelperControllerYear.hpp
-    src/Main/Controller/HelperControllerYear.cpp
 )
 
 qt_add_qml_module(appWorkingHourManager
@@ -44,5 +38,5 @@ target_link_libraries(appWorkingHourManager
     whm-file
     whm-month
     whm-types
-    whm-settings
-    whm-week)
+    whm-week
+    whm-year)

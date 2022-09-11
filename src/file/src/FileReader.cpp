@@ -3,8 +3,8 @@
 #include <whm/day/Day.hpp>
 #include <whm/day/DayType.hpp>
 #include <whm/day/SettingsDay.hpp>
-#include <whm/settings/SettingsYear.hpp>
 #include <whm/types/Time.hpp>
+#include <whm/year/SettingsYear.hpp>
 
 #include <QDebug>
 #include <QFile>
