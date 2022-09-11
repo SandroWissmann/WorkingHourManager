@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 
 import "Week"
+import "../../../../Day"
 
 Item {
     id: root

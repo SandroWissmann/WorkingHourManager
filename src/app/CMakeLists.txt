@@ -8,6 +8,7 @@ qt_add_qml_module(appWorkingHourManager
     URI WorkingHourManager
     VERSION 1.0
     QML_FILES
+    ressources/qml/Day/Day.qml
     ressources/qml/Types/DoubleInput.qml
     ressources/qml/Types/HourMinInput.qml
     ressources/qml/Main.qml
@@ -19,7 +20,6 @@ qt_add_qml_module(appWorkingHourManager
     ressources/qml/Main/Years/Year/Month/HeaderMonth.qml
     ressources/qml/Main/Years/Year/Month/Week.qml
     ressources/qml/Main/Years/Year/Month/FooterMonth.qml
-    ressources/qml/Main/Years/Year/Month/Week/Day.qml
     ressources/qml/Main/Years/Year/Month/Week/FooterWeek.qml
     ressources/qml/Main/Years/Year/SettingsYear.qml
     ressources/qml/Main/Years/Year/SettingsYear/HeaderSettingsYear.qml
