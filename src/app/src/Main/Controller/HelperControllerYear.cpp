@@ -144,17 +144,18 @@ QVector<QObject *> makeControllerDays(
             controllerDays.emplace_back(controllerDay);
         }
         // If first year is 2021 and we have some days from 2020 because of the
-        // first week  take defaultWorkTime from 2021. This days wont be used 
+        // first week  take defaultWorkTime from 2021. This days wont be used
         // for calculations anyway.
         else if (
-            yearsToSettingsYears.find(year - 1) != yearsToSettingsYears.end()) {
+            yearsToSettingsYears.find(year + 1) != yearsToSettingsYears.end()) {
 
             auto controllerDay =
-                makeControllerDay(yearsToSettingsYears.at(year - 1), day);
+                makeControllerDay(yearsToSettingsYears.at(year + 1), day);
             controllerDays.emplace_back(controllerDay);
         }
-        else { // year + 1
-            // only years before should have missing setting thats why we fail here
+        else { // year - 1
+            // only years before should have missing setting thats why we fail
+            // here
             Q_ASSERT(false == true);
         }
     }

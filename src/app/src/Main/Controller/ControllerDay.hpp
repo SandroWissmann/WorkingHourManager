@@ -1,6 +1,15 @@
 #ifndef WORKING_HOUR_MANAGER_CONTROLLER_DAY_HPP
 #define WORKING_HOUR_MANAGER_CONTROLLER_DAY_HPP
 
+#include "ControllerDay/ControllerDayState.hpp"
+#include "ControllerDay/ControllerDayStateFlextime.hpp"
+#include "ControllerDay/ControllerDayStateHoliday.hpp"
+#include "ControllerDay/ControllerDayStateIgnore.hpp"
+#include "ControllerDay/ControllerDayStateParty.hpp"
+#include "ControllerDay/ControllerDayStateSick.hpp"
+#include "ControllerDay/ControllerDayStateVacation.hpp"
+#include "ControllerDay/ControllerDayStateWork.hpp"
+
 #include <whm/types/Date.hpp>
 #include <whm/types/DayType.hpp>
 #include <whm/types/HoursAndMinutes.hpp>
@@ -15,16 +24,17 @@
 namespace whm {
 
 class Day;
+class ControllerDayState;
 
 class ControllerDay : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString date READ dateAsString CONSTANT)
     Q_PROPERTY(QString weekday READ weekdayAsString CONSTANT)
 
-    Q_PROPERTY(QString startTime READ startTimeAsString WRITE setStartTime
-                   NOTIFY startTimeChanged)
-    Q_PROPERTY(QString endTime READ endTimeAsString WRITE setEndTime NOTIFY
-                   endTimeChanged)
+    Q_PROPERTY(QString startTime READ startTimeAsString WRITE
+                   setEnteredStartTime NOTIFY startTimeChanged)
+    Q_PROPERTY(QString endTime READ endTimeAsString WRITE setEnteredEndTime
+                   NOTIFY endTimeChanged)
 
     Q_PROPERTY(QString pauseTime READ pauseTimeAsString NOTIFY pauseTimeChanged)
 
@@ -59,12 +69,17 @@ public:
 
     Time defaultWorkTime() const;
 
+    void setEnteredStartTime(const QString &enteredStartTime);
+    QString enteredStartTime() const;
+
     Time startTime() const;
     QString startTimeAsString() const;
-    void setStartTime(const QString &startTime);
 
+    void setEnteredEndTime(QString enteredEndTime);
+    QString enteredEndTime();
+
+    Time endTime() const;
     QString endTimeAsString() const;
-    void setEndTime(const QString &endTime);
 
     Time pauseTime() const;
     QString pauseTimeAsString() const;
@@ -88,6 +103,8 @@ public:
     double usedFlextimeDay() const;
     double usedVacationDay() const;
 
+    void setState(ControllerDayState *state);
+
 public slots:
     void onDefaultWorkTimeChanged(const whm::Time &defaultWorkTime);
     void onPauseTimeChanged(const whm::Time &pauseTime);
@@ -105,21 +122,39 @@ signals:
     void usedVacationDayChanged();
 
 private:
-    void setPauseTime(const Time &pauseTime);
-    void setWorkTime(const Time &workTime);
-    void setDefaultWorkTime(const Time &defaultWorkTime);
+    friend ControllerDayStateFlextime;
+    friend ControllerDayStateVacation;
+    friend ControllerDayStateHoliday;
+    friend ControllerDayStateIgnore;
+    friend ControllerDayStateParty;
+    friend ControllerDayStateSick;
+    friend ControllerDayStateWork;
 
+    void setStartTime(const QString &startTime);
+    void setEndTime(const QString &endTime);
+    void setWorkTime(const Time &workTime);
+    void setOvertime(const HoursAndMinutes &overtime);
+    void setTimeInputIsEnabled(bool timeInputIsEnabled);
     void setUsedFlextimeDay(double usedFlextimeDay);
     void setUsedVacationDay(double usedVacationDay);
 
     std::shared_ptr<Day> m_day;
 
-    Time m_defaultWorkTime;
-    Time m_pauseTime;
+    QString m_enteredStartTime{};
+    QString m_enteredEndTime{};
+
+    Time m_defaultWorkTime{};
+    Time m_pauseTime{};
     Time m_workTime{};
 
-    double m_usedFlextimeDay;
-    double m_usedVacationDay;
+    HoursAndMinutes m_overtime{};
+
+    double m_usedFlextimeDay{};
+    double m_usedVacationDay{};
+
+    bool m_timeInputIsEnabled{};
+
+    ControllerDayState *m_state{nullptr};
 };
 
 } // namespace whm

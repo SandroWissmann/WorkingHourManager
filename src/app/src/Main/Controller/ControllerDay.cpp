@@ -1,41 +1,56 @@
 #include "ControllerDay.hpp"
 
+#include "ControllerDay/ControllerDayState.hpp"
+#include "ControllerDay/ControllerDayStateFlextime.hpp"
+#include "ControllerDay/ControllerDayStateHoliday.hpp"
+#include "ControllerDay/ControllerDayStateIgnore.hpp"
+#include "ControllerDay/ControllerDayStateParty.hpp"
+#include "ControllerDay/ControllerDayStateSick.hpp"
+#include "ControllerDay/ControllerDayStateVacation.hpp"
+#include "ControllerDay/ControllerDayStateWork.hpp"
+
 #include <whm/types/Day.hpp>
 
 namespace whm {
 
 namespace {
-Time calcWorkTime(Time startTime, Time endTime, Time pauseTime)
+
+ControllerDayState *dayTypeAsState(DayType dayType)
 {
-    auto timesAreValid = startTime.isValid() && endTime.isValid();
-
-    if (!timesAreValid) {
-        return Time{};
+    switch (dayType) {
+        case DayType::Work:
+            return &ControllerDayStateWork::getInstance();
+        case DayType::Holiday:
+            return &ControllerDayStateHoliday::getInstance();
+        case DayType::Vacation:
+            return &ControllerDayStateVacation::getInstance();
+        case DayType::Sick:
+            return &ControllerDayStateSick::getInstance();
+        case DayType::Party:
+            return &ControllerDayStateParty::getInstance();
+        case DayType::Flextime:
+            return &ControllerDayStateFlextime::getInstance();
+        case DayType::Ignore:
+            return &ControllerDayStateIgnore::getInstance();
     }
-    auto workTime = endTime - startTime - pauseTime;
-
-    // If result would be negative time gets invalid and has empty string so
-    // we correct it to 0:00
-    if (workTime.asString().isEmpty()) {
-        return Time{};
-    }
-    return workTime;
+    return &ControllerDayStateWork::getInstance();
 }
 
-double calcUsedFlextimeDay(DayType dayType)
+QString to24HoursFormat(
+    const QString &endTimeAsString,
+    const QString &startTimeAsString)
 {
-    if (dayType == DayType::Flextime) {
-        return 1.0;
-    }
-    return 0.0;
-}
+    Time startTime{startTimeAsString};
+    Time endTime{endTimeAsString};
 
-double calcUsedVacationDay(DayType dayType)
-{
-    if (dayType == DayType::Vacation) {
-        return 1.0;
+    if (endTime.isValid() && endTime < startTime && endTime.hour() < 12) {
+        auto hour = endTime.hour();
+        auto minute = endTime.minute();
+        hour += 12;
+        endTime = Time{hour, minute};
     }
-    return 0.0;
+
+    return endTime.asString();
 }
 
 } // namespace
@@ -45,11 +60,13 @@ ControllerDay::ControllerDay(
     const Time &defaultWorkTime,
     const Time &pauseTime)
     : m_day{day}, m_defaultWorkTime{defaultWorkTime}, m_pauseTime{pauseTime},
-      m_workTime{
-          calcWorkTime(m_day->startTime(), m_day->endTime(), m_pauseTime)},
-      m_usedFlextimeDay{calcUsedFlextimeDay(m_day->dayType())},
-      m_usedVacationDay{calcUsedVacationDay(m_day->dayType())}
+      m_enteredStartTime{m_day->startTime().asString()},
+      m_enteredEndTime{m_day->endTime().asString()}
 {
+    auto dayType = day->dayType();
+    auto state = dayTypeAsState(dayType);
+    setState(state);
+
     Q_ASSERT(pauseTime.isValid());
     Q_ASSERT(defaultWorkTime.isValid());
 }
@@ -88,15 +105,23 @@ QString ControllerDay::startTimeAsString() const
     return startTime().asString();
 }
 
-void ControllerDay::setStartTime(const QString &startTime)
+void ControllerDay::setEnteredStartTime(const QString &enteredStartTime)
 {
-    if (m_day->setStartTime(startTime)) {
-        emit startTimeChanged();
-        auto workTime =
-            calcWorkTime(m_day->startTime(), m_day->endTime(), m_pauseTime);
-        setWorkTime(workTime);
-        emit overtimeChanged();
+    if (m_enteredStartTime == enteredStartTime) {
+        return;
     }
+    m_enteredStartTime = enteredStartTime;
+    m_state->calculate(this);
+}
+
+QString ControllerDay::enteredStartTime() const
+{
+    return m_enteredStartTime;
+}
+
+Time ControllerDay::endTime() const
+{
+    return m_day->endTime();
 }
 
 QString ControllerDay::endTimeAsString() const
@@ -104,16 +129,20 @@ QString ControllerDay::endTimeAsString() const
     return m_day->endTime().asString();
 }
 
-void ControllerDay::setEndTime(const QString &endTime)
+void ControllerDay::setEnteredEndTime(QString enteredEndTime)
 {
-    if (m_day->setEndTime(endTime)) {
-        emit endTimeChanged();
-        auto workTime =
-            calcWorkTime(m_day->startTime(), m_day->endTime(), m_pauseTime);
-        qDebug() << "time" << workTime.asString();
-        setWorkTime(workTime);
-        emit overtimeChanged();
+    enteredEndTime = to24HoursFormat(enteredEndTime, m_enteredStartTime);
+
+    if (m_enteredEndTime == enteredEndTime) {
+        return;
     }
+    m_enteredEndTime = enteredEndTime;
+    m_state->calculate(this);
+}
+
+QString ControllerDay::enteredEndTime()
+{
+    return m_enteredEndTime;
 }
 
 Time ControllerDay::pauseTime() const
@@ -128,24 +157,12 @@ QString ControllerDay::pauseTimeAsString() const
 
 Time ControllerDay::workTime() const
 {
-    if (m_day->dayType() != DayType::Work) {
-        return m_defaultWorkTime;
-    }
     return m_workTime;
 }
 
 HoursAndMinutes ControllerDay::overtime() const
 {
-    if (m_day->dayType() == DayType::Flextime) {
-        return HoursAndMinutes{-m_defaultWorkTime.totalMinutes()};
-    }
-    if (m_day->dayType() != DayType::Work) {
-        return HoursAndMinutes{};
-    }
-    if (!m_day->isValid()) {
-        return HoursAndMinutes{};
-    }
-    return HoursAndMinutes{m_workTime} - HoursAndMinutes{m_defaultWorkTime};
+    return m_overtime;
 }
 
 QString ControllerDay::overtimeAsString() const
@@ -155,7 +172,7 @@ QString ControllerDay::overtimeAsString() const
 
 bool ControllerDay::timeInputIsEnabled() const
 {
-    return m_day->dayType() == DayType::Work;
+    return m_timeInputIsEnabled;
 }
 
 QString ControllerDay::workTimeAsString() const
@@ -177,70 +194,15 @@ QVector<QVariant> ControllerDay::dayTypesAsVariant() const
     return variantList;
 }
 
-// TODO: very ugly and cryptic. We should introduce some kind of state machine
-// here for the types
 void ControllerDay::setDayType(DayType dayType)
 {
-    auto oldDayType = m_day->dayType();
-
     if (!m_day->setDayType(dayType)) {
         return;
     }
     emit dayTypeChanged();
 
-    auto newDayType = m_day->dayType();
-
-    auto isWorkDayToNotWorkDayTransition =
-        oldDayType == DayType::Work && newDayType != DayType::Work;
-
-    auto isNotWorkDayToWorkDayTransition =
-        oldDayType != DayType::Work && newDayType == DayType::Work;
-
-    auto isNotFlextimeToFlextimeTransition =
-        oldDayType != DayType::Flextime && newDayType == DayType::Flextime;
-
-    auto isFlextimeToNotFlextimeTransition =
-        oldDayType == DayType::Flextime && newDayType != DayType::Flextime;
-
-    if (isWorkDayToNotWorkDayTransition) {
-        emit startTimeChanged();
-        emit endTimeChanged();
-        emit workTimeChanged();
-        emit defaultWorkTimeChanged();
-        emit overtimeChanged();
-        emit timeInputIsEnabledChanged();
-    }
-    else if (isNotWorkDayToWorkDayTransition) {
-        emit startTimeChanged();
-        emit endTimeChanged();
-
-        auto workTime =
-            calcWorkTime(m_day->startTime(), m_day->endTime(), m_pauseTime);
-        setWorkTime(workTime);
-        // Even if setWorkTime can emit workTimeChanged we need it here in
-        // case
-        emit workTimeChanged();
-        emit defaultWorkTimeChanged();
-        emit overtimeChanged();
-        emit timeInputIsEnabledChanged();
-    }
-    else if (isNotFlextimeToFlextimeTransition) {
-        emit workTimeChanged();
-        emit defaultWorkTimeChanged();
-        emit overtimeChanged();
-    }
-    else if (isFlextimeToNotFlextimeTransition) {
-        emit workTimeChanged();
-        emit defaultWorkTimeChanged();
-        emit overtimeChanged();
-    }
-
-    // TODO: simplification we normally not need to calc this everytime.
-    auto usedFlextimeDay = calcUsedFlextimeDay(dayType);
-    setUsedFlextimeDay(usedFlextimeDay);
-
-    auto usedVacationDay = calcUsedVacationDay(dayType);
-    setUsedVacationDay(usedVacationDay);
+    auto state = dayTypeAsState(dayType);
+    setState(state);
 }
 
 bool ControllerDay::hasValidStartTime() const
@@ -263,29 +225,48 @@ double ControllerDay::usedVacationDay() const
     return m_usedVacationDay;
 }
 
+void ControllerDay::setState(ControllerDayState *state)
+{
+    m_state = state;
+    m_state->calculate(this);
+}
+
 void ControllerDay::onDefaultWorkTimeChanged(const whm::Time &defaultWorkTime)
 {
-    setDefaultWorkTime(defaultWorkTime);
-    emit overtimeChanged();
+    if (m_defaultWorkTime == defaultWorkTime) {
+        return;
+    }
+    m_defaultWorkTime = defaultWorkTime;
+    emit defaultWorkTimeChanged();
+
+    m_state->calculate(this);
 }
 
 void ControllerDay::onPauseTimeChanged(const whm::Time &pauseTime)
-{
-    setPauseTime(pauseTime);
-
-    auto workTime =
-        calcWorkTime(m_day->startTime(), m_day->endTime(), m_pauseTime);
-    setWorkTime(workTime);
-    emit overtimeChanged();
-}
-
-void ControllerDay::setPauseTime(const Time &pauseTime)
 {
     if (m_pauseTime == pauseTime) {
         return;
     }
     m_pauseTime = pauseTime;
     emit pauseTimeChanged();
+
+    m_state->calculate(this);
+}
+
+void ControllerDay::setStartTime(const QString &startTime)
+{
+    if (!m_day->setStartTime(startTime)) {
+        return;
+    }
+    emit startTimeChanged();
+}
+
+void ControllerDay::setEndTime(const QString &endTime)
+{
+    if (!m_day->setEndTime(endTime)) {
+        return;
+    }
+    emit endTimeChanged();
 }
 
 void ControllerDay::setWorkTime(const Time &workTime)
@@ -297,13 +278,22 @@ void ControllerDay::setWorkTime(const Time &workTime)
     emit workTimeChanged();
 }
 
-void ControllerDay::setDefaultWorkTime(const Time &defaultWorkTime)
+void ControllerDay::setOvertime(const HoursAndMinutes &overtime)
 {
-    if (m_defaultWorkTime == defaultWorkTime) {
+    if (m_overtime == overtime) {
         return;
     }
-    m_defaultWorkTime = defaultWorkTime;
-    emit defaultWorkTimeChanged();
+    m_overtime = overtime;
+    emit overtimeChanged();
+}
+
+void ControllerDay::setTimeInputIsEnabled(bool timeInputIsEnabled)
+{
+    if (m_timeInputIsEnabled == timeInputIsEnabled) {
+        return;
+    }
+    m_timeInputIsEnabled = timeInputIsEnabled;
+    emit timeInputIsEnabledChanged();
 }
 
 void ControllerDay::setUsedFlextimeDay(double usedFlextimeDay)
