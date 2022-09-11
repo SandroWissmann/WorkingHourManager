@@ -2,8 +2,6 @@ add_executable(appWorkingHourManager
     src/Main.cpp
     src/Main/Backend.hpp
     src/Main/Backend.cpp    
-    src/Main/Controller/ControllerMonth.hpp
-    src/Main/Controller/ControllerMonth.cpp
     src/Main/Controller/ControllerYear.hpp
     src/Main/Controller/ControllerYear.cpp
     src/Main/Controller/ControllerYear/ControllerSettingsYear.hpp
@@ -44,6 +42,7 @@ target_link_libraries(appWorkingHourManager
     Qt6::Quick
     whm-day
     whm-file
+    whm-month
     whm-types
     whm-settings
     whm-week)
