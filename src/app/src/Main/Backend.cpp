@@ -95,7 +95,7 @@ bool Backend::readControllerYearsFromFile()
     Q_ASSERT(!yearsToSettingsYears.empty());
 
     auto firstDateNotInFile = days.back()->date();
-    firstDateNotInFile.addDays(1);
+    firstDateNotInFile = firstDateNotInFile.addDays(1);
     auto currentDate = Date::currentDate();
 
     if (firstDateNotInFile < currentDate) {
