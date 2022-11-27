@@ -276,6 +276,10 @@ allDaysInControllerWeeks(const QVector<QObject *> &m_controllerWeeks)
 
 int getCurrentMonth(const QVector<std::shared_ptr<Day>> &days)
 {
+    if (days.size() <= 5) {
+        return days.back()->date().month();
+    }
+
     int count = 0;
     int currentMonth = -1;
     std::map<int, int> monthToCount;
