@@ -95,6 +95,30 @@ QString ControllerWeek::earliestEndTime() const
     return m_earliestEndTime.asString();
 }
 
+std::map<int, HoursAndMinutes> ControllerWeek::monthsToWorkTime() const
+{
+    std::map<int, HoursAndMinutes> monthsToWorkTime;
+    for (const auto &controllerDayAsQObject : m_controllerDays) {
+        auto controllerDay =
+            qobject_cast<ControllerDay *>(controllerDayAsQObject);
+
+        auto day = controllerDay->day();
+        auto date = day->date();
+        auto month = date.month();
+
+        if (monthsToWorkTime.find(month) != monthsToWorkTime.end()) {
+            auto workTime = monthsToWorkTime[month];
+            workTime += HoursAndMinutes{controllerDay->workTime()};
+            monthsToWorkTime[month] = workTime;
+        }
+        else {
+            monthsToWorkTime[month] =
+                HoursAndMinutes{controllerDay->workTime()};
+        }
+    }
+    return monthsToWorkTime;
+}
+
 std::map<int, HoursAndMinutes> ControllerWeek::monthsToOvertime() const
 {
     std::map<int, HoursAndMinutes> monthsToOvertime;

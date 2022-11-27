@@ -59,6 +59,10 @@ public:
     QString overtime() const;
     QString earliestEndTime() const;
 
+    // If week is in two months we can access here the split worktime for the
+    // days in each month
+    std::map<int, HoursAndMinutes> monthsToWorkTime() const;
+
     // If week is in two months we can access here the split overtime for the
     // days in each month
     std::map<int, HoursAndMinutes> monthsToOvertime() const;

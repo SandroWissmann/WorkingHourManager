@@ -37,6 +37,9 @@ int getCurrentMonth(const QVector<std::shared_ptr<Day>> &days);
 int getCurrentYear(const QVector<std::shared_ptr<Day>> &days);
 
 HoursAndMinutes
+calculateWorkTime(const QVector<QObject *> controllerWeeks, int month);
+
+HoursAndMinutes
 calculateOvertime(const QVector<QObject *> controllerWeeks, int month);
 
 double
@@ -47,6 +50,7 @@ calculateUsedVacationDays(const QVector<QObject *> controllerWeeks, int month);
 
 ControllerMonth::ControllerMonth(const QVector<QObject *> &controllerWeeks)
     : m_controllerWeeks{controllerWeeks},
+      m_workTime{calculateWorkTime(m_controllerWeeks, month())},
       m_overtime{calculateOvertime(m_controllerWeeks, month())},
       m_usedFlextimeDays{calculateUsedFlextimeDays(m_controllerWeeks, month())},
       m_usedVacationDays{calculateUsedVacationDays(m_controllerWeeks, month())}
@@ -104,6 +108,16 @@ QString ControllerMonth::nameOfMonth() const
     return date.toString("MMMM");
 }
 
+HoursAndMinutes ControllerMonth::workTime() const
+{
+    return m_workTime;
+}
+
+QString ControllerMonth::workTimeAsString() const
+{
+    return m_workTime.toString();
+}
+
 HoursAndMinutes ControllerMonth::overtime() const
 {
     return m_overtime;
@@ -152,6 +166,12 @@ int ControllerMonth::year() const
     return getCurrentYear(days);
 }
 
+void ControllerMonth::onWorkTimeOfWeekChanged()
+{
+    auto workTime = calculateWorkTime(m_controllerWeeks, month());
+    setWorkTime(workTime);
+}
+
 void ControllerMonth::onOvertimeOfWeekChanged()
 {
     auto overtime = calculateOvertime(m_controllerWeeks, month());
@@ -179,6 +199,11 @@ void ControllerMonth::makeControllerWeeksToThisConnections() const
             qobject_cast<ControllerWeek *>(controllerWeekQObject);
         connect(
             controllerWeek,
+            &ControllerWeek::workTimeChanged,
+            this,
+            &ControllerMonth::onWorkTimeOfWeekChanged);
+        connect(
+            controllerWeek,
             &ControllerWeek::overtimeChanged,
             this,
             &ControllerMonth::onOvertimeOfWeekChanged);
@@ -193,6 +218,15 @@ void ControllerMonth::makeControllerWeeksToThisConnections() const
             this,
             &ControllerMonth::onUsedVacationDaysOfWeekChanged);
     }
+}
+
+void ControllerMonth::setWorkTime(const HoursAndMinutes &workTime)
+{
+    if (m_workTime == workTime) {
+        return;
+    }
+    m_workTime = workTime;
+    emit overtimeChanged();
 }
 
 void ControllerMonth::setOvertime(const HoursAndMinutes &overtime)
@@ -276,6 +310,23 @@ int getCurrentYear(const QVector<std::shared_ptr<Day>> &days)
 }
 
 HoursAndMinutes
+calculateWorkTime(const QVector<QObject *> controllerWeeks, int month)
+{
+    HoursAndMinutes workTimeOfMonth;
+    for (const auto &controllerWeekQObject : controllerWeeks) {
+        auto controllerWeek =
+            qobject_cast<ControllerWeek *>(controllerWeekQObject);
+
+        auto monthsToWorkTime = controllerWeek->monthsToWorkTime();
+
+        Q_ASSERT(monthsToWorkTime.find(month) != monthsToWorkTime.end());
+
+        workTimeOfMonth += monthsToWorkTime[month];
+    }
+    return workTimeOfMonth;
+}
+
+HoursAndMinutes
 calculateOvertime(const QVector<QObject *> controllerWeeks, int month)
 {
     HoursAndMinutes overtimeOfMonth;
@@ -295,7 +346,7 @@ calculateOvertime(const QVector<QObject *> controllerWeeks, int month)
 double
 calculateUsedFlextimeDays(const QVector<QObject *> controllerWeeks, int month)
 {
-    double usedFlextimeDaysInMonth;
+    double usedFlextimeDaysInMonth{};
     for (const auto &controllerWeekQObject : controllerWeeks) {
         auto controllerWeek =
             qobject_cast<ControllerWeek *>(controllerWeekQObject);
@@ -315,7 +366,7 @@ calculateUsedFlextimeDays(const QVector<QObject *> controllerWeeks, int month)
 double
 calculateUsedVacationDays(const QVector<QObject *> controllerWeeks, int month)
 {
-    double usedVacationDaysInMonth;
+    double usedVacationDaysInMonth{};
     for (const auto &controllerWeekQObject : controllerWeeks) {
         auto controllerWeek =
             qobject_cast<ControllerWeek *>(controllerWeekQObject);

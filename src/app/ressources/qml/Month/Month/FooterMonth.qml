@@ -31,11 +31,21 @@ Item {
         spacing: 0
 
         property int elementWidth: root.width / rowLayout.children.length
+
+        Text {
+            Layout.preferredWidth: rowLayout.elementWidth
+            text: qsTr("Worked hours in %1: %2").arg(
+                      root.controller.nameOfMonth).arg(root.controller.workTime)
+            font.bold: true
+        }
         Text {
             Layout.preferredWidth: rowLayout.elementWidth
             text: qsTr("Overtime in %1: %2").arg(
                       root.controller.nameOfMonth).arg(root.controller.overtime)
             font.bold: true
+        }
+        Item {
+            Layout.preferredWidth: rowLayout.elementWidth
         }
     }
 }

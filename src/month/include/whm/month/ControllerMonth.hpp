@@ -33,6 +33,7 @@ class ControllerMonth : public QObject {
     Q_OBJECT
     Q_PROPERTY(QVector<QObject *> controllerWeeks READ controllerWeeks CONSTANT)
     Q_PROPERTY(QString nameOfMonth READ nameOfMonth CONSTANT)
+    Q_PROPERTY(QString workTime READ workTimeAsString NOTIFY workTimeChanged)
     Q_PROPERTY(QString overtime READ overtimeAsString NOTIFY overtimeChanged)
 public:
     ControllerMonth(const QVector<QObject *> &controllerWeeks);
@@ -50,6 +51,9 @@ public:
 
     QString nameOfMonth() const;
 
+    HoursAndMinutes workTime() const;
+    QString workTimeAsString() const;
+
     HoursAndMinutes overtime() const;
     QString overtimeAsString() const;
 
@@ -62,11 +66,13 @@ public:
     int year() const;
 
 signals:
+    void workTimeChanged();
     void overtimeChanged();
     void usedFlextimeDaysChanged();
     void usedVacationDaysChanged();
 
 private slots:
+    void onWorkTimeOfWeekChanged();
     void onOvertimeOfWeekChanged();
     void onUsedFlextimeDaysOfWeekChanged();
     void onUsedVacationDaysOfWeekChanged();
@@ -74,12 +80,14 @@ private slots:
 private:
     void makeControllerWeeksToThisConnections() const;
 
+    void setWorkTime(const HoursAndMinutes &workTime);
     void setOvertime(const HoursAndMinutes &overtime);
     void setUsedFlextimeDays(double usedFlextimeDays);
     void setUsedVacationDays(double usedVacationDays);
 
     QVector<QObject *> m_controllerWeeks;
 
+    HoursAndMinutes m_workTime;
     HoursAndMinutes m_overtime;
     double m_usedFlextimeDays;
     double m_usedVacationDays;
