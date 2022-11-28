@@ -30,6 +30,7 @@ class Backend : public QObject {
     Q_OBJECT
     Q_PROPERTY(QVector<QObject *> controllerYears READ controllerYears NOTIFY
                    controllerYearsChanged)
+    Q_PROPERTY(QObject *controllerSettings READ controllerSettings CONSTANT)
     Q_PROPERTY(int currentYear READ currentYear CONSTANT)
 public:
     Backend(QObject *parent = nullptr);
@@ -42,6 +43,8 @@ public:
     ~Backend() = default;
 
     QVector<QObject *> controllerYears() const;
+
+    QObject *controllerSettings() const;
 
     int currentYear() const;
 
@@ -61,6 +64,7 @@ private:
     void setControllerYears(const QVector<QObject *> &controllerYears);
 
     QVector<QObject *> m_controllerYears;
+    QObject *m_controllerSettings;
 };
 } // namespace whm
 

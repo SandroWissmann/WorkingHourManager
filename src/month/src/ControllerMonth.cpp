@@ -115,6 +115,9 @@ HoursAndMinutes ControllerMonth::workTime() const
 
 QString ControllerMonth::workTimeAsString() const
 {
+    if (m_showMinutesAsFractions) {
+        return m_workTime.toFractionString();
+    }
     return m_workTime.toString();
 }
 
@@ -125,6 +128,9 @@ HoursAndMinutes ControllerMonth::overtime() const
 
 QString ControllerMonth::overtimeAsString() const
 {
+    if (m_showMinutesAsFractions) {
+        return m_overtime.toFractionString();
+    }
     return m_overtime.toString();
 }
 
@@ -164,6 +170,24 @@ int ControllerMonth::year() const
 {
     auto days = allDaysInControllerWeeks(m_controllerWeeks);
     return getCurrentYear(days);
+}
+
+void ControllerMonth::setShowMinutesAsFractions(bool showMinutesAsFractions)
+{
+    if (m_showMinutesAsFractions == showMinutesAsFractions) {
+        return;
+    }
+    m_showMinutesAsFractions = showMinutesAsFractions;
+
+    for (auto &controllerWeekAsObjects : m_controllerWeeks) {
+        auto controllerWeeks =
+            qobject_cast<ControllerWeek *>(controllerWeekAsObjects);
+
+        controllerWeeks->setShowMinutesAsFractions(showMinutesAsFractions);
+    }
+
+    emit workTimeChanged();
+    emit overtimeChanged();
 }
 
 void ControllerMonth::onWorkTimeOfWeekChanged()

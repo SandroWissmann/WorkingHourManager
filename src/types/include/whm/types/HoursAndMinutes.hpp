@@ -37,8 +37,11 @@ public:
     HoursAndMinutes &operator=(const HoursAndMinutes &) = default;
     HoursAndMinutes &operator=(HoursAndMinutes &&) = default;
 
-    // format mm:hh
+    // format hh:mm
     QString toString() const;
+
+    // format hh,mm
+    QString toFractionString() const;
 
     // If HoursAndMinutes will be > 23:59 time will be invalid
     Time toTime() const;

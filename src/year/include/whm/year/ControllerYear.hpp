@@ -33,7 +33,7 @@ class ControllerYear : public QObject {
     Q_PROPERTY(
         QVector<QObject *> controllerMonths READ controllerMonths CONSTANT)
     Q_PROPERTY(
-        QObject *controllerSettinsYear READ controllerSettinsYear CONSTANT)
+        QObject *controllerSettingsYear READ controllerSettingsYear CONSTANT)
     Q_PROPERTY(int year READ year CONSTANT)
     Q_PROPERTY(QString overtime READ overtimeAsString NOTIFY overtimeChanged)
     Q_PROPERTY(QString usedFlextimeDays READ usedFlextimeDaysAsString()
@@ -53,7 +53,7 @@ public:
     ~ControllerYear() = default;
 
     QVector<QObject *> controllerMonths() const;
-    QObject *controllerSettinsYear() const;
+    QObject *controllerSettingsYear() const;
     int year() const;
     QString overtimeAsString() const;
     QString usedFlextimeDaysAsString() const;
@@ -68,6 +68,9 @@ signals:
     void overtimeChanged();
     void usedFlextimeDaysChanged();
     void usedVacationDaysChanged();
+
+public slots:
+    void onShowMinutesAsFractionsChanged(bool minutesAsFractions);
 
 private slots:
     void onOvertimeOfMonthChanged();
@@ -91,6 +94,8 @@ private:
     HoursAndMinutes m_overtime;
     double m_usedFlextimeDays;
     double m_usedVacationDays;
+
+    bool m_showMinutesAsFractions{false};
 };
 } // namespace whm
 

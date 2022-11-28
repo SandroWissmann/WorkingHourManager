@@ -16,46 +16,36 @@
  *
  * Web-Site: https://github.com/SandroWissmann/WorkingHourManager
  */
-#ifndef WORKING_HOUR_MANAGER_FILE_READER_HPP
-#define WORKING_HOUR_MANAGER_FILE_READER_HPP
+#ifndef WORKING_HOUR_MANAGER_CONTROLLER_SETTINGS_HPP
+#define WORKING_HOUR_MANAGER_CONTROLLER_SETTINGS_HPP
 
-#include <whm/settings/Settings.hpp>
+#include "Settings.hpp"
 
-#include <QJsonDocument>
 #include <QObject>
-#include <QString>
-#include <QVector>
-
-#include <array>
 
 namespace whm {
 
-class Day;
-class SettingsYear;
-
-class FileReader {
+class ControllerSettings : public QObject {
+    Q_OBJECT
+    Q_PROPERTY(bool showMinutesAsFraction READ showMinutesAsFraction WRITE
+                   setShowMinutesAsFraction NOTIFY showMinutesAsFractionChanged)
 public:
-    FileReader(const QString &filename);
+    ControllerSettings(const Settings &settings, QObject *parent = nullptr);
 
-    FileReader(const FileReader &) = delete;
-    FileReader(FileReader &&) = delete;
-    FileReader &operator=(const FileReader &) = delete;
-    FileReader &operator=(FileReader &&) = delete;
+    ControllerSettings(const ControllerSettings &) = delete;
+    ControllerSettings(ControllerSettings &&) = delete;
+    ControllerSettings &operator=(const ControllerSettings &) = delete;
+    ControllerSettings &operator=(ControllerSettings &&) = delete;
 
-    ~FileReader() = default;
-
-    bool isValidFile() const;
-
-    QVector<std::shared_ptr<Day>> days() const;
-
-    std::map<int, SettingsYear> yearsToSettingsYears() const;
+    bool showMinutesAsFraction() const;
+    void setShowMinutesAsFraction(bool showMinutesAsFraction);
 
     Settings settings() const;
 
+signals:
+    void showMinutesAsFractionChanged(bool showMinutesAsFraction);
+
 private:
-    QJsonDocument m_jsonDocument;
-    QVector<std::shared_ptr<Day>> m_days;
-    std::map<int, SettingsYear> m_yearsToSettingsYears;
     Settings m_settings;
 };
 

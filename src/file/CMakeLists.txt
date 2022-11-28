@@ -12,5 +12,6 @@ target_link_libraries(whm-file
     PRIVATE
     Qt6::Core
     whm-day
+    whm-settings
     whm-types
     whm-year)

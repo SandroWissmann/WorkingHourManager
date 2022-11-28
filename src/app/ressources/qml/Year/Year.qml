@@ -38,7 +38,7 @@ Page {
                                      })
             } else {
                 loaderPage.setSource("Year/SettingsYear.qml", {
-                                         "controller": root.controller.controllerSettinsYear
+                                         "controller": root.controller.controllerSettingsYear
                                      })
             }
         }
@@ -55,8 +55,8 @@ Page {
     }
 
     onControllerChanged: {
-        var indexTabSettings = tabBarMonth.contentData.length
-        tabBarMonth.removeItem(indexTabSettings)
+        var indexTabSettingsYear = tabBarMonth.contentData.length
+        tabBarMonth.removeItem(indexTabSettingsYear)
         for (var i = tabBarMonth.contentData.length - 1; i >= 0; i--) {
             var object = tabBarMonth.contentData[i]
             tabBarMonth.removeItem(object)
@@ -69,10 +69,10 @@ Page {
                                                            })
             tabBarMonth.addItem(tabMonth)
         }
-        var tabSettings = componentTabButton.createObject(tabBarMonth, {
-                                                              "text": qsTr("Settings")
-                                                          })
-        tabBarMonth.addItem(tabSettings)
+        var tabSettingsYear = componentTabButton.createObject(tabBarMonth, {
+                                                                  "text": qsTr("Settings")
+                                                              })
+        tabBarMonth.addItem(tabSettingsYear)
 
         // This hack is necessary because of bug in tab bar.
         // After we create the tab  we expect to have here:

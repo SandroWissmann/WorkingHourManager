@@ -55,6 +55,10 @@ std::map<int, SettingsYear> extractYearsToSettingsYears(
     const QJsonDocument &jsonDocument,
     const QVector<std::shared_ptr<Day>> &days);
 
+Settings extractSettings(const QJsonDocument &jsonDocument);
+
+bool extractShowMinutesAsFraction(const QJsonObject &jsonObject);
+
 QVector<int> extractYears(const QVector<std::shared_ptr<Day>> &days);
 
 std::optional<std::array<Time, 5>>
@@ -79,7 +83,8 @@ FileReader::FileReader(const QString &filename)
     : m_jsonDocument{extractJsonDocumentFromFile(filename)},
       m_days{extractDays(m_jsonDocument)},
       m_yearsToSettingsYears{
-          extractYearsToSettingsYears(m_jsonDocument, m_days)}
+          extractYearsToSettingsYears(m_jsonDocument, m_days)},
+      m_settings{extractSettings(m_jsonDocument)}
 {
 }
 
@@ -92,9 +97,15 @@ QVector<std::shared_ptr<Day>> FileReader::days() const
 {
     return m_days;
 }
+
 std::map<int, SettingsYear> FileReader::yearsToSettingsYears() const
 {
     return m_yearsToSettingsYears;
+}
+
+Settings FileReader::settings() const
+{
+    return m_settings;
 }
 
 namespace {
@@ -294,6 +305,34 @@ std::map<int, SettingsYear> extractYearsToSettingsYears(
         yearToSettingsYear.insert({years[i], settingsYear});
     }
     return yearToSettingsYear;
+}
+
+Settings extractSettings(const QJsonDocument &jsonDocument)
+{
+    if (jsonDocument.isNull()) {
+        return Settings{};
+    }
+
+    auto jsonObject = jsonDocument.object();
+    QString key{"settings"};
+    if (!jsonObject.contains(key)) {
+        return Settings{};
+    }
+    auto settingsObject = jsonObject[key].toObject();
+
+    auto showMinutesAsFraction = extractShowMinutesAsFraction(settingsObject);
+
+    Settings settings{showMinutesAsFraction};
+    return settings;
+}
+
+bool extractShowMinutesAsFraction(const QJsonObject &jsonObject)
+{
+    QString key{"showMinutesAsFraction"};
+    if (!jsonObject.contains(key)) {
+        return false;
+    }
+    return jsonObject[key].toBool();
 }
 
 QVector<int> extractYears(const QVector<std::shared_ptr<Day>> &days)

@@ -35,10 +35,11 @@ class Day;
 
 class ControllerWeek : public QObject {
     Q_OBJECT
-    Q_PROPERTY(QString expectedWorkedTime READ expectedWorkedTime CONSTANT)
-    Q_PROPERTY(QString workTime READ workTime NOTIFY workTimeChanged)
-    Q_PROPERTY(QString overtime READ overtime NOTIFY overtimeChanged)
-    Q_PROPERTY(QString earliestEndTime READ earliestEndTime NOTIFY
+    Q_PROPERTY(
+        QString expectedWorkedTime READ expectedWorkedTimeAsString CONSTANT)
+    Q_PROPERTY(QString workTime READ workTimeAsString NOTIFY workTimeChanged)
+    Q_PROPERTY(QString overtime READ overtimeAsString NOTIFY overtimeChanged)
+    Q_PROPERTY(QString earliestEndTime READ earliestEndTimeAsString NOTIFY
                    earliestEndTimeChanged)
 
     Q_PROPERTY(QVector<QObject *> controllerDays READ controllerDays CONSTANT)
@@ -54,10 +55,10 @@ public:
 
     QVector<QObject *> controllerDays() const;
 
-    QString expectedWorkedTime() const;
-    QString workTime() const;
-    QString overtime() const;
-    QString earliestEndTime() const;
+    QString expectedWorkedTimeAsString() const;
+    QString workTimeAsString() const;
+    QString overtimeAsString() const;
+    QString earliestEndTimeAsString() const;
 
     // If week is in two months we can access here the split worktime for the
     // days in each month
@@ -80,6 +81,8 @@ public:
     QVector<int> years() const;
 
     QVector<std::shared_ptr<Day>> days() const;
+
+    void setShowMinutesAsFractions(bool showMinutesAsFractions);
 
 signals:
     void workTimeChanged();
@@ -105,6 +108,8 @@ private:
     HoursAndMinutes m_workTime{};
     HoursAndMinutes m_overtime;
     Time m_earliestEndTime{};
+
+    bool m_showMinutesAsFractions{false};
 };
 
 } // namespace whm

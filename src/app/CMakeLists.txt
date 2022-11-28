@@ -26,6 +26,7 @@ qt_add_qml_module(appWorkingHourManager
     ressources/qml/Main.qml
     ressources/qml/Main/PopupEnterStartYear.qml
     ressources/qml/Main/Years.qml
+    ressources/qml/Main/Years/Settings.qml
 )
 
 target_compile_definitions(appWorkingHourManager
@@ -37,6 +38,7 @@ target_link_libraries(appWorkingHourManager
     whm-day
     whm-file
     whm-month
+    whm-settings
     whm-types
     whm-week
     whm-year)

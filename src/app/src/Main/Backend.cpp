@@ -24,6 +24,7 @@
 #include <whm/file/FileReader.hpp>
 #include <whm/file/FileWriter.hpp>
 #include <whm/month/ControllerMonth.hpp>
+#include <whm/settings/ControllerSettings.hpp>
 #include <whm/types/Date.hpp>
 #include <whm/week/ControllerWeek.hpp>
 #include <whm/year/ControllerSettingsYear.hpp>
@@ -37,6 +38,20 @@
 namespace whm {
 
 namespace {
+
+constexpr const char *filenameSettings{"save.json"};
+
+QObject *makeControllerSettings(QObject *parent)
+{
+    FileReader fileReader{filenameSettings};
+
+    if (!fileReader.isValidFile()) {
+        return new ControllerSettings{Settings{}, parent};
+    }
+
+    auto settings = fileReader.settings();
+    return new ControllerSettings{settings, parent};
+}
 
 QVector<QObject *> makeDefaultControllerYears(int year)
 {
@@ -63,13 +78,19 @@ QVector<QObject *> makeDefaultControllerYears(int year)
 
 } // namespace
 
-Backend::Backend(QObject *parent) : QObject{parent}
+Backend::Backend(QObject *parent)
+    : QObject{parent}, m_controllerSettings{makeControllerSettings(parent)}
 {
 }
 
 QVector<QObject *> Backend::controllerYears() const
 {
     return m_controllerYears;
+}
+
+QObject *Backend::controllerSettings() const
+{
+    return m_controllerSettings;
 }
 
 int Backend::currentYear() const
@@ -80,7 +101,7 @@ int Backend::currentYear() const
 
 bool Backend::readControllerYearsFromFile()
 {
-    FileReader fileReader{"save.json"};
+    FileReader fileReader{filenameSettings};
 
     if (!fileReader.isValidFile()) {
         return false;
@@ -136,7 +157,11 @@ void Backend::saveToFile()
     auto days = getDays(m_controllerYears);
     auto settingsYears = getSettingsYears(m_controllerYears);
 
-    auto writeOk = fileWriter.writeToFile(days, settingsYears);
+    auto controllerSettings =
+        qobject_cast<ControllerSettings *>(m_controllerSettings);
+    auto settings = controllerSettings->settings();
+
+    auto writeOk = fileWriter.writeToFile(days, settingsYears, settings);
 
     if (!writeOk) {
         qWarning() << Q_FUNC_INFO << "Save to file failed.";
@@ -158,6 +183,24 @@ void Backend::setControllerYears(const QVector<QObject *> &controllerYears)
         controllerYears->setParent(this);
     }
     emit controllerYearsChanged();
+
+    auto controllerSettings =
+        qobject_cast<ControllerSettings *>(m_controllerSettings);
+    auto settings = controllerSettings->settings();
+    auto showMinutesAsFractions = settings.showMinutesAsFraction();
+
+    for (auto &controllerYearAsQObject : controllerYears) {
+        auto controllerYear =
+            qobject_cast<ControllerYear *>(controllerYearAsQObject);
+
+        controllerYear->onShowMinutesAsFractionsChanged(showMinutesAsFractions);
+
+        connect(
+            controllerSettings,
+            &ControllerSettings::showMinutesAsFractionChanged,
+            controllerYear,
+            &ControllerYear::onShowMinutesAsFractionsChanged);
+    }
 }
 
 } // namespace whm

@@ -94,7 +94,7 @@ QVector<QObject *> ControllerYear::controllerMonths() const
     return m_controllerMonths;
 }
 
-QObject *ControllerYear::controllerSettinsYear() const
+QObject *ControllerYear::controllerSettingsYear() const
 {
     return m_controllerSettingsYear;
 }
@@ -111,6 +111,9 @@ int ControllerYear::year() const
 
 QString ControllerYear::overtimeAsString() const
 {
+    if (m_showMinutesAsFractions) {
+        return m_overtime.toFractionString();
+    }
     return m_overtime.toString();
 }
 
@@ -167,6 +170,23 @@ QVector<std::shared_ptr<Day>> ControllerYear::days() const
         days.append(daysInMonth);
     }
     return days;
+}
+
+void ControllerYear::onShowMinutesAsFractionsChanged(
+    bool showMinutesAsFractions)
+{
+    if (m_showMinutesAsFractions == showMinutesAsFractions) {
+        return;
+    }
+    m_showMinutesAsFractions = showMinutesAsFractions;
+
+    for (auto &controllerMonthAsQObject : m_controllerMonths) {
+        auto controllerMonth =
+            qobject_cast<ControllerMonth *>(controllerMonthAsQObject);
+        controllerMonth->setShowMinutesAsFractions(showMinutesAsFractions);
+    }
+
+    emit overtimeChanged();
 }
 
 void ControllerYear::onOvertimeOfMonthChanged()

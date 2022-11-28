@@ -170,6 +170,9 @@ Time ControllerDay::pauseTime() const
 
 QString ControllerDay::pauseTimeAsString() const
 {
+    if (m_showMinutesAsFractions) {
+        return pauseTime().asFractionString();
+    }
     return pauseTime().asString();
 }
 
@@ -185,6 +188,9 @@ HoursAndMinutes ControllerDay::overtime() const
 
 QString ControllerDay::overtimeAsString() const
 {
+    if (m_showMinutesAsFractions) {
+        return overtime().toFractionString();
+    }
     return overtime().toString();
 }
 
@@ -195,6 +201,9 @@ bool ControllerDay::timeInputIsEnabled() const
 
 QString ControllerDay::workTimeAsString() const
 {
+    if (m_showMinutesAsFractions) {
+        return workTime().asFractionString();
+    }
     return workTime().asString();
 }
 
@@ -247,6 +256,18 @@ void ControllerDay::setState(ControllerDayState *state)
 {
     m_state = state;
     m_state->calculate(this);
+}
+
+void ControllerDay::setShowMinutesAsFractions(bool showMinutesAsFractions)
+{
+    if (m_showMinutesAsFractions == showMinutesAsFractions) {
+        return;
+    }
+    m_showMinutesAsFractions = showMinutesAsFractions;
+
+    emit pauseTimeChanged();
+    emit workTimeChanged();
+    emit overtimeChanged();
 }
 
 void ControllerDay::onDefaultWorkTimeChanged(const whm::Time &defaultWorkTime)

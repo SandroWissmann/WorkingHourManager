@@ -115,6 +115,8 @@ public:
 
     void setState(ControllerDayState *state);
 
+    void setShowMinutesAsFractions(bool showMinutesAsFractions);
+
     // TODO These functions should be only used by ControllerDayState and
     // derrived classes but we dont want to use private + friend here because
     // then we need to include all state classes here. Is there a better way?
@@ -160,6 +162,8 @@ private:
     bool m_timeInputIsEnabled{};
 
     ControllerDayState *m_state{nullptr};
+
+    bool m_showMinutesAsFractions{false};
 };
 
 } // namespace whm

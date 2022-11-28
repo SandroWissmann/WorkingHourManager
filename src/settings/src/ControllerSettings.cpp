@@ -16,42 +16,32 @@
  *
  * Web-Site: https://github.com/SandroWissmann/WorkingHourManager
  */
-#ifndef WORKING_HOUR_MANAGER_FILE_WRITER_HPP
-#define WORKING_HOUR_MANAGER_FILE_WRITER_HPP
-
-#include <whm/settings/Settings.hpp>
-
-#include <QObject>
-#include <QString>
-
-#include <array>
-#include <memory>
+#include "../include/whm/settings/ControllerSettings.hpp"
 
 namespace whm {
+ControllerSettings::ControllerSettings(
+    const Settings &settings,
+    QObject *parent)
+    : QObject{parent}, m_settings{settings}
+{
+}
 
-class Day;
-class SettingsYear;
+bool ControllerSettings::showMinutesAsFraction() const
+{
+    return m_settings.showMinutesAsFraction();
+}
 
-class FileWriter {
-public:
-    FileWriter(const QString &filename);
+void ControllerSettings::setShowMinutesAsFraction(bool showMinutesAsFraction)
+{
+    if (!m_settings.setShowMinutesAsFraction(showMinutesAsFraction)) {
+        return;
+    }
+    emit showMinutesAsFractionChanged(showMinutesAsFraction);
+}
 
-    FileWriter(const FileWriter &) = delete;
-    FileWriter(FileWriter &&) = delete;
-    FileWriter &operator=(const FileWriter &) = delete;
-    FileWriter &operator=(FileWriter &&) = delete;
-
-    ~FileWriter() = default;
-
-    bool writeToFile(
-        const QVector<std::shared_ptr<Day>> &days,
-        const QVector<SettingsYear> &settingsYears,
-        const Settings &settings);
-
-private:
-    QString m_filename;
-};
+Settings ControllerSettings::settings() const
+{
+    return m_settings;
+}
 
 } // namespace whm
-
-#endif

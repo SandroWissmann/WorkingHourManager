@@ -65,6 +65,8 @@ public:
     int month() const;
     int year() const;
 
+    void setShowMinutesAsFractions(bool showMinutesAsFractions);
+
 signals:
     void workTimeChanged();
     void overtimeChanged();
@@ -91,6 +93,8 @@ private:
     HoursAndMinutes m_overtime;
     double m_usedFlextimeDays;
     double m_usedVacationDays;
+
+    bool m_showMinutesAsFractions{false};
 };
 } // namespace whm
 

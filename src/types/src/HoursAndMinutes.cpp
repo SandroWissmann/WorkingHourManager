@@ -34,6 +34,25 @@ QString minutesAsString(int minutes)
     return QStringLiteral("%1").arg(minutes, 2, 10, QLatin1Char('0'));
 }
 
+QString asString(int hours, int minutes)
+{
+    auto hourString = hoursAsString(hours);
+    auto minuteString = minutesAsString(minutes);
+    QString resultString{hourString + ":" + minuteString};
+    resultString.remove('-');
+    if (minutes < 0 || hours < 0) {
+        resultString.push_front('-');
+    }
+    return resultString;
+}
+
+QString asFractionString(int hours, int minutes)
+{
+    double fractionMinutes = minutes / 60.0;
+    double fractionTime = hours + fractionMinutes;
+    return QString::number(fractionTime, 'f', 2);
+}
+
 } // namespace
 
 HoursAndMinutes::HoursAndMinutes(int hours, int minutes)
@@ -53,14 +72,12 @@ HoursAndMinutes::HoursAndMinutes(const Time &time)
 
 QString HoursAndMinutes::toString() const
 {
-    auto hourString = hoursAsString(m_hours);
-    auto minuteString = minutesAsString(m_minutes);
-    QString resultString{hourString + ":" + minuteString};
-    resultString.remove('-');
-    if (m_minutes < 0 || m_hours < 0) {
-        resultString.push_front('-');
-    }
-    return resultString;
+    return asString(m_hours, m_minutes);
+}
+
+QString HoursAndMinutes::toFractionString() const
+{
+    return asFractionString(m_hours, m_minutes);
 }
 
 Time HoursAndMinutes::toTime() const

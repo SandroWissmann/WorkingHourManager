@@ -31,6 +31,15 @@ QString timeToString(const QTime &time)
     return time.toString("h:mm");
 }
 
+QString timeToFractionString(const QTime &time)
+{
+    double hours = time.hour();
+    double fractionMinutes = time.minute() / 60.0;
+    double fractionTime = hours + fractionMinutes;
+
+    return QString::number(fractionTime, 'f', 2);
+}
+
 QTime minutesToTime(int minutes)
 {
     auto hours = minutes / 60;
@@ -69,6 +78,11 @@ int Time::minute() const
 QString Time::asString() const
 {
     return timeToString(m_time);
+}
+
+QString Time::asFractionString() const
+{
+    return timeToFractionString(m_time);
 }
 
 bool Time::set(const QString &timeAsString)

@@ -40,7 +40,11 @@ public:
 
     int minute() const;
 
+    // Format 00:00
     QString asString() const;
+
+    // Format 00,00
+    QString asFractionString() const;
 
     bool set(const QString &timeAsString);
 

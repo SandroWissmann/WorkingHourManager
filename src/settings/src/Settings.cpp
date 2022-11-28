@@ -16,42 +16,25 @@
  *
  * Web-Site: https://github.com/SandroWissmann/WorkingHourManager
  */
-#ifndef WORKING_HOUR_MANAGER_FILE_WRITER_HPP
-#define WORKING_HOUR_MANAGER_FILE_WRITER_HPP
-
-#include <whm/settings/Settings.hpp>
-
-#include <QObject>
-#include <QString>
-
-#include <array>
-#include <memory>
+#include "../include/whm/settings/Settings.hpp"
 
 namespace whm {
+Settings::Settings(bool showMinutesAsFraction)
+    : m_showMinutesAsFraction{showMinutesAsFraction}
+{
+}
 
-class Day;
-class SettingsYear;
+bool Settings::showMinutesAsFraction() const
+{
+    return m_showMinutesAsFraction;
+}
 
-class FileWriter {
-public:
-    FileWriter(const QString &filename);
-
-    FileWriter(const FileWriter &) = delete;
-    FileWriter(FileWriter &&) = delete;
-    FileWriter &operator=(const FileWriter &) = delete;
-    FileWriter &operator=(FileWriter &&) = delete;
-
-    ~FileWriter() = default;
-
-    bool writeToFile(
-        const QVector<std::shared_ptr<Day>> &days,
-        const QVector<SettingsYear> &settingsYears,
-        const Settings &settings);
-
-private:
-    QString m_filename;
-};
-
+bool Settings::setShowMinutesAsFraction(bool showMinutesAsFraction)
+{
+    if (m_showMinutesAsFraction == showMinutesAsFraction) {
+        return false;
+    }
+    m_showMinutesAsFraction = showMinutesAsFraction;
+    return true;
+}
 } // namespace whm
-
-#endif

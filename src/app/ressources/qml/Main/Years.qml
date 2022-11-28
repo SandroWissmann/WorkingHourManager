@@ -30,11 +30,23 @@ Page {
 
     header: TabBar {
         id: tabBarYear
+
+        onCurrentIndexChanged: {
+            if (currentIndex < tabBarYear.contentData.length - 1) {
+                loaderPage.setSource("../Year/Year.qml", {
+                                         "controller": root.controller.controllerYears[tabBarYear.currentIndex]
+                                     })
+            } else {
+                loaderPage.setSource("Years/Settings.qml", {
+                                         "controller": root.controller.controllerSettings
+                                     })
+            }
+        }
     }
 
-    Year {
+    Loader {
+        id: loaderPage
         anchors.fill: parent
-        controller: root.controller.controllerYears[tabBarYear.currentIndex]
     }
 
     Component {
@@ -42,7 +54,7 @@ Page {
         TabButton {}
     }
 
-    Component.onCompleted: {
+    onControllerChanged: {
         for (var i = 0; i < root.controller.controllerYears.length; i++) {
             var year = root.controller.controllerYears[i].year
             var tabYear = componentTabButton.createObject(tabBarYear, {
@@ -50,5 +62,18 @@ Page {
                                                           })
             tabBarYear.addItem(tabYear)
         }
+        var tabSettings = componentTabButton.createObject(tabBarYear, {
+                                                              "text": qsTr("Settings")
+                                                          })
+        tabBarYear.addItem(tabSettings)
+        // This hack is necessary because of bug in tab bar.
+        // After we create the tab  we expect to have here:
+        // tabBarMonth.contentData.length == (years + settings)
+        // but for some reason we have
+        // tabBarYear.contentData.length == 1
+        // this gets fixed the first time we click on a new tab.
+        // so we hit here very dirty 1 and go back to 0.
+        tabBarYear.setCurrentIndex(1)
+        tabBarYear.setCurrentIndex(0)
     }
 }

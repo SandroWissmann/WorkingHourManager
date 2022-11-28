@@ -41,14 +41,14 @@ Item {
             Layout.preferredWidth: rowLayout.elementWidth
             text: qsTr("Flextime days: %1/%2").arg(
                       root.controller.usedFlextimeDays).arg(
-                      root.controller.controllerSettinsYear.flextimeDays)
+                      root.controller.controllerSettingsYear.flextimeDays)
             font.bold: true
         }
         Text {
             Layout.preferredWidth: rowLayout.elementWidth
             text: qsTr("Vacation days: %1/%2").arg(
                       root.controller.usedVacationDays).arg(
-                      root.controller.controllerSettinsYear.vacationDays)
+                      root.controller.controllerSettingsYear.vacationDays)
             font.bold: true
         }
     }

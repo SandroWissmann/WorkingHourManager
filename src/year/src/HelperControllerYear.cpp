@@ -473,7 +473,7 @@ getSettingsYears(const QVector<QObject *> &controllerYears)
             qobject_cast<ControllerYear *>(controllerYearAsQObject);
 
         auto controllerSettinsYearAsQObject =
-            controllerYear->controllerSettinsYear();
+            controllerYear->controllerSettingsYear();
         auto controllerSetingsYear = qobject_cast<ControllerSettingsYear *>(
             controllerSettinsYearAsQObject);
         auto settingsYear = controllerSetingsYear->settingsYear();

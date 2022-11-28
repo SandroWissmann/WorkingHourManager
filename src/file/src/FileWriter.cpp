@@ -34,7 +34,8 @@ namespace {
 
 QJsonObject makeApplicationDataJsonObject(
     const QVector<std::shared_ptr<Day>> &days,
-    const QVector<SettingsYear> &settingsYears);
+    const QVector<SettingsYear> &settingsYears,
+    const Settings &settings);
 
 QJsonArray makeJsonArray(const QVector<std::shared_ptr<Day>> &days);
 
@@ -54,7 +55,8 @@ FileWriter::FileWriter(const QString &filename) : m_filename{filename}
 
 bool FileWriter::writeToFile(
     const QVector<std::shared_ptr<Day>> &days,
-    const QVector<SettingsYear> &settingsYears)
+    const QVector<SettingsYear> &settingsYears,
+    const Settings &settings)
 {
     QFile saveFile{m_filename};
 
@@ -63,7 +65,8 @@ bool FileWriter::writeToFile(
         return false;
     }
 
-    auto jsonObject = makeApplicationDataJsonObject(days, settingsYears);
+    auto jsonObject =
+        makeApplicationDataJsonObject(days, settingsYears, settings);
 
     saveFile.write(QJsonDocument(jsonObject).toJson());
     return true;
@@ -73,11 +76,15 @@ namespace {
 
 QJsonObject makeApplicationDataJsonObject(
     const QVector<std::shared_ptr<Day>> &days,
-    const QVector<SettingsYear> &settingsYears)
+    const QVector<SettingsYear> &settingsYears,
+    const Settings &settings)
 {
     QJsonObject jsonObject;
     jsonObject["days"] = makeJsonArray(days);
     jsonObject["settingsYears"] = makeJsonArray(settingsYears);
+    jsonObject["settings"] = QJsonObject{
+        {"showMinutesAsFraction", settings.showMinutesAsFraction()}};
+
     return jsonObject;
 }
 

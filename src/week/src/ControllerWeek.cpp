@@ -62,36 +62,35 @@ QVector<QObject *> ControllerWeek::controllerDays() const
     return m_controllerDays;
 }
 
-QVector<std::shared_ptr<Day>> ControllerWeek::days() const
+QString ControllerWeek::expectedWorkedTimeAsString() const
 {
-    QVector<std::shared_ptr<Day>> days;
-    days.reserve(m_controllerDays.size());
-    for (const auto &controllerDayAsQObject : m_controllerDays) {
-        auto controllerDay =
-            qobject_cast<ControllerDay *>(controllerDayAsQObject);
-        auto day = controllerDay->day();
-        days.emplace_back(day);
+    if (m_showMinutesAsFractions) {
+        return m_expectedWorkTime.toFractionString();
     }
-    return days;
-}
-
-QString ControllerWeek::expectedWorkedTime() const
-{
     return m_expectedWorkTime.toString();
 }
 
-QString ControllerWeek::workTime() const
+QString ControllerWeek::workTimeAsString() const
 {
+    if (m_showMinutesAsFractions) {
+        return m_workTime.toFractionString();
+    }
     return m_workTime.toString();
 }
 
-QString ControllerWeek::overtime() const
+QString ControllerWeek::overtimeAsString() const
 {
+    if (m_showMinutesAsFractions) {
+        return m_overtime.toFractionString();
+    }
     return m_overtime.toString();
 }
 
-QString ControllerWeek::earliestEndTime() const
+QString ControllerWeek::earliestEndTimeAsString() const
 {
+    if (m_showMinutesAsFractions) {
+        return m_earliestEndTime.asFractionString();
+    }
     return m_earliestEndTime.asString();
 }
 
@@ -264,6 +263,36 @@ QVector<int> ControllerWeek::years() const
         years.emplaceBack(year);
     }
     return years;
+}
+
+QVector<std::shared_ptr<Day>> ControllerWeek::days() const
+{
+    QVector<std::shared_ptr<Day>> days;
+    days.reserve(m_controllerDays.size());
+    for (const auto &controllerDayAsQObject : m_controllerDays) {
+        auto controllerDay =
+            qobject_cast<ControllerDay *>(controllerDayAsQObject);
+        auto day = controllerDay->day();
+        days.emplace_back(day);
+    }
+    return days;
+}
+
+void ControllerWeek::setShowMinutesAsFractions(bool showMinutesAsFractions)
+{
+    if (m_showMinutesAsFractions == showMinutesAsFractions) {
+        return;
+    }
+    m_showMinutesAsFractions = showMinutesAsFractions;
+
+    for (auto &controllerDayAsQObject : m_controllerDays) {
+        auto controllerDay =
+            qobject_cast<ControllerDay *>(controllerDayAsQObject);
+
+        controllerDay->setShowMinutesAsFractions(showMinutesAsFractions);
+    }
+    emit workTimeChanged();
+    emit overtimeChanged();
 }
 
 void ControllerWeek::onWorkTimeOfDayChanged()
