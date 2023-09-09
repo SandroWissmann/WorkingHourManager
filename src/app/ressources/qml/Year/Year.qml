@@ -56,7 +56,7 @@ Page {
 
     onControllerChanged: {
         var indexTabSettingsYear = tabBarMonth.contentData.length
-        tabBarMonth.removeItem(indexTabSettingsYear)
+        tabBarMonth.takeItem(indexTabSettingsYear)
         for (var i = tabBarMonth.contentData.length - 1; i >= 0; i--) {
             var object = tabBarMonth.contentData[i]
             tabBarMonth.removeItem(object)

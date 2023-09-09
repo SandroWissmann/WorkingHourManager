@@ -44,7 +44,7 @@ This was also used as a toy project to try out latest QT6/QML feature.
 
 ## Dependencies
 
-- QT >= 6.2 
+- QT >= 6.5 
   - You can download QT [here](https://www.qt.io/download). 
 - IDE: QT Creator (Done with CMake so other ides should work too)
 - Only tested under Manjaro but should work cross platform
